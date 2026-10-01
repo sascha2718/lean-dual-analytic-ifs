@@ -7,26 +7,39 @@ numbers refer to the current compiled version: Definition 1.2 (`def:SESC`), Theo
 (`thm:SubConjugation`), Section 2 (dual IFS), Section 3 (proof of 1.5), Section 4 (proof of 1.4),
 Section 5 (conjugation).
 
-Status: every statement of the paper without an open issue (Section 3) is formalised, with no
-`sorry` and only the axioms `propext`, `Classical.choice` and `Quot.sound`:
+Status: every statement of the paper is formalised except Rapaport's Theorem 1.6, Corollary 1.7
+and Lemma 2.7 (not needed by the Lean route), with no `sorry` and only the axioms `propext`,
+`Classical.choice` and `Quot.sound`:
 
 | Paper | Lean |
 |---|---|
 | ESC, Definition 1.2 (SESC and weak super-exponential condensation), exact overlaps | `IFS.ESC`, `IFS.SESC`, `IFS.not_sesc_iff`, `IFS.HasExactOverlaps` |
+| Theorem 1.4 | `Challenge.audit_sesc_open_dense` (audited), `theorem_1_4` |
 | Theorem 1.5 | `Challenge.audit_sesc_of_dualProj` (audited), `IFS.theorem_1_5` |
 | Proposition 1.8 and the example of Section 1.2.2 | `Challenge.audit_example_criterion`, `Challenge.audit_example_sesc` (audited), `IFS.proposition_1_8`, `example_sesc` |
 | Lemma 2.1 | `IFS.existsUnique_isDualAttractor` |
 | Theorem 2.2 | `IFS.theorem_2_2` |
 | Lemma 2.4 | `IFS.dualProj_mem_analyticSpace`, `IFS.exists_dualProj_holder`, `IFS.isDualAttractor_range` |
-| Lemma 2.6 and (2.6) | `IFS.lemma_2_6`, `IFS.exists_dualProj_sub_le_d2` |
+| Lemma 2.5 | `IFS.lemma_2_5`, `IFS.dualSSC_iff_exists_delta`, `IFS.dualSSC_iff_ne` |
+| Lemma 2.6 and (2.6) | `IFS.lemma_2_6`, `IFS.lemma_2_6_union`, `IFS.exists_dualProj_sub_le_d2` |
 | Lemma 2.8, Corollary 2.9, Lemma 2.10 | `IFS.lemma_2_8`, `IFS.corollary_2_9`, `IFS.lemma_2_10` |
 | Lemma 3.1 | `lemma_3_1` |
-| Lemma 4.1 and (4.3) | `IFS.lemma_4_1`, `gaussian_bound` |
+| Lemma 3.2 | `IFS.condensation_dichotomy` |
+| Lemma 4.1 | `InClass.of_deriv`, `InClass.mono`, `lemma_4_1`, `exists_inClass` |
+| Lemma 4.2 | `IFS.lemma_4_2` |
+| Lemma 4.3 and (4.3) | `IFS.lemma_4_3`, `gaussian_bound` |
+| Proposition 4.4 | `proposition_4_4` |
+| The density step of Section 4.2 | `IFS.exists_dualSSC_near` |
 | Lemma 5.1, (5.1), (5.2) | `lemma_5_1`, `existsUnique_fixedPoint`, `hatH`, `koenigs` |
+| Definition 1.9 and Theorem 1.12 | `IsAnalyticCoord`, `ConjSelfSimilar`, `IFS.SubConjSelfSimilar`; `Challenge.audit_conj_similarity`, `Challenge.audit_conj_iff`, `Challenge.audit_subconj_iff` (audited), `IFS.theorem_1_12_similarity`, `IFS.theorem_1_12` |
+| Theorem 2.3 | `IFS.theorem_2_3_conj`, `IFS.theorem_2_3_subconj` |
 
 The manuscript now corrects the statements of Proposition 1.8, Theorem 2.3 and Lemma 5.1 and the
-proofs affected by issues I6 and I8 to I14. Theorems 1.12 and 2.3 wait for decision D3, Theorem 1.4
-and Proposition 4.2 for decision D1 and the fixes for issues I1 to I3, and Lemma 2.5 for issue I4.
+proofs affected by issues I5 to I14. Decision D1 is taken (the union class), and the manuscript
+now contains the fixes for issues I1 to I3, I16 and I17 in Section 4. Theorem 1.4 is proved in
+the union class; Lemma 4.2 uses affine target maps with disjoint images of `[0,1]`, and
+Proposition 4.4 an additive perturbation by Gaussian bumps with Cauchy estimates (constant
+`C = 8`).
 Lemma 5.1 is proved through the linearising map (5.2), constructed as a uniform limit on `B_ε`, so
 no primitive of `Ĥ_f` is needed. Lemma 2.7 is not needed
 by the Lean route. The proof of Theorem 1.5 uses the condensation dichotomy
@@ -42,7 +55,7 @@ Seven audited theorems, stated in `Challenge.lean` over Mathlib alone.
 | `audit_sesc_of_dualProj` | Thm 1.5 | Distinct dual projections of equal length imply SESC |
 | `audit_example_criterion` | Prop 1.8 | The explicit criterion `α > 2βc/(1-c)` implies the hypothesis of 1.5 and SESC |
 | `audit_example_sesc` | Prop 1.8, example | The system `x/8`, `x/8 + x²/32`, `x/16 + x²/32 + 29/32` lies in the class for some `ε > 0` and satisfies SESC |
-| `audit_sesc_open_dense` | Thm 1.4 | SESC systems contain a `d₂`-open, `d₂`-dense subset (ambient class: decision D1) |
+| `audit_sesc_open_dense` | Thm 1.4 | SESC systems contain a `d₂`-open, `d₂`-dense subset (the union class, decision D1) |
 | `audit_conj_similarity` | Thm 1.12, first claim | Every system is conjugated to one with a similarity map |
 | `audit_conj_iff` | Thm 1.12(a) | Conjugacy to a self-similar system iff all `H_i` agree on `[0,1]` |
 | `audit_subconj_iff` | Thm 1.12(b) | Sub-conjugacy iff `H_{i^∞} ≡ H_{j^∞}` for distinct `i, j` of equal length |
@@ -127,7 +140,7 @@ def exampleIFS : Fin 3 → ℂ → ℂ :=
 
 theorem audit_example_sesc : ∃ ε > 0, (∀ i, InClass ε (exampleIFS i)) ∧ SESC exampleIFS := sorry
 
--- Ambient class `C` per decision D1: `InClass ε` for the fixed `ε`, or `∃ ε > 0, InClass ε`.
+-- Ambient class `C` (decision D1): the union class, `C f := ∃ ε > 0, InClass ε f`.
 theorem audit_sesc_open_dense (N : ℕ) :
     ∃ U : Set (Fin N → ℂ → ℂ), (∀ Φ ∈ U, (∀ i, C (Φ i)) ∧ SESC Φ) ∧
       (∀ Φ ∈ U, ∃ r > 0, ∀ Ψ, (∀ i, C (Ψ i)) → d2 Φ Ψ < r → Ψ ∈ U) ∧
@@ -163,7 +176,10 @@ theorem audit_subconj_iff (hε : 0 < ε) (Φ : Fin N → ℂ → ℂ) (hΦ : ∀
 
 ## 2. Decisions for the authors
 
-**D1. Ambient class of Theorem 1.4 (blocking for Phase 5).** As written, the density step does
+**D1. Ambient class of Theorem 1.4.** *Decided: (a), the union class. The manuscript defines
+`S^ω(I) = ⋃_{ε>0} S^ω_ε(I)` and lets `𝔖_N` consist of IFSs of maps in `S^ω(I)`. The new Lemma 4.1
+shows that `S^ω_ε(I)` decreases in `ε` and that `S^ω(I)` consists of the maps that are complex
+analytic near `I` with `f(I) ⊆ I` and `0 < |f'| < 1` on `I`.* As written, the density step did
 not stay in `𝔖_N` for the fixed `ε` (issue I1). Options:
 (a) state 1.4 for the class `⋃_{ε>0} 𝔖_N(ε)`, that is analytic systems with no fixed complex
 neighbourhood; the paper's argument proves this after the fixes for I2 and I3;
@@ -178,7 +194,7 @@ Recommendation: (a), and correct the paper accordingly. Theorems 1.5 and 1.12 do
 `HasDerivAt.real_of_complex`. The alternative, a real map with an existential holomorphic
 extension, makes every statement carry the extension.
 
-**D3. Conjugacy.** Definition 1.9 asks for an analytic, invertible `g`. If invertibility only
+**D3. Conjugacy.** *Decided: the paper's notion, analytic and injective on `[0,1]`.* Definition 1.9 asks for an analytic, invertible `g`. If invertibility only
 means injectivity, `g'` may vanish and the step `|g'(p_i)| > 0` in the proof of 1.12(a) needs an
 argument (issue I5). Recommendation: keep the paper's notion (analytic and injective on `I`) in
 the challenge and prove in the library that `g' ≠ 0` on `I` when the attractor is not a
@@ -203,37 +219,62 @@ for the `lean/` directory, as for JA-ST. All three need the co-authors' agreemen
 
 Ordered by severity. Each affects either a statement or the route of the Lean proof.
 
-**I1. Proposition 4.2: the perturbation leaves the class.** The proposition asserts that, after
+**I1. Proposition 4.4: the perturbation leaves the class.** *Resolved in the manuscript by D1(a):
+the proposition is stated for `S^ω(I)`, and `g ∈ S^ω(I)` follows from Lemma 4.1 and the bounds on
+`[0,1]`.* The proposition asserts that, after
 shrinking the `η_i`, `g = f·exp(φψA)` satisfies (B) and (C) on `cl B_ε`. Off the real axis,
 `|exp(-(z-y_i)²/η_i)| = exp(((Im z)² - (Re z - y_i)²)/η_i)`, which near `z = y_i + iε` grows like
 `exp(ε²/η_i)`; shrinking `η_i` makes `g` larger on `cl B_ε`. A numerical check with
 `f(z) = z/2 + 1/4`, `Y = {1/2}`, `δ = 0.01`, `ε = 0.1` gives `max Re(φψA)` on `Im z = ε` of about
 `0.9` at `η = 10⁻³` and about `10³⁹` at `η = 10⁻⁴`, so `|g|` is astronomically large and
-`g(cl B_ε) ⊄ B_ε`. The real-line estimates are unaffected. Consequence: the density half of
+`g(cl B_ε) ⊄ B_ε`. The real-line estimates are unaffected. The statement itself fails for fixed
+`ε`, not only the construction: every map of `S^ω_ε` has `|f'| < 1` on `cl B_ε`, so the Cauchy
+estimates give `|f'''| ≤ 2/ε²` on `[0,1]`, and Lemma 3.1 applied to `f'` and `g'` gives
+`sup |g'' - f''| ≤ (2 + 2/ε²)·√ε'` when `sup |g' - f'| ≤ ε'`. This tends to `0` with `ε'`, while
+(iii) asks for `|g''(y) - f''(y)| ≥ δ|f'(y)|` with `δ` fixed. Consequence: the density half of
 Theorem 1.4 is not established for fixed `ε`. It does hold for the union class (D1(a)), where
 only conditions on `[0,1]` and analyticity on some neighbourhood are required.
 
-**I2. Proposition 4.2 assumes `f([0,1]) ⊂ (0,1)`.** The proof divides by `f(y_i)` and states the
+**I2. Proposition 4.4 assumes `f([0,1]) ⊂ (0,1)`.** *Resolved in the manuscript: the
+proposition assumes `f([0,1]) ⊆ (0,1)`, and Lemma 4.2 provides it by a small perturbation.* The
+proof divides by `f(y_i)` and states the
 constant `C` depends only on `f`; the class only gives `f(I) ⊆ I`, and the paper's own example has
 `f_1(0) = 0` and `f_3(1) = 1`. Then `a_i` is undefined at zeros of `f`, `C` is not uniform as
 points approach a zero, and `g(I) ⊆ I` can fail (for `f(1) = 1`, `g(1) > 1`). Fix: first
 replace `f_i` by `(1-t)f_i + t/2`, which stays in `𝔖_N(ε)` for fixed `ε` (as `B_ε` is convex),
 is `d₂`-close, and maps `I` into `(0,1)`.
 
-**I3. "We may assume that Φ has no exact overlaps."** No argument is given for removing exact
-overlaps by a small perturbation. Lemma 4.1 only needs `f_u ≢ f_v` on `[0,1]` for the finitely
+**I3. "We may assume that Φ has no exact overlaps."** *Resolved in the manuscript: Lemma 4.2
+perturbs `Φ` to `(1-t)f_i + t h_i` with affine `h_i(x) = ax + i/(N+2)`, `a` transcendental, and a
+generic small `t`, so that `g_u ≢ g_v` on `[0,1]` for all distinct finite words. Lemma 4.3 now
+assumes exactly this, which is implied by having no exact overlaps. A singleton attractor has
+exact overlaps; the Lean `IFS.lemma_4_3` assumes `IFS.NoCoincidence`.* No argument is given for removing exact
+overlaps by a small perturbation. Lemma 4.3 only needs `f_u ≢ f_v` on `[0,1]` for the finitely
 many distinct compositions of length at most `n`, so a lemma removing finitely many coincidences
 suffices. It still needs a written proof (for example, generic parameters in the family
 `(1-t)f_i + t c_i`).
 
-**I4. Lemma 2.5(d) and the proof of Theorem 2.2.** For a finite word, `H_i = F_i(0)` and `0` is
+**I16. Proof of Theorem 1.4: the bad-pair dichotomy.** *Resolved in the manuscript.* The proof
+claimed that for a bad pair either `(F_i k)(x) ∈ conv((F_j k)(x), (F_j K)(x))` or the same with `i`
+and `j` swapped. This fails when exactly one of the compositions reverses orientation. The proof
+now always perturbs the map `f_{i_1}` at a bad pair: the interval of `G_i` at `x` is the interval
+of `F_i` shifted by `τ` with `|τ| ≥ δ`, and two intersecting intervals of length `< δ/3` are
+separated by any such shift.
+
+**I17. Proof of Theorem 1.4: cylinders for the perturbed system.** *Resolved in the manuscript.*
+Lemma 2.5 (b) for `Ψ*` needs `G_i cl(k,K) ⊆ (k,K)`, which the proof did not check. The proof now
+fixes `K > M/(1-c')` with `c' = (1+c_max)/2` and `M = 1 + max sup |f_i''/f_i'|`, `k = -K`, and
+chooses `δ` so small that every `Ψ` within `(C+3)δ` has `|g_i'| ≤ c'` and `|g_i''/g_i'| ≤ M` on
+`[0,1]`. It also makes the bound `d₂(Φ,Ψ) < (C+3)δ` explicit.
+
+**I4. Lemma 2.5(d) and the proof of Theorem 2.2.** *Resolved in the manuscript: (d) is removed, and Theorems 1.5 and 2.2 follow from the new Lemma 3.2.* For a finite word, `H_i = F_i(0)` and `0` is
 not in `Λ*` in general, so (a) ⇒ (d) is not a consequence of the strong separation of `Λ*` for
 short words; the proof is left to the reader. Theorem 2.2 is deduced from 2.5 and 1.5, which
 needs `H_a ≢ H_b` for distinct finite words of equal length. The Lean route avoids (d): the
 condensation dichotomy of Section 5 yields either infinite words with equal `H` or an exact
 coincidence `f_a ≡ f_b`, and both contradict the separation of the dual.
 
-**I5. Theorem 1.12(a), forward direction.** The proof uses `|g'(p_i)| > 0`. For a merely
+**I5. Theorem 1.12(a), forward direction.** *Resolved in the manuscript.* The proof uses `|g'(p_i)| > 0`. For a merely
 injective analytic `g` this can fail: `g(x) = x³` conjugates `x/2` to `y/8` on `[0,1]`, with
 `f'(p) = 1/2 ≠ 1/8 = λ`. The identity `f'_i(p_i) = λ_i` then fails. With a non-singleton attractor
 one can show `g' ≠ 0`: the zero set of `g'` in `I` is finite and invariant under every `f_i`,
@@ -242,12 +283,17 @@ hence contains the attractor. See also D3.
 **I6. Lemma 5.1 needs `b ≠ 0`.** *Resolved in the manuscript.* For `b = 0` the solution of `g'' = Ĥ_f g'` with `g'(p) = 0` is
 constant, so not invertible.
 
-**I7. Theorem 1.12(b) via (a).** Part (a) is applied to the sub-system `(f_i, f_j)`, whose
+**I7. Theorem 1.12(b) via (a).** *Resolved in the manuscript.* Part (a) is applied to the sub-system `(f_i, f_j)`, whose
 attractor can be a singleton (in the example, `(f_1, f_2)` has the common fixed point `0`), while
 the proof of (a) uses a non-singleton attractor. The Lean route for (a) does not need it: if
 `g ∘ f_i = λ_i g + t_i` with `g' ≠ 0`, then `G = g''/g'` satisfies `G = f_i'·G∘f_i + f_i''/f_i'`,
 so `G` is the common fixed point of the dual operators on bounded functions on `[0,1]`, hence
 `H_w = G` for every infinite word `w`.
+
+**I15. Theorem 2.3 allows singleton attractors.** *Resolved in the manuscript.* Its proof cited
+Theorem 1.12, which assumes a non-singleton attractor. For a singleton attractor the maps share a
+fixed point, the conjugated similarities commute, and the linearising map of one map conjugates all
+of them, which shows that all `H_i` coincide.
 
 **I8. Proposition 1.8: `β > 0` needs `N ≥ 2`.** *Resolved in the manuscript.* For `N = 1` the hypothesis is vacuous and
 `f(x) = x/2` gives `β = 0`. The conclusion about `H` does not use `β > 0`.
@@ -383,11 +429,11 @@ unpublished sibling repositories.
 | 2 | Dual projection, regularity, analysis lemmas | L | |
 | 3 | Theorem 1.5, Proposition 1.8, example | L | Phases 1–2 |
 | 4 | Dual attractor and Theorem 2.2 | M | Phase 3 |
-| 5 | Theorem 1.4 | XL | D1, written fixes for I1–I3 |
+| 5 | Theorem 1.4 | XL | done |
 | 6 | Theorem 1.12, Theorem 2.3 | M | Phases 1–2, D3 |
 
 Sizes: S below 300 lines, M up to 1000, L up to 3000, XL beyond. Phase 5 is the largest and
-riskiest; the real-line estimates of Proposition 4.2 alone are long. Within a phase, modules can
+riskiest; the real-line estimates of Proposition 4.4 alone are long. Within a phase, modules can
 be assigned to separate agents once their interfaces (definitions and statements) are fixed.
 
 The first milestone is Phases 0 to 3 with three audited endpoints (`audit_sesc_of_dualProj`,

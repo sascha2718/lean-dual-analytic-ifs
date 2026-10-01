@@ -122,6 +122,11 @@ def attractor : Set ℝ := range Φ.natProj
 def HasExactOverlaps : Prop :=
   ∃ i j : List (Fin N), i ≠ j ∧ ∀ x ∈ Φ.attractor, Φ.comp i (x : ℂ) = Φ.comp j (x : ℂ)
 
+/-- Compositions along distinct finite words differ somewhere on `[0,1]`: `f_i ≢ f_j` on `[0,1]`
+for all distinct `i, j ∈ Σ_*` (the hypothesis of Lemma 4.3). -/
+def NoCoincidence : Prop :=
+  ∀ i j : List (Fin N), i ≠ j → ∃ x ∈ I, Φ.comp i (x : ℂ) ≠ Φ.comp j (x : ℂ)
+
 /-- The constant `c_max` of (1.7): the supremum of `|f_i'|` over `cl B_ε` and `i`. -/
 noncomputable def cmax : ℝ := ⨆ (i : Fin N) (z : closure (nbhd ε)), ‖deriv (Φ.f i) z‖
 
@@ -206,7 +211,16 @@ noncomputable def d2Map (f g : ℂ → ℂ) : ℝ :=
     (⨆ x : I, ‖deriv f ((x : ℝ) : ℂ) - deriv g ((x : ℝ) : ℂ)‖) +
     (⨆ x : I, ‖deriv (deriv f) ((x : ℝ) : ℂ) - deriv (deriv g) ((x : ℝ) : ℂ)‖)
 
-/-- The `𝒞²` distance `d₂(Φ, Ψ) = max_i d₂(f_i, g_i)` on `𝔖_N`. -/
-noncomputable def d2 {N : ℕ} {ε : ℝ} (Φ Ψ : IFS N ε) : ℝ := ⨆ i, d2Map (Φ.f i) (Ψ.f i)
+/-- The `𝒞²` distance `d₂(Φ, Ψ) = max_i d₂(f_i, g_i)` between two families of maps. -/
+noncomputable def d2Sys {N : ℕ} (f g : Fin N → ℂ → ℂ) : ℝ := ⨆ i, d2Map (f i) (g i)
+
+/-- The `𝒞²` distance `d₂(Φ, Ψ) = max_i d₂(f_i, g_i)` on `𝔖_N`. The two systems may lie in
+`𝔖_N(ε)` for different `ε`. -/
+noncomputable def d2 {N : ℕ} {ε ε' : ℝ} (Φ : IFS N ε) (Ψ : IFS N ε') : ℝ :=
+  ⨆ i, d2Map (Φ.f i) (Ψ.f i)
+
+/-- The space `𝔖_N` of Section 1.1: families of maps that all lie in `S^ω_ε(I)` for some
+`ε > 0`, that is, in `S^ω(I) = ⋃_{ε > 0} S^ω_ε(I)`. -/
+def InUnionClass {N : ℕ} (f : Fin N → ℂ → ℂ) : Prop := ∃ ε > 0, ∀ i, InClass ε (f i)
 
 end AnalyticESC

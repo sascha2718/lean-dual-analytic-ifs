@@ -2,7 +2,7 @@
 # Provenance metadata for the Lean formalisation accompanying
 # "On exponential separation of analytic self-conformal sets on the real line"
 # (Bárány, Kolossváry and Troscheit). Follows the mathlib-initiative formalization.yaml v0.4
-# self-reporting format. The project is in the planning stage: no statement is formalised yet.
+# self-reporting format.
 
 version: "v0.4"
 
@@ -51,14 +51,15 @@ related_formalizations: []
 
 status:
   scope: >-
-    Audited: Theorem 1.5 (the sufficient condition for the strong exponential separation
-    condition), Proposition 1.8 (an explicit criterion) and the example of Section 1.2.2, stated in
+    Audited: Theorem 1.4 (an open and dense set of strongly exponentially separated systems in
+    the C2 topology), Theorem 1.5 (the sufficient condition for the strong exponential
+    separation condition), Proposition 1.8 (an explicit criterion), the example of Section 1.2.2
+    and Theorem 1.12 (conjugacy and sub-conjugacy to self-similar systems), stated in
     Challenge.lean and proved in Solution.lean. Formalised in the library: the exponential
     separation conditions and Definition 1.2 (failure of the SESC is weak super-exponential
-    condensation), Theorem 2.2, Lemmas 2.1, 2.4, 2.6, 2.8, 2.10, 3.1, 4.1 and 5.1, Corollary 2.9
-    and the bound (4.3). Not yet formalised, pending the decisions and issues recorded in PLAN.md:
-    Theorems 1.4, 1.12 and 2.3, Lemma 2.5 and Proposition 4.2. Not formalised: Theorem 1.6
-    (Rapaport), Corollary 1.7 and Lemma 2.7.
+    condensation), Definition 1.9, Theorems 2.2 and 2.3, Lemmas 2.1, 2.4, 2.5, 2.6, 2.8, 2.10,
+    3.1, 3.2, 4.1, 4.2, 4.3 and 5.1, Corollary 2.9, Proposition 4.4 and the bound (4.3). Not
+    formalised: Theorem 1.6 (Rapaport), Corollary 1.7 and Lemma 2.7.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: ["propext", "Classical.choice", "Quot.sound"]
@@ -101,7 +102,15 @@ fidelity:
     The proof of Theorem 1.5 goes through a condensation dichotomy instead of the case analysis
     of Section 3, and bounds the derivatives of the dual natural projection by Cauchy estimates
     instead of the Faà di Bruno formula (Lemma 2.7). The space C^ω_ε([0,1]) of Lemma 2.1 is
-    modelled by restrictions to B_ε with the topology of uniform convergence on B_ε.
+    modelled by restrictions to B_ε with the topology of uniform convergence on B_ε. In
+    Theorem 1.4 the space 𝔖_N is the union over ε > 0 of the IFSs with maps in S^ω_ε(I), as in
+    the manuscript; the open set consists of the systems whose dual IFS satisfies the SSC, and of
+    all systems when N = 0, where the Lean dual attractor would be empty. Lemma 4.2 is proved
+    with affine target maps with pairwise disjoint images of [0,1] in place of a transcendental
+    slope, and with complex analyticity in the parameter. Proposition 4.4 is proved with an
+    additive perturbation by Gaussian bumps and Cauchy estimates in place of the multiplicative
+    perturbation f exp(φψA), with the absolute constant C = 8. In the density step the bound M
+    on g''/g' is fixed before δ.
 
 review:
   status: "unchecked"
@@ -113,6 +122,11 @@ review:
 alignment:
   namespace: "Challenge"
   statements:
+    - source: "Theorem 1.4 (open and dense set of systems satisfying the SESC)"
+      lean: "Challenge.audit_sesc_open_dense"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from AnalyticESC.Generic.OpenDense, for the union class 𝔖_N."
     - source: "Theorem 1.5 (sufficient condition for the SESC)"
       lean: "Challenge.audit_sesc_of_dualProj"
       module: "Challenge"
@@ -128,6 +142,21 @@ alignment:
       module: "Challenge"
       status: "proved"
       note: "Proved in Solution from AnalyticESC.Main.Example, with ε = 1/100."
+    - source: "Theorem 1.12, first claim (conjugacy to an IFS with a similarity map)"
+      lean: "Challenge.audit_conj_similarity"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from AnalyticESC.Conjugation.Characterisation."
+    - source: "Theorem 1.12 (a) (conjugacy to a self-similar IFS)"
+      lean: "Challenge.audit_conj_iff"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from AnalyticESC.Conjugation.Characterisation; the hypothesis on the attractor is not needed."
+    - source: "Theorem 1.12 (b) (sub-conjugacy to a self-similar IFS)"
+      lean: "Challenge.audit_subconj_iff"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from AnalyticESC.Conjugation.Characterisation; the hypothesis on the attractor is not needed."
 
 acknowledgements: >-
   Lean 4 and Mathlib (leanprover-community), the leanprover comparator, lean4export and nanoda.

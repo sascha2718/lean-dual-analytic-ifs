@@ -9,7 +9,7 @@ public import AnalyticESC.Basic
 
 The natural projection and the attractor, the equivalence in Definition 1.2 between the failure
 of the SESC and weak super-exponential condensation, the implication SESC ⇒ ESC, and the
-consequence of having no exact overlaps used in Lemma 4.1.
+consequence of having no exact overlaps used in Lemma 4.3.
 -/
 
 namespace AnalyticESC

@@ -2,9 +2,13 @@
     "challenge_module": "Challenge",
     "solution_module": "Solution",
     "theorem_names": [
+        "Challenge.audit_sesc_open_dense",
         "Challenge.audit_sesc_of_dualProj",
         "Challenge.audit_example_criterion",
-        "Challenge.audit_example_sesc"
+        "Challenge.audit_example_sesc",
+        "Challenge.audit_conj_similarity",
+        "Challenge.audit_conj_iff",
+        "Challenge.audit_subconj_iff"
     ],
     "definition_names": [],
     "permitted_axioms": [

@@ -4,8 +4,9 @@ This repository contains the Lean 4 formalisation of *On exponential separation 
 self-conformal sets on the real line* by Balázs Bárány, István Kolossváry and Sascha Troscheit.
 
 **Status:** the statements of the paper without open issues are formalised, with no `sorry`
-and only the axioms `propext`, `Classical.choice` and `Quot.sound`. Theorem 1.5 is audited by the
-comparator. [PLAN.md](PLAN.md) lists what is formalised, the issues found in the paper and the
+and only the axioms `propext`, `Classical.choice` and `Quot.sound`. Seven statements, covering
+Theorems 1.4 and 1.5, Proposition 1.8, the example of Section 1.2.2 and Theorem 1.12, are audited
+by the comparator. [PLAN.md](PLAN.md) lists what is formalised, the issues found in the paper and the
 remaining work.
 
 ## Results
@@ -13,21 +14,23 @@ remaining work.
 - **Sufficient condition (Theorem 1.5, formalised and audited):** an analytic IFS whose dual
   natural projections of equal length are pairwise distinct satisfies the strong exponential
   separation condition (SESC). The library also proves Theorem 2.2 (strong separation of the
-  dual IFS implies the SESC) and the lemmas of Sections 2 to 4 that have no open issue.
+  dual IFS implies the SESC) and the lemmas of Sections 2 to 4.
 - **Explicit criterion (Proposition 1.8, formalised and audited):** distortions `f_i''/f_i'` that
   are far apart at some point, compared with the contraction ratios, give the SESC. The
   three-map example of Section 1.2.2 satisfies it (audited).
 - **Linearisation (Lemma 5.1, formalised):** the linearising map of a single map of the class.
-- **Genericity (Theorem 1.4):** the openness half (Lemma 2.6) and Lemma 4.1 are formalised. The
-  density half is not, pending issue I1 of PLAN.md.
-
-Not yet formalised, pending the decisions recorded in PLAN.md: the characterisation of conjugacy to
-self-similar systems (Theorem 1.12 and Theorem 2.3).
+- **Genericity (Theorem 1.4, formalised and audited):** the systems satisfying the SESC contain
+  an open and dense subset of the space of analytic IFSs in the `𝒞²` metric. The space is the
+  union over `ε > 0` of the classes `𝔖_N(ε)`, as in the manuscript.
+- **Conjugation (Theorem 1.12, formalised and audited; Theorem 2.3, formalised):** an analytic IFS
+  is conjugated, or sub-conjugated, to a self-similar system exactly when the corresponding dual
+  natural projections coincide.
 
 ## Statements and proofs
 
 [Challenge.lean](Challenge.lean) states the headline results using Mathlib alone, with an
-intentional `sorry` per theorem; it contains Theorem 1.5, Proposition 1.8 and the example.
+intentional `sorry` per theorem; it contains Theorem 1.5, Proposition 1.8, the example and
+Theorem 1.12.
 [Solution.lean](Solution.lean) proves them from the `AnalyticESC` library. The comparator check
 verifies that the solution proves the same statements with the same definitions, using only
 `propext`, `Classical.choice` and `Quot.sound`.

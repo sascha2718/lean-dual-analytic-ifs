@@ -3,6 +3,7 @@ module
 public import Mathlib
 public import AnalyticESC.Main.Example
 public import AnalyticESC.Conjugation.Characterisation
+public import AnalyticESC.Generic.OpenDense
 
 @[expose] public section
 
@@ -101,12 +102,40 @@ def ConjSelfSimilar {M : ℕ} (F : Fin M → ℝ → ℝ) : Prop :=
 def periodic {m : ℕ} (hm : 0 < m) (w : Fin m → Fin N) : ℕ → Fin N :=
   fun n => w ⟨n % m, Nat.mod_lt n hm⟩
 
+/-- The `𝒞²` distance `d₂(f, g)` on `[0,1]` of Section 1.1, with derivatives at real points. -/
+noncomputable def d2Map (f g : ℂ → ℂ) : ℝ :=
+  (⨆ x : I, ‖f ((x : ℝ) : ℂ) - g ((x : ℝ) : ℂ)‖) +
+    (⨆ x : I, ‖deriv f ((x : ℝ) : ℂ) - deriv g ((x : ℝ) : ℂ)‖) +
+    (⨆ x : I, ‖deriv (deriv f) ((x : ℝ) : ℂ) - deriv (deriv g) ((x : ℝ) : ℂ)‖)
+
+/-- The `𝒞²` distance `d₂(Φ, Ψ) = max_i d₂(f_i, g_i)` between two IFSs (Section 1.1). -/
+noncomputable def d2 (f g : Fin N → ℂ → ℂ) : ℝ := ⨆ i, d2Map (f i) (g i)
+
+/-- The space `𝔖_N` of Section 1.1: IFSs whose maps lie in `S^ω_ε(I)` for some `ε > 0`. -/
+def InUnionClass (f : Fin N → ℂ → ℂ) : Prop := ∃ ε > 0, ∀ i, InClass ε (f i)
+
 /-- The system `(f_i)` as an IFS of the library. -/
 noncomputable def toIFS {ε : ℝ} (hε : 0 < ε) (f : Fin N → ℂ → ℂ) (hf : ∀ i, InClass ε (f i)) :
     AnalyticESC.IFS N ε where
   f := f
   ε_pos := hε
   inClass i := ⟨(hf i).1, (hf i).2, (hf i).3, (hf i).4, (hf i).5, (hf i).6⟩
+
+/-- Theorem 1.4. The IFSs in `𝔖_N` that satisfy the strong exponential separation condition
+contain a subset `U` of `𝔖_N` that is open and dense in `𝔖_N` for the `𝒞²` metric `d₂`. -/
+theorem audit_sesc_open_dense (N : ℕ) :
+    ∃ U : Set (Fin N → ℂ → ℂ), (∀ f ∈ U, InUnionClass f ∧ SESC f) ∧
+      (∀ f ∈ U, ∃ r > 0, ∀ g, InUnionClass g → d2 f g < r → g ∈ U) ∧
+      (∀ f, InUnionClass f → ∀ r > 0, ∃ g ∈ U, d2 f g < r) := by
+  have hlib : ∀ f : Fin N → ℂ → ℂ, InUnionClass f → AnalyticESC.InUnionClass f :=
+    fun f ⟨ε, hε, hf⟩ => ⟨ε, hε, fun i =>
+      ⟨(hf i).1, (hf i).2, (hf i).3, (hf i).4, (hf i).5, (hf i).6⟩⟩
+  obtain ⟨U, hS, hO, hD⟩ := AnalyticESC.theorem_1_4 N
+  refine ⟨U, fun f hf => ?_, fun f hf => ?_, fun f hf r hr => hD f (hlib f hf) r hr⟩
+  · obtain ⟨ε, ⟨g, hε, hg⟩, rfl, hSE⟩ := hS f hf
+    exact ⟨⟨ε, hε, fun i => ⟨(hg i).1, (hg i).2, (hg i).3, (hg i).4, (hg i).5, (hg i).6⟩⟩, hSE⟩
+  · obtain ⟨r, hr, h⟩ := hO f hf
+    exact ⟨r, hr, fun g hg hd => h g (hlib g hg) hd⟩
 
 /-- Theorem 1.5. Let `Φ = (f_i)_{i ∈ Fin N}` be an analytic IFS in `𝔖_N`. If
 `sup_{x ∈ [0,1]} |H_i(x) - H_j(x)| > 0` for all distinct `i, j ∈ Σ ∪ Σ_*` with `|i| = |j|`, then `Φ`

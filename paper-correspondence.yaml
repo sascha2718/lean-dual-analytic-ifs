@@ -35,9 +35,11 @@ entries:
 
   - source: "thm:ESCOpenDense"
     kind: theorem
-    status: planned
+    status: formalized
+    lean: ["Challenge.audit_sesc_open_dense"]
+    relation: exact
     headline: true
-    note: "Open and dense set of SESC systems. The density step leaves the fixed-epsilon class; see PLAN.md, issue I1, and decision D1 on the ambient class. Phase 5."
+    note: "Library form AnalyticESC.theorem_1_4. The space of IFSs is the union class of decision D1 (AnalyticESC.InUnionClass), with the d2 metric between families (AnalyticESC.d2Sys); open and dense are relative to this space. The open set consists of the systems whose dual IFS satisfies the SSC, as in the paper, and of all systems when N = 0, where the dual attractor would be empty. Density goes through Lemma 4.2, Lemma 4.3, Proposition 4.4 and the density step AnalyticESC.IFS.exists_dualSSC_near; openness through AnalyticESC.IFS.lemma_2_6_union."
 
   - source: "thm:main"
     kind: theorem
@@ -45,7 +47,7 @@ entries:
     lean: ["Challenge.audit_sesc_of_dualProj"]
     relation: exact
     headline: true
-    note: "Library form AnalyticESC.IFS.theorem_1_5, over finite and infinite words (AnalyticESC.Word). The challenge splits the hypothesis into finite words of equal length and infinite words, which are the pairs of equal length. Maps are holomorphic extensions; H_w is evaluated at real points with complex derivatives, which equal the real ones there. The proof goes through the condensation dichotomy AnalyticESC.IFS.condensation_dichotomy (PLAN.md, section 4)."
+    note: "Library form AnalyticESC.IFS.theorem_1_5, over finite and infinite words (AnalyticESC.Word). The challenge splits the hypothesis into finite words of equal length and infinite words, which are the pairs of equal length. Maps are holomorphic extensions; H_w is evaluated at real points with complex derivatives, which equal the real ones there. Proved from Lemma 3.2 (AnalyticESC.IFS.condensation_dichotomy), as in the paper."
 
   - source: "thm:RapaportMain"
     kind: theorem
@@ -69,21 +71,27 @@ entries:
 
   - source: "def:conjugation"
     kind: definition
-    status: planned
+    status: formalized
+    lean: ["AnalyticESC.IsAnalyticCoord", "AnalyticESC.ConjSelfSimilar"]
+    relation: representation
     headline: false
-    note: "Analytic conjugacy. PLAN.md, decision D3, fixes whether the conjugating map is required to have nonvanishing derivative. Phase 6."
+    note: "Analytic means analytic on a neighbourhood of each point of [0,1]; invertible means injective on [0,1], as in the paper. Conjugacy to a self-similar IFS is stated as g(f_j(x)) = lambda_j g(x) + t_j on [0,1], which is equivalent for injective g."
 
   - source: "unlabelled:def-subconjugated"
     kind: definition
-    status: planned
+    status: formalized
+    lean: ["AnalyticESC.IFS.SubConjSelfSimilar"]
+    relation: representation
     headline: false
-    note: "Sub-conjugacy to a self-similar system. Phase 6."
+    note: "Words of the same length are maps Fin m -> Fin N; distinctness excludes m = 0."
 
   - source: "thm:SubConjugation"
     kind: theorem
-    status: planned
+    status: formalized
+    lean: ["Challenge.audit_conj_similarity", "Challenge.audit_conj_iff", "Challenge.audit_subconj_iff"]
+    relation: split
     headline: true
-    note: "Split into three endpoints: the similarity map, part (a) and part (b). The Lean proof of the forward direction of (a) uses that g''/g' is a common fixed point of the dual operators (PLAN.md, issues I5 and I7). Phase 6."
+    note: "Library forms AnalyticESC.IFS.theorem_1_12_similarity and AnalyticESC.IFS.theorem_1_12, with general versions AnalyticESC.IFS.conjSelfSimilar_iff and AnalyticESC.IFS.subConjSelfSimilar_iff that do not need the attractor to be a non-singleton. The similarity claim also gives g' != 0, so the conjugated IFS is analytic. A conjugacy has no critical point when two maps have distinct fixed points (AnalyticESC.deriv_ne_zero_of_conj); maps with a common fixed point commute (AnalyticESC.comp_comm_of_conj). Periodic words are AnalyticESC.periodic."
 
   - source: "lem:ExistanceAttractor"
     kind: lemma
@@ -93,19 +101,29 @@ entries:
     headline: false
     note: "C^omega_eps([0,1]) is AnalyticESC.analyticSpace, the restrictions to B_eps of maps holomorphic there and real on I, with the topology of uniform convergence on B_eps. The hypothesis 0 < N is the paper's implicit assumption that the IFS has a map."
 
+  - source: "thm:dichotomy"
+    kind: lemma
+    status: formalized
+    lean: ["AnalyticESC.IFS.condensation_dichotomy"]
+    relation: exact
+    headline: false
+    note: "The Lean hypothesis is the failure of the SESC, which is weak super-exponential condensation by AnalyticESC.IFS.not_sesc_iff. The Lean proof splits only on whether the prefix lengths stay bounded and works at the limit of the left end points of f_u([0,1])."
+
   - source: "thm:DualSSC"
     kind: theorem
     status: formalized
     lean: ["AnalyticESC.IFS.theorem_2_2"]
     relation: exact
     headline: false
-    note: "Proved from the condensation dichotomy, so it does not use Lemma 2.5(d) (PLAN.md, issue I4)."
+    note: "Proved from Lemma 3.2 (AnalyticESC.IFS.condensation_dichotomy), as in the paper."
 
   - source: "thm:DualConj"
     kind: theorem
-    status: planned
+    status: formalized
+    lean: ["AnalyticESC.IFS.theorem_2_3_conj", "AnalyticESC.IFS.theorem_2_3_subconj"]
+    relation: split
     headline: false
-    note: "Phase 6, after decision D3 on the notion of conjugacy."
+    note: "The dual attractor is the unique AnalyticESC.IFS.IsDualAttractor; F_i on C^omega_eps([0,1]) is AnalyticESC.IFS.dualCompOn. The hypothesis 0 < N is the paper's implicit assumption that the IFS has a map."
 
   - source: "thm:H_iAnalytic"
     kind: lemma
@@ -117,17 +135,19 @@ entries:
 
   - source: "lem:SSCEequiv"
     kind: lemma
-    status: planned
+    status: formalized
+    lean: ["AnalyticESC.IFS.lemma_2_5", "AnalyticESC.IFS.dualSSC_iff_exists_delta", "AnalyticESC.IFS.dualSSC_iff_ne"]
+    relation: split
     headline: false
-    note: "Not formalised as stated, because of item (d) (PLAN.md, issue I4). The equivalence (a) <=> (c) is AnalyticESC.IFS.dualSSC_iff_exists_delta, with the variant AnalyticESC.IFS.dualSSC_iff_ne."
+    note: "The cylinder set (k,K) is AnalyticESC.dualCyl and its closure is represented by AnalyticESC.dualCylClosed, the maps with values in [k,K] on [0,1]. Disjointness of cylinders is the pointwise condition (2.2). The proof of (a) => (b) goes through (c) and uses the contraction of the cylinder intervals in place of the compactness argument."
 
   - source: "lem:cont"
     kind: lemma
     status: formalized
-    lean: ["AnalyticESC.IFS.lemma_2_6", "AnalyticESC.IFS.exists_dualProj_sub_le_d2"]
+    lean: ["AnalyticESC.IFS.lemma_2_6", "AnalyticESC.IFS.lemma_2_6_union", "AnalyticESC.IFS.exists_dualProj_sub_le_d2"]
     relation: split
     headline: false
-    note: "The estimate (2.6) holds for all finite and infinite words. As in the paper, the perturbed system is controlled with the constants c_min/2 and a constant in (c_max, 1)."
+    note: "The estimate (2.6) holds for all finite and infinite words. As in the paper, the perturbed system is controlled with the constants c_min/2 and a constant in (c_max, 1). The radius depends only on Phi, and the perturbed system may lie in S^omega_eps' for any eps' (lemma_2_6_union)."
 
   - source: "thm:ugly"
     kind: lemma
@@ -167,19 +187,37 @@ entries:
     headline: false
     note: "AnalyticESC.abs_deriv_sub_le_of_abs_sub_le is the C^2 form with any common bound Q, and AnalyticESC.abs_iteratedDeriv_sub_le its iterate."
 
+  - source: "thm:class"
+    kind: lemma
+    status: formalized
+    lean: ["AnalyticESC.InClass.of_deriv", "AnalyticESC.InClass.mono", "AnalyticESC.lemma_4_1", "AnalyticESC.exists_inClass"]
+    relation: split
+    headline: false
+    note: "The first claim is InClass.of_deriv, item (a) is InClass.mono and item (b) is lemma_4_1, with exists_inClass the direction used for perturbations. Realness is required at the real points of the neighbourhood."
+
+  - source: "thm:remove-coincidences"
+    kind: lemma
+    status: formalized
+    lean: ["AnalyticESC.IFS.lemma_4_2"]
+    relation: exact
+    headline: false
+    note: "The perturbation stays in the same class S^omega_eps. The Lean proof takes affine maps h_i with pairwise disjoint images of [0,1] in place of a transcendental slope, proves that their compositions along distinct words differ by induction on the words, uses complex analyticity in t at a fixed point in place of joint real analyticity in (t, x), and bounds d2(Phi, Phi^t) by a constant multiple of t."
+
   - source: "lem:Pointsx_ij"
     kind: lemma
     status: formalized
-    lean: ["AnalyticESC.IFS.lemma_4_1"]
+    lean: ["AnalyticESC.IFS.lemma_4_3", "AnalyticESC.IFS.noCoincidence_of_not_hasExactOverlaps"]
     relation: exact
     headline: false
-    note: "Orbits are lists of real points; item (c) is stated for distinct pairs of B_n."
+    note: "The hypothesis is AnalyticESC.IFS.NoCoincidence. Orbits are lists of real points; item (c) is stated for distinct pairs of B_n."
 
   - source: "prop:AnalyticBumpFunc"
     kind: proposition
-    status: planned
+    status: formalized
+    lean: ["AnalyticESC.proposition_4_4"]
+    relation: exact
     headline: false
-    note: "The Gaussian perturbation is not small on the complex neighbourhood, and g(I) need not lie in I (PLAN.md, issues I1 and I2). Phase 5."
+    note: "The paper's epsilon is eta. The Lean proof uses the additive perturbation g = f + sum over y of delta f'(y) G_y P_y, with Gaussian bumps G_y and polynomials P_y vanishing to third order at the other points, and Cauchy estimates on circles of radius sqrt(sigma); the constant is C = 8. The paper's multiplicative perturbation f exp(phi psi A) and the bound (4.3) are not used."
 
   - source: "unlabelled:lem-gaussian-bound"
     kind: lemma

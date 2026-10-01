@@ -6,11 +6,12 @@ public import AnalyticESC.Separation
 @[expose] public section
 
 /-!
-# Lemma 4.1
+# Lemma 4.3
 
-For a system without exact overlaps, a choice of points `x_{i,j}`, `(i, j) ∈ ℬ_n`, at which the
-cylinders of pairs that are not bad are disjoint, with orbits that are injective, meet only at
-the base point, and are disjoint for different pairs.
+For a system whose compositions along distinct finite words differ on `[0,1]`, a choice of
+points `x_{i,j}`, `(i, j) ∈ ℬ_n`, at which the cylinders of pairs that are not bad are disjoint,
+with orbits that are injective, meet only at the base point, and are disjoint for different
+pairs. Systems without exact overlaps satisfy the hypothesis.
 
 The points are chosen one pair at a time, by induction over finite sets of pairs. At each step
 the admissible points form an infinite subset of `I` (all of `I` for a bad pair, a relative
@@ -37,7 +38,8 @@ private theorem ofReal_mem_closure_nbhd {δ : ℝ} (hδ : 0 < δ) {t : ℝ} (ht 
 private theorem injOn_re_comp (w : List (Fin N)) :
     InjOn (fun t : ℝ => (Φ.comp w t).re) I := by
   have hd : ∀ t ∈ I, HasDerivAt (fun t : ℝ => (Φ.comp w t).re) (deriv (Φ.comp w) t).re t :=
-    fun t ht => hasDerivAt_re_ofReal (Φ.differentiableAt_comp w (ofReal_mem_closure_nbhd Φ.ε_pos ht))
+    fun t ht =>
+      hasDerivAt_re_ofReal (Φ.differentiableAt_comp w (ofReal_mem_closure_nbhd Φ.ε_pos ht))
   have hne : ∀ t ∈ I, (deriv (Φ.comp w) t).re ≠ 0 := by
     intro t ht h0
     apply Φ.deriv_comp_ne_zero w (ofReal_mem_closure_nbhd Φ.ε_pos ht)
@@ -55,10 +57,10 @@ private theorem injOn_re_comp (w : List (Fin N)) :
   · exact h
   · exact absurd hab.symm (key b hb a ha h)
 
-/-- Without exact overlaps, two distinct compositions agree at finitely many points of `I`. -/
-private theorem finite_eq_comp (h : ¬ Φ.HasExactOverlaps) {v w : List (Fin N)} (hvw : v ≠ w) :
+/-- Two compositions along distinct words agree at finitely many points of `I`. -/
+private theorem finite_eq_comp (h : Φ.NoCoincidence) {v w : List (Fin N)} (hvw : v ≠ w) :
     {t : ℝ | t ∈ I ∧ (Φ.comp v t).re = (Φ.comp w t).re}.Finite := by
-  obtain ⟨x, hx, hne⟩ := Φ.exists_comp_ne_of_not_hasExactOverlaps h hvw
+  obtain ⟨x, hx, hne⟩ := h v w hvw
   refine (finite_zeros Φ.ε_pos ((Φ.differentiableOn_comp v).sub (Φ.differentiableOn_comp w))
     ⟨x, hx, sub_ne_zero.2 hne⟩).subset ?_
   rintro t ⟨ht, heq⟩
@@ -73,7 +75,7 @@ private theorem finite_comp_eq (w : List (Fin N)) (y : ℝ) :
 
 /-- The exceptional points of `I`: two distinct compositions of length at most `n` agree there,
 or one of them takes a value in the finite set `F`. -/
-private theorem finite_exceptional (h : ¬ Φ.HasExactOverlaps) (n : ℕ) {F : Set ℝ}
+private theorem finite_exceptional (h : Φ.NoCoincidence) (n : ℕ) {F : Set ℝ}
     (hF : F.Finite) :
     {t : ℝ | t ∈ I ∧ ((∃ v w : List (Fin N), v.length ≤ n ∧ w.length ≤ n ∧ v ≠ w ∧
       (Φ.comp v t).re = (Φ.comp w t).re) ∨
@@ -180,16 +182,16 @@ private theorem take_reverse_ne_of_mem_pairs {n : ℕ} {p : (Fin n → Fin N) ×
     hn, dite_true] at this
   exact hlt.ne (Option.some_inj.1 this)
 
-/-- The properties of Lemma 4.1 (a) and (b) for one pair `p` and the point `t`. -/
+/-- The properties of Lemma 4.3 (a) and (b) for one pair `p` and the point `t`. -/
 private def Good (k K : ℝ) {n : ℕ} (p : (Fin n → Fin N) × (Fin n → Fin N)) (t : ℝ) : Prop :=
   t ∈ I ∧ (Φ.DualCylDisjoint k K (List.ofFn p.1) (List.ofFn p.2) →
       Disjoint (Φ.dualCylAt k K (List.ofFn p.1) t) (Φ.dualCylAt k K (List.ofFn p.2) t)) ∧
     (Φ.orbit (List.ofFn p.1) t).Nodup ∧ (Φ.orbit (List.ofFn p.2) t).Nodup ∧
     ∀ y ∈ Φ.orbit (List.ofFn p.1) t, y ∈ Φ.orbit (List.ofFn p.2) t → y = t
 
-/-- One step of the induction in Lemma 4.1: a point for the pair `p` whose orbits avoid the
+/-- One step of the induction in Lemma 4.3: a point for the pair `p` whose orbits avoid the
 finite set `F`. -/
-private theorem exists_point (h : ¬ Φ.HasExactOverlaps) (k K : ℝ) {n : ℕ}
+private theorem exists_point (h : Φ.NoCoincidence) (k K : ℝ) {n : ℕ}
     {p : (Fin n → Fin N) × (Fin n → Fin N)} (hp : p ∈ pairs N n) {F : Set ℝ} (hF : F.Finite) :
     ∃ t, Φ.Good k K p t ∧
       ∀ y ∈ Φ.orbit (List.ofFn p.1) t ++ Φ.orbit (List.ofFn p.2) t, y ∉ F := by
@@ -227,8 +229,8 @@ private theorem exists_point (h : ¬ Φ.HasExactOverlaps) (k K : ℝ) {n : ℕ}
     · obtain ⟨l, -, rfl⟩ := Φ.mem_orbit.1 hy
       exact havoid _ (hlen _ _)
 
-/-- The induction of Lemma 4.1 over finite sets of pairs. -/
-private theorem exists_points_finset (h : ¬ Φ.HasExactOverlaps) (k K : ℝ) (n : ℕ)
+/-- The induction of Lemma 4.3 over finite sets of pairs. -/
+private theorem exists_points_finset (h : Φ.NoCoincidence) (k K : ℝ) (n : ℕ)
     (S : Finset ((Fin n → Fin N) × (Fin n → Fin N))) :
     ∃ x : (Fin n → Fin N) × (Fin n → Fin N) → ℝ,
       (∀ p ∈ S, p ∈ pairs N n → Φ.Good k K p (x p)) ∧
@@ -278,8 +280,8 @@ private theorem exists_points_finset (h : ¬ Φ.HasExactOverlaps) (k K : ℝ) (n
         · exact absurd hqp hpa
         exact hsep p hp q hq hpp hqp hpq
 
-/-- Lemma 4.1. A pair `(i, j)` is not bad when `F_i(k, K) ∩ F_j(k, K) = ∅` in the sense of (2.2). -/
-theorem lemma_4_1 (n : ℕ) (k K : ℝ) (h : ¬ Φ.HasExactOverlaps) :
+/-- Lemma 4.3. A pair `(i, j)` is not bad when `F_i(k, K) ∩ F_j(k, K) = ∅` in the sense of (2.2). -/
+theorem lemma_4_3 (n : ℕ) (k K : ℝ) (h : Φ.NoCoincidence) :
     ∃ x : (Fin n → Fin N) × (Fin n → Fin N) → ℝ,
       (∀ p ∈ pairs N n, x p ∈ I) ∧
       (∀ p ∈ pairs N n, Φ.DualCylDisjoint k K (List.ofFn p.1) (List.ofFn p.2) →
@@ -296,6 +298,10 @@ theorem lemma_4_1 (n : ℕ) (k K : ℝ) (h : ¬ Φ.HasExactOverlaps) :
     fun p hp => (hgood p (Finset.mem_univ _) hp).2.1,
     fun p hp => (hgood p (Finset.mem_univ _) hp).2.2,
     fun p hp q hq hpq => hsep p (Finset.mem_univ _) q (Finset.mem_univ _) hp hq hpq⟩
+
+/-- A system without exact overlaps satisfies the hypothesis of Lemma 4.3. -/
+theorem noCoincidence_of_not_hasExactOverlaps (h : ¬ Φ.HasExactOverlaps) : Φ.NoCoincidence :=
+  fun _ _ hij => Φ.exists_comp_ne_of_not_hasExactOverlaps h hij
 
 end IFS
 
