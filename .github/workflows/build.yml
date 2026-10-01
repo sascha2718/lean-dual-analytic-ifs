@@ -1,0 +1,138 @@
+name: Build and audit
+
+on:
+  push:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build the library
+    runs-on: ubuntu-latest
+    steps:
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.0
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+
+      - name: Check out the project
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: project
+          persist-credentials: false
+
+      - name: Check Lean module headers
+        working-directory: project
+        run: python3 scripts/check_module_headers.py
+
+      # Mathlib arrives through `lake exe cache get`; this caches our own oleans,
+      # which are the expensive part of a rebuild.
+      - name: Cache the library build output
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: project/.lake/build
+          key: lake-build-${{ hashFiles('project/lean-toolchain', 'project/lakefile.toml', 'project/lake-manifest.json') }}-${{ hashFiles('project/**/*.lean') }}
+          restore-keys: |
+            lake-build-${{ hashFiles('project/lean-toolchain', 'project/lakefile.toml', 'project/lake-manifest.json') }}-
+
+      # No lint driver and no `mk_all` umbrellas are configured, so both checks stay off.
+      - name: Build
+        uses: leanprover/lean-action@434f25c2f80ded67bba02502ad3a86f25db50709 # 2025-07-02
+        with:
+          lake-package-directory: project
+          build: true
+          lint: false
+          mk_all-check: false
+
+  comparator:
+    name: Comparator audit of the headline theorems
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      PROJECT_DIR: ${{ github.workspace }}/project
+    steps:
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.0
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+
+      - name: Check out the project
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: project
+          persist-credentials: false
+
+      - name: Check Lean module headers
+        working-directory: project
+        run: python3 scripts/check_module_headers.py
+
+      # Install Lean only. In particular, do not compile project code or restore
+      # a project .lake cache before Comparator sees Solution.lean.
+      - name: Install the project Lean toolchain
+        uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9 # v1.5.0
+        with:
+          lake-package-directory: project
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          mk_all-check: false
+          check-reservoir-eligibility: false
+          lean4checker: false
+          use-github-cache: false
+          use-mathlib-cache: false
+
+      # Comparator's README expressly permits obtaining a trusted Mathlib cache
+      # before the audit. This step must not compile Challenge or Solution.
+      - name: Prepare trusted dependencies
+        working-directory: ${{ env.PROJECT_DIR }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          lake exe cache get
+
+          # Challenge imports Mathlib alone, so the dependency tree is trusted
+          # (README assumption 1) and is settled unsandboxed here: this replays
+          # the fetched cache and writes the packages' build bookkeeping before
+          # Comparator's sandboxed builds run. No project code is compiled.
+          lake build Mathlib
+
+          compiled="$(find .lake/build -type f \( -name '*.olean' -o -name '*.ilean' \) \
+            -print -quit 2>/dev/null || true)"
+          if [[ -n "$compiled" ]]; then
+            echo "::error::Project code was compiled before Comparator ran: $compiled"
+            exit 1
+          fi
+          mkdir -p .lake
+
+      - name: Install bubblewrap for lake comparator's sandbox
+        # Ubuntu 24.04 restricts unprivileged user namespaces through AppArmor,
+        # which `bwrap` needs for the sandbox; the runner is disposable.
+        shell: bash
+        run: |
+          sudo apt-get update -qq >/dev/null
+          sudo apt-get install -y -qq bubblewrap >/dev/null
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Run the toolchain's lake comparator
+        working-directory: ${{ env.PROJECT_DIR }}
+        shell: bash
+        run: ./comparator-audit.sh

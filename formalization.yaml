@@ -1,0 +1,133 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+# Provenance metadata for the Lean formalisation accompanying
+# "On exponential separation of analytic self-conformal sets on the real line"
+# (Bárány, Kolossváry and Troscheit). Follows the mathlib-initiative formalization.yaml v0.4
+# self-reporting format. The project is in the planning stage: no statement is formalised yet.
+
+version: "v0.4"
+
+project:
+  name: "Exponential separation of analytic self-conformal sets on the real line: Lean formalisation"
+  description: >-
+    Lean 4 formalisation of the paper "On exponential separation of analytic self-conformal
+    sets on the real line" by Balázs Bárány, István Kolossváry and Sascha Troscheit. The planned
+    audited statements are the sufficient condition for the strong exponential separation
+    condition in terms of the dual natural projection, its explicit criterion and example, the
+    open and dense set of strongly exponentially separated systems in the C2 topology, and the
+    characterisation of analytic systems conjugated or sub-conjugated to self-similar systems.
+  authors:
+    - "Balázs Bárány"
+    - "István Kolossváry"
+    - "Sascha Troscheit"
+  license: "Apache-2.0"
+  responsible_maintainers:
+    - "Sascha Troscheit"
+
+classification:
+  msc2020: ["28A80", "37C45"]
+
+sources:
+  - title: "On exponential separation of analytic self-conformal sets on the real line"
+    authors:
+      - "Balázs Bárány"
+      - "István Kolossváry"
+      - "Sascha Troscheit"
+    type: "paper"
+    location: "Theorems 1.4, 1.5 and 1.12, Proposition 1.8, Sections 2 to 5"
+    relationship: "formalizes"
+    note: >-
+      The paper whose results are formalised here. paper-correspondence.yaml records the
+      statement-by-statement correspondence with the Lean declarations. The formalisation and the
+      paper are developed by the same authors.
+    author_endorsement: "participated"
+  - title: "Dimension of self-conformal measures associated to an exponentially separated analytic IFS on R"
+    authors:
+      - "Ariel Rapaport"
+    type: "preprint"
+    relationship: "background"
+    note: "Source of the exponential separation condition for analytic systems. Its main theorem is not formalised."
+
+related_formalizations: []
+
+status:
+  scope: >-
+    Audited: Theorem 1.5 (the sufficient condition for the strong exponential separation
+    condition), Proposition 1.8 (an explicit criterion) and the example of Section 1.2.2, stated in
+    Challenge.lean and proved in Solution.lean. Formalised in the library: the exponential
+    separation conditions and Definition 1.2 (failure of the SESC is weak super-exponential
+    condensation), Theorem 2.2, Lemmas 2.1, 2.4, 2.6, 2.8, 2.10, 3.1, 4.1 and 5.1, Corollary 2.9
+    and the bound (4.3). Not yet formalised, pending the decisions and issues recorded in PLAN.md:
+    Theorems 1.4, 1.12 and 2.3, Lemma 2.5 and Proposition 4.2. Not formalised: Theorem 1.6
+    (Rapaport), Corollary 1.7 and Lemma 2.7.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Classical.choice", "Quot.sound"]
+
+automation:
+  methods:
+    - method: "agent"
+      models: ["Claude Opus (Anthropic)"]
+      framework: "Claude Code (Anthropic)"
+      tool_setup: "Agentic planning of the formalisation and set-up of the repository framework."
+      cost:
+        wall_time: "not tracked"
+        spend_usd: "subscription-based"
+        hardware: "local machine"
+      prompting_notes: "n/a"
+    - method: "manual"
+      models: []
+      framework: "n/a"
+      tool_setup: "Statement design and review of the Challenge statements against the paper."
+      cost:
+        wall_time: "not tracked"
+        spend_usd: "not tracked"
+        hardware: "local machine"
+      prompting_notes: "n/a"
+  spend_usd: "not tracked"
+  notes: >-
+    AI tools are used in the Lean development, following the principles of the Leiden
+    Declaration on the responsible use of artificial intelligence in research. The authors
+    review the Challenge statements against the paper and accept responsibility for the
+    formalisation.
+
+fidelity:
+  divergences: >-
+    Maps of the IFS are given by their holomorphic extensions f : ℂ → ℂ, real at the real points
+    of B_{2ε}; statements about [0,1] evaluate at real points, where the complex derivatives
+    agree with the derivatives of the real restrictions. Finite words are lists and infinite
+    words are sequences ℕ → Fin N, read from the left. In Challenge.lean the hypothesis of
+    Theorem 1.5, over distinct words of Σ ∪ Σ_* of equal length, is split into finite words of
+    the same length and infinite words. Suprema over [0,1] are real iSups of bounded families.
+    The proof of Theorem 1.5 goes through a condensation dichotomy instead of the case analysis
+    of Section 3, and bounds the derivatives of the dual natural projection by Cauchy estimates
+    instead of the Faà di Bruno formula (Lemma 2.7). The space C^ω_ε([0,1]) of Lemma 2.1 is
+    modelled by restrictions to B_ε with the topology of uniform convergence on B_ε.
+
+review:
+  status: "unchecked"
+  reviewers: []
+  notes: >-
+    The statements were written against the paper and checked by the comparator against
+    Solution.lean, but have not yet been reviewed by the authors.
+
+alignment:
+  namespace: "Challenge"
+  statements:
+    - source: "Theorem 1.5 (sufficient condition for the SESC)"
+      lean: "Challenge.audit_sesc_of_dualProj"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from AnalyticESC.Main.Dichotomy."
+    - source: "Proposition 1.8 (explicit sufficient condition)"
+      lean: "Challenge.audit_example_criterion"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from AnalyticESC.Main.Criterion."
+    - source: "The example of Section 1.2.2"
+      lean: "Challenge.audit_example_sesc"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from AnalyticESC.Main.Example, with ε = 1/100."
+
+acknowledgements: >-
+  Lean 4 and Mathlib (leanprover-community), the leanprover comparator, lean4export and nanoda.

@@ -1,0 +1,197 @@
+version: 1
+
+manuscript_files:
+  - analytic.tex
+
+# One entry per statement environment of the manuscript. Labelled statements use their label as
+# source; unlabelled ones use an `unlabelled:` identifier and are matched by count per kind.
+# Status is `planned` until the Lean declarations exist, then `formalized` with the declaration
+# names in `lean`. Headline entries become the Challenge endpoints listed in comparator.json.
+# Source-file locations and proof-helper inventories are deliberately omitted.
+entries:
+  - source: "unlabelled:def-esc"
+    kind: definition
+    status: formalized
+    lean: ["AnalyticESC.IFS.ESC"]
+    relation: exact
+    headline: false
+    note: "Suprema over [0,1] are real iSups of bounded families."
+
+  - source: "def:SESC"
+    kind: definition
+    status: formalized
+    lean: ["AnalyticESC.IFS.SESC", "AnalyticESC.IFS.WeakSuperExpCondensation", "AnalyticESC.IFS.not_sesc_iff"]
+    relation: split
+    headline: false
+    note: "The 'i.e.' of the definition, that the SESC fails exactly under weak super-exponential condensation, is AnalyticESC.IFS.not_sesc_iff; the positive sequence eta and the strictly increasing subsequence are explicit."
+
+  - source: "unlabelled:def-exact-overlaps"
+    kind: definition
+    status: formalized
+    lean: ["AnalyticESC.IFS.HasExactOverlaps"]
+    relation: representation
+    headline: false
+    note: "The attractor is AnalyticESC.IFS.attractor, defined as the range of the natural projection, which the paper identifies with the Hutchinson attractor."
+
+  - source: "thm:ESCOpenDense"
+    kind: theorem
+    status: planned
+    headline: true
+    note: "Open and dense set of SESC systems. The density step leaves the fixed-epsilon class; see PLAN.md, issue I1, and decision D1 on the ambient class. Phase 5."
+
+  - source: "thm:main"
+    kind: theorem
+    status: formalized
+    lean: ["Challenge.audit_sesc_of_dualProj"]
+    relation: exact
+    headline: true
+    note: "Library form AnalyticESC.IFS.theorem_1_5, over finite and infinite words (AnalyticESC.Word). The challenge splits the hypothesis into finite words of equal length and infinite words, which are the pairs of equal length. Maps are holomorphic extensions; H_w is evaluated at real points with complex derivatives, which equal the real ones there. The proof goes through the condensation dichotomy AnalyticESC.IFS.condensation_dichotomy (PLAN.md, section 4)."
+
+  - source: "thm:RapaportMain"
+    kind: theorem
+    status: intentionally_unformalized
+    headline: false
+    reason: "Cited result of Rapaport on the dimension of self-conformal sets and measures under ESC; its proof is outside the scope of this formalisation."
+
+  - source: "cor:dim"
+    kind: corollary
+    status: intentionally_unformalized
+    headline: false
+    reason: "Combines thm:ESCOpenDense with the cited thm:RapaportMain. A conditional version with Rapaport's theorem as a named literature axiom is an optional later phase (PLAN.md, decision D5)."
+
+  - source: "prop:example"
+    kind: proposition
+    status: formalized
+    lean: ["Challenge.audit_example_criterion", "Challenge.audit_example_sesc"]
+    relation: split
+    headline: true
+    note: "The proposition is AnalyticESC.IFS.proposition_1_8, with beta as AnalyticESC.IFS.beta. The example after the proof is AnalyticESC.example_sesc, with epsilon = 1/100: AnalyticESC.exampleIFS has c_max < 1/5 (exampleIFS_cmax_lt), beta <= 1 (exampleIFS_beta_le) and distortions 1/2 apart at 0 (exampleIFS_nonlin_sep). The challenge splits the conclusion over finite and infinite words, as for Theorem 1.5."
+
+  - source: "def:conjugation"
+    kind: definition
+    status: planned
+    headline: false
+    note: "Analytic conjugacy. PLAN.md, decision D3, fixes whether the conjugating map is required to have nonvanishing derivative. Phase 6."
+
+  - source: "unlabelled:def-subconjugated"
+    kind: definition
+    status: planned
+    headline: false
+    note: "Sub-conjugacy to a self-similar system. Phase 6."
+
+  - source: "thm:SubConjugation"
+    kind: theorem
+    status: planned
+    headline: true
+    note: "Split into three endpoints: the similarity map, part (a) and part (b). The Lean proof of the forward direction of (a) uses that g''/g' is a common fixed point of the dual operators (PLAN.md, issues I5 and I7). Phase 6."
+
+  - source: "lem:ExistanceAttractor"
+    kind: lemma
+    status: formalized
+    lean: ["AnalyticESC.IFS.existsUnique_isDualAttractor"]
+    relation: representation
+    headline: false
+    note: "C^omega_eps([0,1]) is AnalyticESC.analyticSpace, the restrictions to B_eps of maps holomorphic there and real on I, with the topology of uniform convergence on B_eps. The hypothesis 0 < N is the paper's implicit assumption that the IFS has a map."
+
+  - source: "thm:DualSSC"
+    kind: theorem
+    status: formalized
+    lean: ["AnalyticESC.IFS.theorem_2_2"]
+    relation: exact
+    headline: false
+    note: "Proved from the condensation dichotomy, so it does not use Lemma 2.5(d) (PLAN.md, issue I4)."
+
+  - source: "thm:DualConj"
+    kind: theorem
+    status: planned
+    headline: false
+    note: "Phase 6, after decision D3 on the notion of conjugacy."
+
+  - source: "thm:H_iAnalytic"
+    kind: lemma
+    status: formalized
+    lean: ["AnalyticESC.IFS.dualProj_mem_analyticSpace", "AnalyticESC.IFS.exists_dualProj_holder", "AnalyticESC.IFS.isDualAttractor_range"]
+    relation: split
+    headline: false
+    note: "The three claims: H_i lies in C^omega_eps([0,1]), the Hoelder bound on B_eps, and that {H_i : i in Sigma} is the attractor."
+
+  - source: "lem:SSCEequiv"
+    kind: lemma
+    status: planned
+    headline: false
+    note: "Not formalised as stated, because of item (d) (PLAN.md, issue I4). The equivalence (a) <=> (c) is AnalyticESC.IFS.dualSSC_iff_exists_delta, with the variant AnalyticESC.IFS.dualSSC_iff_ne."
+
+  - source: "lem:cont"
+    kind: lemma
+    status: formalized
+    lean: ["AnalyticESC.IFS.lemma_2_6", "AnalyticESC.IFS.exists_dualProj_sub_le_d2"]
+    relation: split
+    headline: false
+    note: "The estimate (2.6) holds for all finite and infinite words. As in the paper, the perturbed system is controlled with the constants c_min/2 and a constant in (c_max, 1)."
+
+  - source: "thm:ugly"
+    kind: lemma
+    status: intentionally_unformalized
+    headline: false
+    reason: "The Lean route bounds the derivatives of H_w by Cauchy estimates on B_epsilon (thm:kbound, thm:difbound), so the Faa di Bruno formula for H_w is not needed."
+
+  - source: "thm:kbound"
+    kind: lemma
+    status: formalized
+    lean: ["AnalyticESC.IFS.lemma_2_8"]
+    relation: exact
+    headline: false
+    note: "Proved by Cauchy estimates on discs in B_eps."
+
+  - source: "thm:difcor"
+    kind: corollary
+    status: formalized
+    lean: ["AnalyticESC.IFS.corollary_2_9"]
+    relation: exact
+    headline: false
+    note: "Holds for any constants C_k as in Lemma 2.8; the hypothesis k >= 1 is not needed."
+
+  - source: "thm:difbound"
+    kind: lemma
+    status: formalized
+    lean: ["AnalyticESC.IFS.lemma_2_10"]
+    relation: exact
+    headline: false
+    note: "Stated, as in the paper, for distinct words, with the constants of Lemma 2.8. AnalyticESC.IFS.exists_iteratedDeriv_bounds gives the bound for every common prefix length m <= |i ∧ j|."
+
+  - source: "thm:analyticity"
+    kind: lemma
+    status: formalized
+    lean: ["AnalyticESC.lemma_3_1"]
+    relation: exact
+    headline: false
+    note: "AnalyticESC.abs_deriv_sub_le_of_abs_sub_le is the C^2 form with any common bound Q, and AnalyticESC.abs_iteratedDeriv_sub_le its iterate."
+
+  - source: "lem:Pointsx_ij"
+    kind: lemma
+    status: formalized
+    lean: ["AnalyticESC.IFS.lemma_4_1"]
+    relation: exact
+    headline: false
+    note: "Orbits are lists of real points; item (c) is stated for distinct pairs of B_n."
+
+  - source: "prop:AnalyticBumpFunc"
+    kind: proposition
+    status: planned
+    headline: false
+    note: "The Gaussian perturbation is not small on the complex neighbourhood, and g(I) need not lie in I (PLAN.md, issues I1 and I2). Phase 5."
+
+  - source: "unlabelled:lem-gaussian-bound"
+    kind: lemma
+    status: formalized
+    lean: ["AnalyticESC.gaussian_bound"]
+    relation: exact
+    headline: false
+
+  - source: "lem:conj0"
+    kind: lemma
+    status: formalized
+    lean: ["AnalyticESC.lemma_5_1", "AnalyticESC.existsUnique_fixedPoint"]
+    relation: split
+    headline: false
+    note: "The map g is a + b times the linearising map of (5.2), AnalyticESC.koenigs, which is constructed as a uniform limit on B_eps; Lean does not integrate H. Invertibility means injectivity of the real restriction on [0,1]. The second part assumes g twice differentiable within [0,1], with one-sided derivatives at the end points. Ĥ_f of (5.1) is AnalyticESC.hatH."

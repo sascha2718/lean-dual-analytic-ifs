@@ -1,0 +1,10 @@
+.lake/
+build/
+*.olean
+*.ilean
+*.trace
+
+Archive/
+Archive.lean
+texput.log
+.DS_Store
