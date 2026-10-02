@@ -7,6 +7,7 @@ public import AnalyticESC.Analysis
 public import AnalyticESC.Separation
 public import AnalyticESC.Dual.Projection
 public import AnalyticESC.Dual.Derivatives
+public import AnalyticESC.Dual.HigherDerivatives
 public import AnalyticESC.Dual.Attractor
 public import AnalyticESC.Dual.Cylinders
 public import AnalyticESC.Main.Closeness
@@ -29,6 +30,7 @@ public import AnalyticESC.Conjugation.Composite
 public import AnalyticESC.Conjugation.Zeros
 public import AnalyticESC.Conjugation.Characterisation
 public import AnalyticESC.Conjugation.DualConj
+public import AnalyticESC.Conjugation.ExactOverlaps
 
 /-!
 # Exponential separation of analytic self-conformal sets on the real line
@@ -46,6 +48,7 @@ analytic self-conformal sets on the real line*.
   SESC ⇒ ESC, the natural projection and the attractor.
 * `Dual.Projection`: the dual natural projection, the cocycle identity, (2.7), Lemma 2.4 (a), (b).
 * `Dual.Derivatives`: Lemma 2.8, Corollary 2.9 and Lemma 2.10, by Cauchy estimates.
+* `Dual.HigherDerivatives`: the identity (2.10) and Lemma 2.7.
 * `Dual.Attractor`: Lemma 2.1, Lemma 2.4 (c) and Lemma 2.5, (a) ⇔ (c).
 * `Dual.Cylinders`: the cylinder sets of Section 2.1 and Lemma 2.5.
 * `Main.Closeness`: the estimates (3.2) and (3.3).
@@ -68,4 +71,6 @@ analytic self-conformal sets on the real line*.
 * `Conjugation.Zeros`: conjugacies by injective analytic maps.
 * `Conjugation.Characterisation`: Theorem 1.12.
 * `Conjugation.DualConj`: Theorem 2.3.
+* `Conjugation.ExactOverlaps`: the remark after the conjecture of Section 1, exact overlaps
+  and sub-conjugation.
 -/

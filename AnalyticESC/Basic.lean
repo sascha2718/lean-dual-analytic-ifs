@@ -373,6 +373,30 @@ theorem im_deriv_comp_ofReal (w : List (Fin N)) {t : ℝ} (ht : (t : ℂ) ∈ nb
   im_deriv_eq_zero (isOpen_nbhd ε) (Φ.differentiableOn_comp w)
     (fun _ hs => Φ.im_comp_ofReal w hs) ht
 
+/-- The real restriction of a composition is injective on `I`. -/
+theorem injOn_re_comp (w : List (Fin N)) :
+    InjOn (fun t : ℝ => (Φ.comp w t).re) I := by
+  have hcl : ∀ t ∈ I, (t : ℂ) ∈ closure (nbhd ε) := fun t ht =>
+    subset_closure (ofReal_mem_nbhd Φ.ε_pos ht)
+  have hd : ∀ t ∈ I, HasDerivAt (fun t : ℝ => (Φ.comp w t).re) (deriv (Φ.comp w) t).re t :=
+    fun t ht => hasDerivAt_re_ofReal (Φ.differentiableAt_comp w (hcl t ht))
+  have hne : ∀ t ∈ I, (deriv (Φ.comp w) t).re ≠ 0 := fun t ht h0 =>
+    Φ.deriv_comp_ne_zero w (hcl t ht)
+      (Complex.ext h0 (Φ.im_deriv_comp_ofReal w (ofReal_mem_nbhd Φ.ε_pos ht)))
+  -- Rolle's theorem
+  have key : ∀ a ∈ I, ∀ b ∈ I, a < b → (Φ.comp w a).re ≠ (Φ.comp w b).re := by
+    intro a ha b hb hab heq
+    have hsub : Icc a b ⊆ I := Icc_subset_Icc ha.1 hb.2
+    obtain ⟨c, hc, hc0⟩ := exists_hasDerivAt_eq_zero (f' := fun t => (deriv (Φ.comp w) t).re)
+      hab (fun t ht => (hd t (hsub ht)).continuousAt.continuousWithinAt) heq
+      (fun t ht => hd t (hsub (Ioo_subset_Icc_self ht)))
+    exact hne c (hsub (Ioo_subset_Icc_self hc)) hc0
+  intro a ha b hb hab
+  rcases lt_trichotomy a b with h | h | h
+  · exact absurd hab (key a ha b hb h)
+  · exact h
+  · exact absurd hab.symm (key b hb a ha h)
+
 /-- The image `f_w(I)` is an interval of length between `c_min^{|w|}` and `c_max^{|w|}`. -/
 theorem exists_image_comp_eq_Icc (w : List (Fin N)) :
     ∃ p q : ℝ, 0 ≤ p ∧ p ≤ q ∧ q ≤ 1 ∧ Φ.cmin ^ w.length ≤ q - p ∧

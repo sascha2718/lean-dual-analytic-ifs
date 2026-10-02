@@ -151,9 +151,11 @@ entries:
 
   - source: "thm:ugly"
     kind: lemma
-    status: intentionally_unformalized
+    status: formalized
+    lean: ["AnalyticESC.IFS.lemma_2_7", "AnalyticESC.IFS.iteratedDeriv_comp_div_deriv", "AnalyticESC.gPoly", "AnalyticESC.IFS.dualDerivTerm"]
+    relation: representation
     headline: false
-    reason: "The Lean route bounds the derivatives of H_w by Cauchy estimates on B_epsilon (thm:kbound, thm:difbound), so the Faa di Bruno formula for H_w is not needed."
+    note: "The polynomials g_k are AnalyticESC.gPoly with integer coefficients, the variable X l standing for H^(l); the partitions of {1, ..., k+1} are Mathlib's OrderedFinpartition (k + 1), with blocks ordered by their greatest element; phi_i^(m) is written as the (m-1)-th derivative of f_i''/f_i'. The identity (2.10) is AnalyticESC.IFS.iteratedDeriv_comp_div_deriv. The Lean statement also asserts convergence of the series for infinite words. The proof uses a local primitive of f_i''/f_i' in place of log|f_i'| and justifies the termwise differentiation by locally uniform convergence on B_eps. The Lean route to Lemmas 2.8 to 2.10 does not use this lemma."
 
   - source: "thm:kbound"
     kind: lemma

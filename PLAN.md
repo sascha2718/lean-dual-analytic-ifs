@@ -7,9 +7,8 @@ numbers refer to the current compiled version: Definition 1.2 (`def:SESC`), Theo
 (`thm:SubConjugation`), Section 2 (dual IFS), Section 3 (proof of 1.5), Section 4 (proof of 1.4),
 Section 5 (conjugation).
 
-Status: every statement of the paper is formalised except Rapaport's Theorem 1.6, Corollary 1.7
-and Lemma 2.7 (not needed by the Lean route), with no `sorry` and only the axioms `propext`,
-`Classical.choice` and `Quot.sound`:
+Status: every statement of the paper is formalised except Rapaport's Theorem 1.6 and Corollary
+1.7, with no `sorry` and only the axioms `propext`, `Classical.choice` and `Quot.sound`:
 
 | Paper | Lean |
 |---|---|
@@ -22,6 +21,7 @@ and Lemma 2.7 (not needed by the Lean route), with no `sorry` and only the axiom
 | Lemma 2.4 | `IFS.dualProj_mem_analyticSpace`, `IFS.exists_dualProj_holder`, `IFS.isDualAttractor_range` |
 | Lemma 2.5 | `IFS.lemma_2_5`, `IFS.dualSSC_iff_exists_delta`, `IFS.dualSSC_iff_ne` |
 | Lemma 2.6 and (2.6) | `IFS.lemma_2_6`, `IFS.lemma_2_6_union`, `IFS.exists_dualProj_sub_le_d2` |
+| Lemma 2.7 and (2.10) | `IFS.lemma_2_7`, `IFS.iteratedDeriv_comp_div_deriv`, `gPoly`, `IFS.dualDerivTerm` |
 | Lemma 2.8, Corollary 2.9, Lemma 2.10 | `IFS.lemma_2_8`, `IFS.corollary_2_9`, `IFS.lemma_2_10` |
 | Lemma 3.1 | `lemma_3_1` |
 | Lemma 3.2 | `IFS.condensation_dichotomy` |
@@ -33,6 +33,7 @@ and Lemma 2.7 (not needed by the Lean route), with no `sorry` and only the axiom
 | Lemma 5.1, (5.1), (5.2) | `lemma_5_1`, `existsUnique_fixedPoint`, `hatH`, `koenigs` |
 | Definition 1.9 and Theorem 1.12 | `IsAnalyticCoord`, `ConjSelfSimilar`, `IFS.SubConjSelfSimilar`; `Challenge.audit_conj_similarity`, `Challenge.audit_conj_iff`, `Challenge.audit_subconj_iff` (audited), `IFS.theorem_1_12_similarity`, `IFS.theorem_1_12` |
 | Theorem 2.3 | `IFS.theorem_2_3_conj`, `IFS.theorem_2_3_subconj` |
+| Remark after the conjecture of Section 1 (exact overlaps and sub-conjugation) | `IFS.subConjSelfSimilar_of_hasExactOverlaps` |
 
 The manuscript now corrects the statements of Proposition 1.8, Theorem 2.3 and Lemma 5.1 and the
 proofs affected by issues I5 to I14. Decision D1 is taken (the union class), and the manuscript
@@ -41,8 +42,8 @@ the union class; Lemma 4.2 uses affine target maps with disjoint images of `[0,1
 Proposition 4.4 an additive perturbation by Gaussian bumps with Cauchy estimates (constant
 `C = 8`).
 Lemma 5.1 is proved through the linearising map (5.2), constructed as a uniform limit on `B_ε`, so
-no primitive of `Ĥ_f` is needed. Lemma 2.7 is not needed
-by the Lean route. The proof of Theorem 1.5 uses the condensation dichotomy
+no primitive of `Ĥ_f` is needed. Lemma 2.7 is formalised but not used: Lemmas 2.8 to 2.10 are
+proved by Cauchy estimates. The proof of Theorem 1.5 uses the condensation dichotomy
 `IFS.condensation_dichotomy`, with a single case split on whether the prefix lengths `|a_k|` stay
 bounded.
 
@@ -266,6 +267,16 @@ Lemma 2.5 (b) for `Ψ*` needs `G_i cl(k,K) ⊆ (k,K)`, which the proof did not c
 fixes `K > M/(1-c')` with `c' = (1+c_max)/2` and `M = 1 + max sup |f_i''/f_i'|`, `k = -K`, and
 chooses `δ` so small that every `Ψ` within `(C+3)δ` has `|g_i'| ≤ c'` and `|g_i''/g_i'| ≤ M` on
 `[0,1]`. It also makes the bound `d₂(Φ,Ψ) < (C+3)δ` explicit.
+
+**I18. Remark after the conjecture: exact overlaps and sub-conjugation.** *Resolved in the
+manuscript.* The remark claimed that every analytic IFS with an exact overlap is sub-conjugated to
+a self-similar IFS. With a singleton attractor every IFS has an exact overlap (all compositions
+agree on `Λ = {p}`), and sub-conjugation would require two distinct compositions of equal length
+that commute, which the paper does not show. The remark now assumes a non-singleton attractor
+and contains the proof: `f_i = f_j` on `[0,1]` by analyticity; if `|i| < |j|`, then `i` is not a
+prefix of `j`, so `ij ≠ ji` have the same length and `f_{ij} = f_{ji}` on `[0,1]`; the map
+conjugating one composition to a similarity conjugates the pair. Lean:
+`IFS.subConjSelfSimilar_of_hasExactOverlaps`.
 
 **I4. Lemma 2.5(d) and the proof of Theorem 2.2.** *Resolved in the manuscript: (d) is removed, and Theorems 1.5 and 2.2 follow from the new Lemma 3.2.* For a finite word, `H_i = F_i(0)` and `0` is
 not in `Λ*` in general, so (a) ⇒ (d) is not a consequence of the strong separation of `Λ*` for
