@@ -51,23 +51,27 @@ entries:
 
   - source: "thm:RapaportMain"
     kind: theorem
-    status: intentionally_unformalized
-    headline: false
-    reason: "Cited result of Rapaport on the dimension of self-conformal sets and measures under ESC; its proof is outside the scope of this formalisation."
+    status: formalized
+    lean: ["Challenge.audit_dim_of_esc"]
+    relation: representation
+    headline: true
+    note: "Derived in AnalyticESC.IFS.theorem_1_6 from Rapaport's Theorem 1.2 and Corollary 1.3 (arXiv:2412.16753), which the audited statement takes as the hypotheses RapaportMeasureStatement and RapaportSetStatement, stated for real analytic maps of [0,1] as in his paper. Equality in (1.6) is AnalyticESC.IFS.DimEquality: the pressure has a unique zero s(Phi) and dim_H of the attractor is min{1, s(Phi)}; for each positive probability vector p, the self-conformal measure has local dimension min{1, H(p)/chi} almost everywhere (exact dimensionality, Feng and Hu, is part of RapaportMeasureStatement). The statement assumes N > 0; the remark after the theorem, that the attractor is a singleton exactly when the maps have a common fixed point, is AnalyticESC.IFS.exists_attractor_eq_singleton_iff."
 
   - source: "cor:dim"
     kind: corollary
-    status: intentionally_unformalized
-    headline: false
-    reason: "Combines thm:ESCOpenDense with the cited thm:RapaportMain. A conditional version with Rapaport's theorem as a named literature axiom is an optional later phase (PLAN.md, decision D5)."
+    status: formalized
+    lean: ["Challenge.audit_dim_open_dense"]
+    relation: representation
+    headline: true
+    note: "AnalyticESC.corollary_1_7, for N >= 2, assuming Rapaport's results, and Theorem 1.4. The open set is the open set of Theorem 1.4 intersected with the systems having two maps with distinct fixed points, which is open and dense in the union class for N >= 2. Equality in (1.6) is AnalyticESC.IFS.DimEquality, as for thm:RapaportMain."
 
   - source: "prop:example"
     kind: proposition
     status: formalized
-    lean: ["Challenge.audit_example_criterion", "Challenge.audit_example_sesc"]
+    lean: ["Challenge.audit_example_criterion", "Challenge.audit_example_sesc", "Challenge.audit_example_dim", "Challenge.audit_example_localDim", "Challenge.audit_example_lq"]
     relation: split
     headline: true
-    note: "The proposition is AnalyticESC.IFS.proposition_1_8, with beta as AnalyticESC.IFS.beta. The example after the proof is AnalyticESC.example_sesc, with epsilon = 1/100: AnalyticESC.exampleIFS has c_max < 1/5 (exampleIFS_cmax_lt), beta <= 1 (exampleIFS_beta_le) and distortions 1/2 apart at 0 (exampleIFS_nonlin_sep). The challenge splits the conclusion over finite and infinite words, as for Theorem 1.5."
+    note: "The proposition is AnalyticESC.IFS.proposition_1_8, with beta as AnalyticESC.IFS.beta. The example after the proof is AnalyticESC.example_sesc, with epsilon = 1/100: AnalyticESC.exampleIFS has c_max < 1/5 (exampleIFS_cmax_lt), beta <= 1 (exampleIFS_beta_le) and distortions 1/2 apart at 0 (exampleIFS_nonlin_sep). The challenge splits the conclusion over finite and infinite words, as for Theorem 1.5. The dimensions of the example, dim_H of the attractor = s(Phi) < 1 and dim mu_p = H(p)/chi < 1, are AnalyticESC.example_dim, from Theorem 1.6, as in the manuscript. The local dimension s(Phi) - 1/3 at 0 of the natural measure, in the remark at the end of Section 1.2.2, is AnalyticESC.example_localDim_of_bowen, and the bound D_mu(q) <= q (s(Phi) - 1/3)/(q - 1) < s(Phi) for q > 3 s(Phi) on its L^q dimensions is AnalyticESC.example_lq_of_bowen, both assuming Bowen's theorem (BowenGibbsStatement). The L^q statement also asserts that the L^q sums converge and that the liminf defining the L^q spectrum is not a junk value."
 
   - source: "def:conjugation"
     kind: definition

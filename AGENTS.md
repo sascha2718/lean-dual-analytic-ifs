@@ -43,6 +43,11 @@ instructions. The manuscript is `../analytic.tex`.
   headline declarations with `sorry`.
 - Every permitted literature axiom must be conspicuously named and cited, identically declared in
   Challenge and Solution, and individually whitelisted in `comparator.json`.
+- Prefer named hypotheses to literature axioms: the con-ron kernel, which the CI audit and
+  Palomar run, rejects every non-standard axiom. A cited result the authors agree to assume is a
+  named, cited `Prop` in Challenge and Solution, stated as in its source, and an explicit
+  hypothesis of the endpoints that use it. These endpoints are the only permitted conditional
+  statements in `Challenge.lean`.
 - Never put proof bodies, proved helper lemmas, internal reductions, conditional variants or
   audit endpoints in `Challenge.lean`.
 - Put all proof infrastructure in `Solution.lean` or the library. `Solution.lean` repeats the

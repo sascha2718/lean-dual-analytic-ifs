@@ -54,13 +54,20 @@ status:
     Audited: Theorem 1.4 (an open and dense set of strongly exponentially separated systems in
     the C2 topology), Theorem 1.5 (the sufficient condition for the strong exponential
     separation condition), Proposition 1.8 (an explicit criterion), the example of Section 1.2.2
-    and Theorem 1.12 (conjugacy and sub-conjugacy to self-similar systems), stated in
-    Challenge.lean and proved in Solution.lean. Formalised in the library: the exponential
-    separation conditions and Definition 1.2 (failure of the SESC is weak super-exponential
+    with its dimensions and the local and L^q dimensions of its natural measure, Theorem 1.6
+    (Rapaport, in the class of the paper), Corollary 1.7 (for N ≥ 2) and Theorem 1.12 (conjugacy and
+    sub-conjugacy to self-similar systems), stated in Challenge.lean and proved in Solution.lean.
+    Five of them take results from the literature as explicit hypotheses, stated as in their
+    sources and defined identically in Challenge.lean and Solution.lean: Bowen's theorem on Gibbs
+    measures (BowenGibbsStatement), Rapaport's Theorem 1.2 with the exact dimensionality of Feng
+    and Hu (RapaportMeasureStatement) and Rapaport's Corollary 1.3 (RapaportSetStatement).
+    Formalised in the library: the exponential separation conditions and Definition 1.2 (failure
+    of the SESC is weak super-exponential
     condensation), Definition 1.9, Theorems 2.2 and 2.3, Lemmas 2.1, 2.4, 2.5, 2.6, 2.7, 2.8,
     2.10, 3.1, 3.2, 4.1, 4.2, 4.3 and 5.1, Corollary 2.9, Proposition 4.4, the bound (4.3) and
-    the remark after the conjecture of Section 1 (exact overlaps and sub-conjugation). Not
-    formalised: Theorem 1.6 (Rapaport) and Corollary 1.7.
+    the remark after the conjecture of Section 1 (exact overlaps and sub-conjugation), and the
+    local dimension s(Φ) - 1/3 at 0 of the natural measure of the example of Section 1.2.2, for
+    a measure with the Gibbs property.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: ["propext", "Classical.choice", "Quot.sound"]
@@ -116,7 +123,15 @@ fidelity:
     perturbation f exp(φψA), with the absolute constant C = 8. In the density step the bound M
     on g''/g' is fixed before δ. In the remark after the conjecture of Section 1, that a
     non-singleton attractor is infinite is proved from the invariance of Λ under the compositions
-    and a pigeonhole argument, without fixed points.
+    and a pigeonhole argument, without fixed points. Bowen's theorem and Rapaport's Theorem 1.2
+    and Corollary 1.3 are hypotheses, stated as in their sources (Rapaport's for real analytic
+    maps of [0,1]). The natural measure of the
+    example is the image of a Gibbs measure in Bowen's sense of s(Φ) log|f'_{ω₀}(π(σω))|, and the
+    bounds on f_w and f_w' for words over {1,2} are proved by induction on the word, with
+    polynomial bounds in place of the product estimate. The pressure and s(Φ) come from Fekete's
+    lemma. The dimension of a self-conformal measure is its almost everywhere local dimension.
+    Theorem 1.6 assumes N > 0. The open set of Corollary 1.7 (N ≥ 2) is the open set of
+    Theorem 1.4 intersected with the systems without a common fixed point.
 
 review:
   status: "unchecked"
@@ -163,6 +178,31 @@ alignment:
       module: "Challenge"
       status: "proved"
       note: "Proved in Solution from AnalyticESC.Conjugation.Characterisation; the hypothesis on the attractor is not needed."
+    - source: "Theorem 1.6 (Rapaport: dimension under the ESC)"
+      lean: "Challenge.audit_dim_of_esc"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from AnalyticESC.Dimension.Rapaport assuming Rapaport's Theorem 1.2 and Corollary 1.3 (RapaportMeasureStatement, RapaportSetStatement)."
+    - source: "Corollary 1.7 (open and dense set of systems without dimension drop)"
+      lean: "Challenge.audit_dim_open_dense"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from AnalyticESC.Dimension.OpenDense assuming Rapaport's results, for N ≥ 2."
+    - source: "The example of Section 1.2.2 (dimensions of the attractor and of self-conformal measures)"
+      lean: "Challenge.audit_example_dim"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from AnalyticESC.Dimension.Example, assuming Rapaport's results."
+    - source: "The remark at the end of Section 1.2.2 (local dimension of the natural measure at 0)"
+      lean: "Challenge.audit_example_localDim"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from AnalyticESC.Dimension.NaturalMeasure assuming Bowen's theorem (BowenGibbsStatement)."
+    - source: "The end of Section 1.2.2 (L^q dimensions of the natural measure)"
+      lean: "Challenge.audit_example_lq"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from AnalyticESC.Dimension.Lq assuming Bowen's theorem (BowenGibbsStatement). The statement also asserts that the L^q sums converge and that the liminf defining the L^q spectrum is not a junk value."
 
 acknowledgements: >-
   Lean 4 and Mathlib (leanprover-community), the leanprover comparator, lean4export and nanoda.

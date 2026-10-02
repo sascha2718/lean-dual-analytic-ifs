@@ -8,7 +8,12 @@
         "Challenge.audit_example_sesc",
         "Challenge.audit_conj_similarity",
         "Challenge.audit_conj_iff",
-        "Challenge.audit_subconj_iff"
+        "Challenge.audit_subconj_iff",
+        "Challenge.audit_dim_of_esc",
+        "Challenge.audit_dim_open_dense",
+        "Challenge.audit_example_dim",
+        "Challenge.audit_example_localDim",
+        "Challenge.audit_example_lq"
     ],
     "definition_names": [],
     "permitted_axioms": [

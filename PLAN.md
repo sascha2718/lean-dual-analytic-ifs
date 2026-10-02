@@ -7,8 +7,10 @@ numbers refer to the current compiled version: Definition 1.2 (`def:SESC`), Theo
 (`thm:SubConjugation`), Section 2 (dual IFS), Section 3 (proof of 1.5), Section 4 (proof of 1.4),
 Section 5 (conjugation).
 
-Status: every statement of the paper is formalised except Rapaport's Theorem 1.6 and Corollary
-1.7, with no `sorry` and only the axioms `propext`, `Classical.choice` and `Quot.sound`:
+Status: every statement of the paper is formalised, with no `sorry` and only the axioms
+`propext`, `Classical.choice` and `Quot.sound`. Three cited results, Bowen's theorem on Gibbs
+measures and Rapaport's Theorem 1.2 and Corollary 1.3, are stated as in their sources and are
+explicit hypotheses of the theorems that use them (decision D5).
 
 | Paper | Lean |
 |---|---|
@@ -34,6 +36,12 @@ Status: every statement of the paper is formalised except Rapaport's Theorem 1.6
 | Definition 1.9 and Theorem 1.12 | `IsAnalyticCoord`, `ConjSelfSimilar`, `IFS.SubConjSelfSimilar`; `Challenge.audit_conj_similarity`, `Challenge.audit_conj_iff`, `Challenge.audit_subconj_iff` (audited), `IFS.theorem_1_12_similarity`, `IFS.theorem_1_12` |
 | Theorem 2.3 | `IFS.theorem_2_3_conj`, `IFS.theorem_2_3_subconj` |
 | Remark after the conjecture of Section 1 (exact overlaps and sub-conjugation) | `IFS.subConjSelfSimilar_of_hasExactOverlaps` |
+| Theorem 1.6 (Rapaport) and the remark after it | `Challenge.audit_dim_of_esc` (audited), `IFS.theorem_1_6`, `IFS.exists_attractor_eq_singleton_iff` |
+| Corollary 1.7 (for `N ≥ 2`) | `Challenge.audit_dim_open_dense` (audited), `corollary_1_7` |
+| The pressure and the conformality dimension `s(Φ)` (Section 1.2.1) | `IFS.exists_pressure_zero` |
+| Dimensions in the example of Section 1.2.2 | `Challenge.audit_example_dim` (audited), `example_dim` |
+| `L^q` dimensions of the natural measure of the example (end of Section 1.2.2) | `Challenge.audit_example_lq` (audited), `example_lq_of_bowen`, `lqSum`, `lqRatio`, `lqDim` |
+| Remark at the end of Section 1.2.2 (local dimension of the natural measure of the example) | `Challenge.audit_example_localDim` (audited), `example_localDim_of_bowen`, `example_localDim`, `IFS.exists_isGibbsMeasure`, `IFS.isGibbs_of_isGibbsMeasure` |
 
 The manuscript now corrects the statements of Proposition 1.8, Theorem 2.3 and Lemma 5.1 and the
 proofs affected by issues I5 to I14. Decision D1 is taken (the union class), and the manuscript
@@ -49,7 +57,8 @@ bounded.
 
 ## 1. Proposed headline endpoints
 
-Seven audited theorems, stated in `Challenge.lean` over Mathlib alone.
+Twelve audited theorems, stated in `Challenge.lean` over Mathlib alone. Five of them take cited
+results as hypotheses (decision D5).
 
 | Endpoint | Paper | Content |
 |---|---|---|
@@ -60,6 +69,11 @@ Seven audited theorems, stated in `Challenge.lean` over Mathlib alone.
 | `audit_conj_similarity` | Thm 1.12, first claim | Every system is conjugated to one with a similarity map |
 | `audit_conj_iff` | Thm 1.12(a) | Conjugacy to a self-similar system iff all `H_i` agree on `[0,1]` |
 | `audit_subconj_iff` | Thm 1.12(b) | Sub-conjugacy iff `H_{i^∞} ≡ H_{j^∞}` for distinct `i, j` of equal length |
+| `audit_dim_of_esc` | Thm 1.6 | Non-singleton attractor and ESC imply equality in (1.6), from Rapaport's results |
+| `audit_dim_open_dense` | Cor 1.7 | For `N ≥ 2`, systems with equality in (1.6) contain a `d₂`-open, `d₂`-dense subset |
+| `audit_example_dim` | Example, Section 1.2.2 | `dim_H Λ = s(Φ) < 1` and `dim μ_p = H(p)/χ < 1` |
+| `audit_example_localDim` | Remark, Section 1.2.2 | The natural measure has local dimension `s(Φ) - 1/3` at `0` |
+| `audit_example_lq` | End of Section 1.2.2 | The natural measure has `D_μ(q) ≤ q(s(Φ) - 1/3)/(q - 1) < s(Φ)` for `q > 3s(Φ)` |
 
 The dual-IFS reformulations (Theorems 2.2, 2.3 and Lemma 2.1) are proved in the library and
 recorded in the correspondence manifest, but are not audited endpoints: stating them in the
@@ -201,12 +215,21 @@ argument (issue I5). Recommendation: keep the paper's notion (analytic and injec
 the challenge and prove in the library that `g' ≠ 0` on `I` when the attractor is not a
 singleton. Fallback: require `g' ≠ 0` (analytic diffeomorphism), which removes that lemma.
 
-**D4. Headline scope.** The seven endpoints of Section 1. Adding Theorems 2.2 and 2.3 as
+**D4. Headline scope.** The twelve endpoints of Section 1. Adding Theorems 2.2 and 2.3 as
 endpoints is possible but brings the dual attractor into the challenge.
 
-**D5. Corollary 1.7 and Rapaport's theorem.** Recommendation: out of scope. A conditional
-version with Theorem 1.6 as a named, cited literature axiom would need Hausdorff dimension of
-measures, self-conformal measures, pressure and Lyapunov exponents in the challenge vocabulary.
+**D5. Corollary 1.7 and Rapaport's theorem.** *Decided: cited results as named hypotheses.*
+Rapaport's Theorem 1.2 (with the exact dimensionality of Feng and Hu) and Corollary 1.3, and
+Bowen's theorem on Gibbs measures (Theorem 1.4 of his lecture notes, for the one-sided full
+shift), are the propositions `RapaportMeasureStatement`, `RapaportSetStatement` and
+`BowenGibbsStatement`, stated as in the cited sources: Rapaport's for real analytic maps of
+`[0,1]` with his hypotheses (`RapaportHyp`), Bowen's for potentials with exponentially decaying
+variations. They are defined identically in `Challenge.lean`, `Solution.lean` and
+`Dimension/Defs.lean`, and are explicit hypotheses of the five audited theorems that use them:
+Theorem 1.6 in the class of the paper, Corollary 1.7 (for `N ≥ 2`), the dimensions of the example
+and the local dimension of its natural measure. Literature axioms were tried first: Lean's kernel
+and nanoda accept them, but con-ron, which the CI audit and Palomar run, rejects every
+non-standard axiom.
 
 **D6. Suprema.** Recommendation: write `sup_{x∈[0,1]} |u(x)| > 0` as `∃ x ∈ I, u x ≠ 0`, and
 `sup ≥ c^n` as `∃ x ∈ I, c^n ≤ |u x|`. These are equivalent for continuous `u` (for SESC up to
@@ -277,6 +300,18 @@ and contains the proof: `f_i = f_j` on `[0,1]` by analyticity; if `|i| < |j|`, t
 prefix of `j`, so `ij ≠ ji` have the same length and `f_{ij} = f_{ji}` on `[0,1]`; the map
 conjugating one composition to a similarity conjugates the pair. Lean:
 `IFS.subConjSelfSimilar_of_hasExactOverlaps`.
+
+**I19. Corollary 1.7 and singleton attractors.** *Resolved in the manuscript.* Theorem 1.6
+needs a non-singleton attractor, which Theorem 1.4 does not provide, so "combining Theorem 1.4
+with Theorem 1.6" did not give the corollary. The corollary now assumes `N ≥ 2`, and the text
+before it notes that the systems without a common fixed point are open and dense in `𝔖_N`, so
+Theorem 1.6 applies on the intersection with the open set of Theorem 1.4. Lean:
+`corollary_1_7`.
+
+**I20. Dimensions in the example.** *Resolved in the manuscript.* The example cited
+Corollary 1.7, a genericity statement, for `dim_H Λ = s(Φ)` and `dim μ_p = H(p)/χ`. They follow
+from Theorem 1.6, since the attractor is not a singleton, with `s(Φ) < 1` and `H(p) < χ` because
+`∑_i sup |f_i'| = 7/16 < 1`. Lean: `example_dim`.
 
 **I4. Lemma 2.5(d) and the proof of Theorem 2.2.** *Resolved in the manuscript: (d) is removed, and Theorems 1.5 and 2.2 follow from the new Lemma 3.2.* For a finite word, `H_i = F_i(0)` and `0` is
 not in `Λ*` in general, so (a) ⇒ (d) is not a consequence of the strong separation of `Λ*` for
@@ -356,6 +391,22 @@ so "Polish, i.e. complete" needs rewording; the claim is not used.
 5. **Finite and infinite words together.** Internally, a word in `Σ ∪ Σ_*` is a sequence in
    `Option (Fin N)` that stays `none` once it is `none`. This is a closed subset of a compact
    space, so limits of words of equal length have equal length, as used in Section 3.
+6. **Cited results as hypotheses.** The library states Bowen's theorem and Rapaport's Theorem 1.2
+   and Corollary 1.3 as propositions (`Dimension/Defs.lean`) and takes them as hypotheses, as do the
+   audited theorems in `Challenge.lean`. The natural measure is the image of a Gibbs measure in
+   Bowen's sense of the potential `s(Φ) log|f'_{ω₀}(π(σω))|`; bounded distortion turns Bowen's
+   bounds into `ν[w] ≍ ‖f_w'‖^{s(Φ)}` (`IFS.isGibbs_of_isGibbsMeasure`). The pressure and its zero
+   `s(Φ)` come from Fekete's lemma (`IFS.exists_pressure_zero`), without the cited results. The
+   bounds on `f_w` and `f_w'` for words over `{1,2}` in the example are proved by induction on the
+   word, with polynomial bounds in place of the paper's product estimate. The `L^q` bound at the end
+   of Section 1.2.2 follows from the local dimension; its statement also asserts that the `L^q` sums
+   converge and that the limit inferior defining `τ_μ(q)` is not a junk value.
+7. **Equality in (1.6).** The dimension of a self-conformal measure is its local dimension at
+   almost every point, as in Rapaport's paper (which uses the exact dimensionality of Feng and
+   Hu). Theorem 1.6 assumes `N > 0`. Corollary 1.7 is stated for `N ≥ 2`; its open set is the open
+   set of Theorem 1.4 intersected with the systems whose maps have no common fixed point, which is
+   open by compactness of `[0,1]` and dense by the perturbations of Lemma 4.2 (issue I19). In the
+   example, `dim_H Λ = s(Φ)` and `dim μ_p = H(p)/χ` follow from Theorem 1.6 (issue I20).
 
 ## 5. Library architecture
 

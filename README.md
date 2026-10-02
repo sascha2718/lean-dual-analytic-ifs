@@ -3,10 +3,12 @@
 This repository contains the Lean 4 formalisation of *On exponential separation of analytic
 self-conformal sets on the real line* by Balázs Bárány, István Kolossváry and Sascha Troscheit.
 
-**Status:** the statements of the paper without open issues are formalised, with no `sorry`
-and only the axioms `propext`, `Classical.choice` and `Quot.sound`. Seven statements, covering
-Theorems 1.4 and 1.5, Proposition 1.8, the example of Section 1.2.2 and Theorem 1.12, are audited
-by the comparator. [PLAN.md](PLAN.md) lists what is formalised, the issues found in the paper and the
+**Status:** every numbered statement of the paper is formalised, with no `sorry` and only the
+axioms `propext`, `Classical.choice` and `Quot.sound`. Three cited results, Bowen's theorem on
+Gibbs measures and Rapaport's Theorem 1.2 and Corollary 1.3, are stated as in their sources and
+are explicit hypotheses of the theorems that use them. Twelve statements, covering Theorems 1.4,
+1.5, 1.6 and 1.12, Corollary 1.7, Proposition 1.8 and the example of Section 1.2.2, are audited by
+the comparator. [PLAN.md](PLAN.md) lists what is formalised, the issues found in the paper and the
 remaining work.
 
 ## Results
@@ -18,6 +20,16 @@ remaining work.
 - **Explicit criterion (Proposition 1.8, formalised and audited):** distortions `f_i''/f_i'` that
   are far apart at some point, compared with the contraction ratios, give the SESC. The
   three-map example of Section 1.2.2 satisfies it (audited).
+- **Dimension (Theorem 1.6 and Corollary 1.7, formalised and audited, assuming Rapaport's
+  results):**
+  Rapaport's Theorem 1.2 and Corollary 1.3, stated for real analytic maps as in his paper, give
+  Theorem 1.6 in the class of the paper, and with Theorem 1.4 the open and dense set of
+  Corollary 1.7 (for `N ≥ 2`). In the example, `dim_H Λ = s(Φ) < 1` and `dim μ_p = H(p)/χ < 1`
+  (audited).
+- **Local dimension of the example (remark at the end of Section 1.2.2, formalised and
+  audited):** by Bowen's theorem the potential `s(Φ) log|f'_{ω₀}(π(σω))|` has a Gibbs measure
+  `ν`, and the natural measure `μ = ν ∘ π⁻¹` has local dimension `s(Φ) - 1/3` at `0`. Hence its
+  `L^q` dimensions satisfy `D_μ(q) ≤ q(s(Φ) - 1/3)/(q - 1) < s(Φ)` for `q > 3s(Φ)` (audited).
 - **Linearisation (Lemma 5.1, formalised):** the linearising map of a single map of the class.
 - **Genericity (Theorem 1.4, formalised and audited):** the systems satisfying the SESC contain
   an open and dense subset of the space of analytic IFSs in the `𝒞²` metric. The space is the

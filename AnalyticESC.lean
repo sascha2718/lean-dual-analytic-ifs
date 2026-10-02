@@ -14,6 +14,7 @@ public import AnalyticESC.Main.Closeness
 public import AnalyticESC.Main.Dichotomy
 public import AnalyticESC.Main.Criterion
 public import AnalyticESC.Main.Example
+public import AnalyticESC.Main.LocalDimension
 public import AnalyticESC.Generic.Continuity
 public import AnalyticESC.Generic.Points
 public import AnalyticESC.Generic.Class
@@ -31,6 +32,13 @@ public import AnalyticESC.Conjugation.Zeros
 public import AnalyticESC.Conjugation.Characterisation
 public import AnalyticESC.Conjugation.DualConj
 public import AnalyticESC.Conjugation.ExactOverlaps
+public import AnalyticESC.Dimension.Defs
+public import AnalyticESC.Dimension.Pressure
+public import AnalyticESC.Dimension.NaturalMeasure
+public import AnalyticESC.Dimension.Rapaport
+public import AnalyticESC.Dimension.OpenDense
+public import AnalyticESC.Dimension.Example
+public import AnalyticESC.Dimension.Lq
 
 /-!
 # Exponential separation of analytic self-conformal sets on the real line
@@ -55,6 +63,8 @@ analytic self-conformal sets on the real line*.
 * `Main.Dichotomy`: Theorem 1.5 and Theorem 2.2.
 * `Main.Criterion`: Proposition 1.8.
 * `Main.Example`: the example of Section 1.2.2.
+* `Main.LocalDimension`: the local dimension `s(Φ) - 1/3` at `0` of the natural measure of the
+  example, for a measure with the Gibbs property.
 * `Generic.Continuity`: the estimate (2.6) and Lemma 2.6.
 * `Generic.Points`: Lemma 4.3.
 * `Generic.Class`: Lemma 4.1, the classes `S^ω_ε(I)` and their union `S^ω(I)`.
@@ -73,4 +83,14 @@ analytic self-conformal sets on the real line*.
 * `Conjugation.DualConj`: Theorem 2.3.
 * `Conjugation.ExactOverlaps`: the remark after the conjecture of Section 1, exact overlaps
   and sub-conjugation.
+* `Dimension.Defs`: entropy, Lyapunov exponents, self-conformal measures, equality in (1.6),
+  Gibbs measures, and the statements of the cited results of Bowen and Rapaport.
+* `Dimension.Pressure`: the pressure and its unique zero, the conformality dimension `s(Φ)`.
+* `Dimension.NaturalMeasure`: the natural measure from Bowen's theorem, and its local dimension
+  `s(Φ) - 1/3` at `0` in the example.
+* `Dimension.Rapaport`: Theorem 1.6 from Rapaport's results, and the remark after it.
+* `Dimension.OpenDense`: Corollary 1.7.
+* `Dimension.Example`: the dimensions of the attractor and of the self-conformal measures of the
+  example of Section 1.2.2.
+* `Dimension.Lq`: the `L^q` dimensions of the natural measure of the example.
 -/
