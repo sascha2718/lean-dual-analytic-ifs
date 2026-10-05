@@ -8,7 +8,7 @@ public import AnalyticESC.Separation
 /-!
 # Exact overlaps and sub-conjugation
 
-The remark after the conjecture in Section 1: an analytic IFS with a non-singleton attractor and
+The remark on exact overlaps in Section 1.2.3: an analytic IFS with a non-singleton attractor and
 an exact overlap is sub-conjugated to a self-similar IFS.
 
 The attractor `Λ` is invariant under every composition `f_w`. If `Λ` is finite, then the iterates
@@ -114,6 +114,16 @@ private theorem exact_attractor_subsingleton (k : Fin N) (hfin : Φ.attractor.Fi
   rcases lt_or_gt_of_ne hnm with h | h
   · exact key n m h he.1 he.2
   · exact key m n h he.1.symm he.2.symm
+
+/-- The attractor of a system with at least one map is infinite unless it is a singleton. -/
+theorem attractor_infinite (hN : 0 < N) (hnd : ¬ ∃ x, Φ.attractor = {x}) :
+    Φ.attractor.Infinite := by
+  intro hfin
+  have hk : Φ.natProj (fun _ => (⟨0, hN⟩ : Fin N)) ∈ Φ.attractor := ⟨_, rfl⟩
+  rcases (Φ.exact_attractor_subsingleton ⟨0, hN⟩ hfin).eq_empty_or_singleton with he | he
+  · rw [he] at hk
+    exact hk
+  · exact hnd he
 
 /-- An exact overlap on a non-singleton attractor holds on `[0,1]`: the attractor is infinite, and
 two compositions agree at finitely many points of `I` unless they agree on `I`. -/

@@ -123,7 +123,7 @@ def HasExactOverlaps : Prop :=
   ∃ i j : List (Fin N), i ≠ j ∧ ∀ x ∈ Φ.attractor, Φ.comp i (x : ℂ) = Φ.comp j (x : ℂ)
 
 /-- Compositions along distinct finite words differ somewhere on `[0,1]`: `f_i ≢ f_j` on `[0,1]`
-for all distinct `i, j ∈ Σ_*` (the hypothesis of Lemma 4.3). -/
+for all distinct `i, j ∈ Σ_*` (the hypothesis of Lemma 4.1). -/
 def NoCoincidence : Prop :=
   ∀ i j : List (Fin N), i ≠ j → ∃ x ∈ I, Φ.comp i (x : ℂ) ≠ Φ.comp j (x : ℂ)
 

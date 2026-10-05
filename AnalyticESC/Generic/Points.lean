@@ -6,7 +6,7 @@ public import AnalyticESC.Separation
 @[expose] public section
 
 /-!
-# Lemma 4.3
+# Lemma 4.1
 
 For a system whose compositions along distinct finite words differ on `[0,1]`, a choice of
 points `x_{i,j}`, `(i, j) ∈ ℬ_n`, at which the cylinders of pairs that are not bad are disjoint,
@@ -155,14 +155,14 @@ private theorem take_reverse_ne_of_mem_pairs {n : ℕ} {p : (Fin n → Fin N) ×
     hn, dite_true] at this
   exact hlt.ne (Option.some_inj.1 this)
 
-/-- The properties of Lemma 4.3 (a) and (b) for one pair `p` and the point `t`. -/
+/-- The properties of Lemma 4.1 (a) and (b) for one pair `p` and the point `t`. -/
 private def Good (k K : ℝ) {n : ℕ} (p : (Fin n → Fin N) × (Fin n → Fin N)) (t : ℝ) : Prop :=
   t ∈ I ∧ (Φ.DualCylDisjoint k K (List.ofFn p.1) (List.ofFn p.2) →
       Disjoint (Φ.dualCylAt k K (List.ofFn p.1) t) (Φ.dualCylAt k K (List.ofFn p.2) t)) ∧
     (Φ.orbit (List.ofFn p.1) t).Nodup ∧ (Φ.orbit (List.ofFn p.2) t).Nodup ∧
     ∀ y ∈ Φ.orbit (List.ofFn p.1) t, y ∈ Φ.orbit (List.ofFn p.2) t → y = t
 
-/-- One step of the induction in Lemma 4.3: a point for the pair `p` whose orbits avoid the
+/-- One step of the induction in Lemma 4.1: a point for the pair `p` whose orbits avoid the
 finite set `F`. -/
 private theorem exists_point (h : Φ.NoCoincidence) (k K : ℝ) {n : ℕ}
     {p : (Fin n → Fin N) × (Fin n → Fin N)} (hp : p ∈ pairs N n) {F : Set ℝ} (hF : F.Finite) :
@@ -202,7 +202,7 @@ private theorem exists_point (h : Φ.NoCoincidence) (k K : ℝ) {n : ℕ}
     · obtain ⟨l, -, rfl⟩ := Φ.mem_orbit.1 hy
       exact havoid _ (hlen _ _)
 
-/-- The induction of Lemma 4.3 over finite sets of pairs. -/
+/-- The induction of Lemma 4.1 over finite sets of pairs. -/
 private theorem exists_points_finset (h : Φ.NoCoincidence) (k K : ℝ) (n : ℕ)
     (S : Finset ((Fin n → Fin N) × (Fin n → Fin N))) :
     ∃ x : (Fin n → Fin N) × (Fin n → Fin N) → ℝ,
@@ -253,7 +253,7 @@ private theorem exists_points_finset (h : Φ.NoCoincidence) (k K : ℝ) (n : ℕ
         · exact absurd hqp hpa
         exact hsep p hp q hq hpp hqp hpq
 
-/-- Lemma 4.3. A pair `(i, j)` is not bad when `F_i(k, K) ∩ F_j(k, K) = ∅` in the sense of (2.2). -/
+/-- Lemma 4.1. A pair `(i, j)` is not bad when `F_i(k, K) ∩ F_j(k, K) = ∅` in the sense of (2.2). -/
 theorem lemma_4_3 (n : ℕ) (k K : ℝ) (h : Φ.NoCoincidence) :
     ∃ x : (Fin n → Fin N) × (Fin n → Fin N) → ℝ,
       (∀ p ∈ pairs N n, x p ∈ I) ∧
@@ -272,7 +272,7 @@ theorem lemma_4_3 (n : ℕ) (k K : ℝ) (h : Φ.NoCoincidence) :
     fun p hp => (hgood p (Finset.mem_univ _) hp).2.2,
     fun p hp q hq hpq => hsep p (Finset.mem_univ _) q (Finset.mem_univ _) hp hq hpq⟩
 
-/-- A system without exact overlaps satisfies the hypothesis of Lemma 4.3. -/
+/-- A system without exact overlaps satisfies the hypothesis of Lemma 4.1. -/
 theorem noCoincidence_of_not_hasExactOverlaps (h : ¬ Φ.HasExactOverlaps) : Φ.NoCoincidence :=
   fun _ _ hij => Φ.exists_comp_ne_of_not_hasExactOverlaps h hij
 

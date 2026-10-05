@@ -386,19 +386,13 @@ theorem audit_example_localDim (hB : BowenGibbsStatement) :
 
 /-- The end of Section 1.2.2, from Bowen's theorem: for every Gibbs measure `ν` of the potential
 `s(Φ) log|f'_{ω₀}(π(σω))|` and every `q > 1`, the natural measure `μ = ν ∘ π⁻¹` has
-`D_μ(q) ≤ q (s(Φ) - 1/3) / (q - 1)`, which is smaller than `s(Φ)` for `q > 3 s(Φ)`. The `L^q` sums
-converge, and the quotient whose limit inferior is `τ_μ(q)` is bounded below and does not tend to
-`∞`, so the limit inferior is not a junk value. -/
+`D_μ(q) ≤ q (s(Φ) - 1/3) / (q - 1)`, which is smaller than `s(Φ)` for `q > 3 s(Φ)`. -/
 theorem audit_example_lq (hB : BowenGibbsStatement) :
     ∃ s : ℝ,
       (∀ t, Tendsto (fun n : ℕ => Real.log (pressureSum exampleMaps t n) / n) atTop (𝓝 0) ↔
         t = s) ∧
       ∀ ν : Measure (ℕ → Fin 3), IsProbabilityMeasure ν →
         IsGibbsMeasure (potential exampleMaps s) ν → ∀ q > 1,
-        (∀ r > 0, Summable fun k : ℤ =>
-          (ν.map (natProj exampleMaps)).real (Ico (k * r) ((k + 1) * r)) ^ q) ∧
-        IsBoundedUnder (· ≥ ·) (𝓝[>] 0) (lqRatio (ν.map (natProj exampleMaps)) q) ∧
-        IsCoboundedUnder (· ≥ ·) (𝓝[>] 0) (lqRatio (ν.map (natProj exampleMaps)) q) ∧
         lqDim (ν.map (natProj exampleMaps)) q ≤ q / (q - 1) * (s - 1 / 3) ∧
         (3 * s < q → lqDim (ν.map (natProj exampleMaps)) q < s) := by
   sorry

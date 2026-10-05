@@ -19,12 +19,6 @@ set -euo pipefail
 repository_root=$(cd "$(dirname "$0")" && pwd)
 cd "$repository_root"
 
-# During the planning stage comparator.json lists no theorems, and there is nothing to judge.
-if ! python3 -c 'import json,sys; sys.exit(0 if json.load(open("comparator.json"))["theorem_names"] else 1)'; then
-  echo "comparator.json lists no theorem_names yet; skipping the comparator audit"
-  exit 0
-fi
-
 for required_command in bwrap lake lean python3; do
   if ! command -v "$required_command" >/dev/null 2>&1; then
     echo "error: $required_command is required to run lake comparator" >&2

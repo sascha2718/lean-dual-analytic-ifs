@@ -1,86 +1,76 @@
 # Exponential separation of analytic self-conformal sets on the real line
 
-This repository contains the Lean 4 formalisation of *On exponential separation of analytic
-self-conformal sets on the real line* by Balázs Bárány, István Kolossváry and Sascha Troscheit.
+Lean 4 formalisation of the paper by Balázs Bárány, István Kolossváry and Sascha Troscheit.
+The [preprint](https://arxiv.org/abs/2509.07888) is on arXiv; the theorem numbers and
+correspondence below refer to the revised working manuscript `analytic.tex` of 5 October 2026,
+which includes corrections made after arXiv v2.
 
-**Status:** every numbered statement of the paper is formalised, with no `sorry` and only the
-axioms `propext`, `Classical.choice` and `Quot.sound`. Three cited results, Bowen's theorem on
-Gibbs measures and Rapaport's Theorem 1.2 and Corollary 1.3, are stated as in their sources and
-are explicit hypotheses of the theorems that use them. Twelve statements, covering Theorems 1.4,
-1.5, 1.6 and 1.12, Corollary 1.7, Proposition 1.8 and the example of Section 1.2.2, are audited by
-the comparator. [PLAN.md](PLAN.md) lists what is formalised, the issues found in the paper and the
-remaining work.
+## Formalised results
 
-## Results
+- **Genericity (Theorem 1.4):** systems satisfying the strong exponential separation condition
+  (SESC) contain an open and dense subset in the `𝒞²` topology, in the union over admissible
+  complex neighbourhoods.
+- **Separation (Theorem 1.5 and Proposition 1.8):** distinct dual projections imply SESC;
+  an explicit distortion criterion applies to the three-map example of Section 1.2.2.
+- **Conjugation (Theorem 1.12):** linearisation of an individual map and characterisations of
+  conjugacy and sub-conjugacy to self-similar systems through the dual projections.
+- **Dimensions (Theorem 1.6, Corollary 1.7 and the example):** the expected set and measure
+  dimensions under ESC, and generically for `N ≥ 2`, assuming Rapaport's results.
+- **Natural measure of the example:** local dimension `s(Φ) - 1/3` at `0` and
+  `D_μ(q) ≤ q(s(Φ) - 1/3)/(q - 1)`, assuming Bowen's Gibbs-measure theorem.
 
-- **Sufficient condition (Theorem 1.5, formalised and audited):** an analytic IFS whose dual
-  natural projections of equal length are pairwise distinct satisfies the strong exponential
-  separation condition (SESC). The library also proves Theorem 2.2 (strong separation of the
-  dual IFS implies the SESC) and the lemmas of Sections 2 to 4.
-- **Explicit criterion (Proposition 1.8, formalised and audited):** distortions `f_i''/f_i'` that
-  are far apart at some point, compared with the contraction ratios, give the SESC. The
-  three-map example of Section 1.2.2 satisfies it (audited).
-- **Dimension (Theorem 1.6 and Corollary 1.7, formalised and audited, assuming Rapaport's
-  results):**
-  Rapaport's Theorem 1.2 and Corollary 1.3, stated for real analytic maps as in his paper, give
-  Theorem 1.6 in the class of the paper, and with Theorem 1.4 the open and dense set of
-  Corollary 1.7 (for `N ≥ 2`). In the example, `dim_H Λ = s(Φ) < 1` and `dim μ_p = H(p)/χ < 1`
-  (audited).
-- **Local dimension of the example (remark at the end of Section 1.2.2, formalised and
-  audited):** by Bowen's theorem the potential `s(Φ) log|f'_{ω₀}(π(σω))|` has a Gibbs measure
-  `ν`, and the natural measure `μ = ν ∘ π⁻¹` has local dimension `s(Φ) - 1/3` at `0`. Hence its
-  `L^q` dimensions satisfy `D_μ(q) ≤ q(s(Φ) - 1/3)/(q - 1) < s(Φ)` for `q > 3s(Φ)` (audited).
-- **Linearisation (Lemma 5.1, formalised):** the linearising map of a single map of the class.
-- **Genericity (Theorem 1.4, formalised and audited):** the systems satisfying the SESC contain
-  an open and dense subset of the space of analytic IFSs in the `𝒞²` metric. The space is the
-  union over `ε > 0` of the classes `𝔖_N(ε)`, as in the manuscript.
-- **Conjugation (Theorem 1.12, formalised and audited; Theorem 2.3, formalised):** an analytic IFS
-  is conjugated, or sub-conjugated, to a self-similar system exactly when the corresponding dual
-  natural projections coincide.
+The library also proves the supporting statements of Sections 2–5. Five of the twelve headline
+statements have explicit literature hypotheses: Bowen's Theorem 1.4 (one-sided full-shift
+specialisation), Rapaport's Theorem 1.2 together with Feng–Hu exact dimensionality, and Rapaport's
+Corollary 1.3. These results are stated and cited in the challenge, not proved here.
 
-## Statements and proofs
+## Statements and correspondence
 
-[Challenge.lean](Challenge.lean) states the headline results using Mathlib alone, with an
-intentional `sorry` per theorem; it contains Theorem 1.5, Proposition 1.8, the example and
-Theorem 1.12.
-[Solution.lean](Solution.lean) proves them from the `AnalyticESC` library. The comparator check
-verifies that the solution proves the same statements with the same definitions, using only
-`propext`, `Classical.choice` and `Quot.sound`.
-[comparator.json](comparator.json) lists the audited declarations.
+[Challenge.lean](Challenge.lean) contains twelve headline theorems, each with an intentional
+`sorry`, and their definitions over Mathlib alone. [Solution.lean](Solution.lean) repeats that
+vocabulary and proves the theorems from [AnalyticESC](AnalyticESC.lean). The solution and library
+are free of `sorry`. [comparator.json](comparator.json) selects the twelve theorems and permits
+only `propext`, `Classical.choice` and `Quot.sound`; there are no literature axioms.
 
-[paper-correspondence.yaml](paper-correspondence.yaml) records, for every numbered statement of
-the paper, whether it is planned, formalised or intentionally left out, and
-[formalization.yaml](formalization.yaml) records provenance in the mathlib-initiative format.
+[paper-correspondence.yaml](paper-correspondence.yaml) maps 26 theorem, lemma, proposition,
+corollary and definition environments to Lean and records the precise qualifications.
+[formalization.yaml](formalization.yaml) gives
+provenance and a summary of the differences. The main limitations are:
 
-## Building
+- Corollary 1.7 is formalised for `N ≥ 2`; its trivial `N = 1` case is omitted.
+- The internal analytic function space omits continuity on the closed complex neighbourhood.
+  Thus Lemmas 2.1, 2.4 and 5.1 use a different space from the manuscript.
+- Several proof routes differ: Cauchy derivative estimates, the condensation dichotomy,
+  direct construction of the dual attractor, and construction of the linearising map by a limit.
+  Theorem 1.12(a) follows the manuscript's periodic-point argument.
+- Proposition 4.2 uses the manuscript's multiplicative perturbation and supplies the two omitted
+  second-derivative estimates. Lean handles empty `𝒵` by enlarging the constants; the manuscript
+  adjoins an auxiliary point to `𝒵`.
 
-The toolchain is `leanprover/lean4:v4.35.0-rc2` with Mathlib `v4.35.0-rc2`.
+These qualifications prevent describing the development as a literal verification of every
+proof as printed. Automated correspondence checks do not replace mathematical review.
+
+## Build and verification
+
+Lean and Mathlib are pinned to `v4.35.0-rc2`. On a fresh checkout:
 
 ```bash
 lake exe cache get
-lake build
+lake build AnalyticESC Challenge Solution
+python3 scripts/check_module_headers.py
 ```
 
-On a machine that already holds a built Mathlib at that revision, link its packages instead of
-fetching a second copy (`.lake` is not tracked):
+The warnings about `sorry` in Challenge are intentional. The source check enforces the module
+headers, the Palomar file-size limits and the exclusion of Lean symlinks. Locally,
+`python3 scripts/check_paper_correspondence.py` also checks the manifest against `../analytic.tex`.
+The workstation shares `.lake/packages` with another project; do not run `lake update` there.
 
-```bash
-mkdir -p .lake
-ln -sfn /path/to/other/project/.lake/packages .lake/packages
-```
+On Linux, `./comparator-audit.sh` runs the sandboxed Comparator with the bundled NanoDa and
+con-ron kernels. The [build workflow](.github/workflows/build.yml) runs this audit from fresh
+project build directories. The [Palomar preflight](.github/workflows/palomar-preflight.yml)
+runs the registry's verifier on demand. A local Lean build is not a Palomar acceptance verdict.
 
-## Checks
+## Attribution and licence
 
-| Command | Checks |
-|---|---|
-| `python3 scripts/check_module_headers.py` | Every Lean source begins with `module` (Palomar requirement) |
-| `python3 scripts/check_paper_correspondence.py` | Manifest against the paper's labels, the Lean sources, `comparator.json`, `Challenge.lean`, `Solution.lean` and `formalization.yaml` (needs the manuscript in the parent directory) |
-| `./comparator-audit.sh` | The comparator audit in a `bwrap` sandbox (Linux), skipped while no endpoints are listed |
-
-The [build workflow](.github/workflows/build.yml) builds the library and runs the comparator
-audit; the [Palomar preflight](.github/workflows/palomar-preflight.yml) runs Palomar's verifier
-on demand.
-
-## Licence
-
-The Lean development is distributed under the [Apache License 2.0](LICENSE).
+The paper and formalisation are developed by the same authors, with AI assistance in the Lean
+development and review. The Lean sources are distributed under the [Apache License 2.0](LICENSE).

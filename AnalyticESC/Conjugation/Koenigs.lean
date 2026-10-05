@@ -12,11 +12,12 @@ For a map `f` of the class with fixed point `p ∈ I`: the function `Ĥ_f` of (5
 linearising map `ĝ(z) = lim_{n → ∞} (f^n(z) - p)/f'(p)^n` of (5.2), which is holomorphic on `B_ε`,
 satisfies `ĝ ∘ f = f'(p) ĝ` and `ĝ'' = Ĥ_f ĝ'`, and has positive derivative on `I`.
 
-The proof follows Section 5. With `λ = f'(p)`, the maps `ĝ_n(z) = (f^n(z) - p)/λ^n` have
-derivatives `P_n(z) = (f^n)'(z)/λ^n = ∏_{k<n} f'(f^k(z))/λ`. The factors satisfy
-`|f'(f^k(z))/λ - 1| ≤ A c_max^k` on `B_ε`, so the `P_n` are uniformly bounded, and
-`|P_{n+1} - P_n|` and, by the mean value inequality, `|ĝ_{n+1} - ĝ_n|` decay geometrically. Hence
-`ĝ` and `ĝ' = lim P_n` are sums of uniformly convergent series of holomorphic maps, and
+The paper defines `ĝ` by integrating `Ĥ_f` and derives (5.2); here `ĝ` is the limit (5.2). With
+`λ = f'(p)`, the maps `ĝ_n(z) = (f^n(z) - p)/λ^n` have derivatives
+`P_n(z) = (f^n)'(z)/λ^n = ∏_{k<n} f'(f^k(z))/λ`. The factors satisfy
+`|f'(f^k(z))/λ - 1| ≤ A c_max^k` on `B_ε`, so the `P_n` are uniformly bounded, and `|P_{n+1} - P_n|`
+and, by the mean value inequality, `|ĝ_{n+1} - ĝ_n|` decay geometrically. Hence `ĝ` and
+`ĝ' = lim P_n` are sums of uniformly convergent series of holomorphic maps, and
 `ĝ'' = lim P_n' = lim Ĥ_n P_n = Ĥ_f ĝ'`, where `Ĥ_n` is the partial sum of (5.1).
 -/
 

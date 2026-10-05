@@ -96,10 +96,11 @@ theorem exists_forall_d2Sys_lt_not_fixed {N : ℕ} {f : Fin N → ℂ → ℂ} (
     linarith
   linarith
 
-/-- Having no common fixed point in `I` is a `d₂`-dense condition in `𝔖_N` for `N ≥ 2`. If the
-maps `f_i` fix a common point `p`, replace one map `f_j` by the perturbation
-`f_j^t = (1 - t) f_j + t h_j` of Lemma 4.2, with `h_j(p) ≠ p` and small `t > 0`. A common fixed
-point of the new system is fixed by some `f_k`, `k ≠ j`, so it is `p`, which `f_j^t` moves. -/
+/-- Having no common fixed point in `I` is a `d₂`-dense condition in `𝔖_N` for `N ≥ 2`. If the maps
+`f_i` fix a common point `p`, replace one map `f_j` by the perturbation
+`f_j^t = (1 - t) f_j + t h_j` of the interpolation `IFS.lemma_4_2`, with `h_j(p) ≠ p` and small
+`t > 0`. A common fixed point of the new system is fixed by some `f_k`, `k ≠ j`, so it is `p`, which
+`f_j^t` moves. -/
 theorem exists_not_fixed_d2Sys_lt {N : ℕ} (hN : 2 ≤ N) {f : Fin N → ℂ → ℂ}
     (hf : InUnionClass f) {r : ℝ} (hr : 0 < r) :
     ∃ g, InUnionClass g ∧ (¬ ∃ x ∈ I, ∀ i, (g i x).re = x) ∧ d2Sys f g < r := by

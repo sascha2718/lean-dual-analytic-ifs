@@ -13,7 +13,7 @@ Every system is conjugated to one with a similarity map; it is conjugated to a s
 system exactly when all dual natural projections agree on `[0,1]`; and it is sub-conjugated to a
 self-similar system exactly when two distinct periodic words of the same period have equal dual
 natural projections. Both equivalences hold without the hypothesis that the attractor is not a
-singleton; `theorem_1_12` states them as in the paper.
+singleton; `theorem_1_12` in `Conjugation.PeriodicPoints` states them as in the paper.
 -/
 
 namespace AnalyticESC
@@ -306,16 +306,6 @@ theorem subConjSelfSimilar_iff :
       rw [← hH x hx]; exact hode x hx
     exact ⟨m, i ∘ Fin.rev, j ∘ Fin.rev, hrev_ne hij, _, hco, ![l₁, l₂], ![t₁, t₂],
       Fin.forall_fin_two.2 ⟨c₁, c₂⟩⟩
-
-set_option linter.unusedVariables false in
-/-- Theorem 1.12 (a) and (b), for systems whose attractor is not a singleton. -/
-theorem theorem_1_12 (hnd : ¬ ∃ x, Φ.attractor = {x}) :
-    (ConjSelfSimilar Φ.realMaps ↔
-      ∀ i j : ℕ → Fin N, ∀ x ∈ I, Φ.dualProj (.inf i) x = Φ.dualProj (.inf j) x) ∧
-    (Φ.SubConjSelfSimilar ↔
-      ∃ (m : ℕ) (hm : 0 < m) (i j : Fin m → Fin N), i ≠ j ∧
-        ∀ x ∈ I, Φ.dualProj (.inf (periodic hm i)) x = Φ.dualProj (.inf (periodic hm j)) x) :=
-  ⟨Φ.conjSelfSimilar_iff, Φ.subConjSelfSimilar_iff⟩
 
 end IFS
 

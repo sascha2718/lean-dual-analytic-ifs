@@ -9,12 +9,12 @@ version: "v0.4"
 project:
   name: "Exponential separation of analytic self-conformal sets on the real line: Lean formalisation"
   description: >-
-    Lean 4 formalisation of the paper "On exponential separation of analytic self-conformal
-    sets on the real line" by Balázs Bárány, István Kolossváry and Sascha Troscheit. The planned
-    audited statements are the sufficient condition for the strong exponential separation
-    condition in terms of the dual natural projection, its explicit criterion and example, the
-    open and dense set of strongly exponentially separated systems in the C2 topology, and the
-    characterisation of analytic systems conjugated or sub-conjugated to self-similar systems.
+    Lean 4 formalisation of exponential separation for analytic iterated function systems
+    on the real line. Strong exponential separation holds on an open and dense subset in
+    the C2 topology and follows from an explicit criterion involving dual projections.
+    The development characterises conjugacy to self-similar systems and proves dimension
+    consequences conditional on cited results of Rapaport and Bowen, including a drop in
+    the L^q dimensions of the natural measure of a concrete three-map example.
   authors:
     - "Balázs Bárány"
     - "István Kolossváry"
@@ -24,6 +24,7 @@ project:
     - "Sascha Troscheit"
 
 classification:
+  arxiv: ["math.DS", "math.CA", "math.MG"]
   msc2020: ["28A80", "37C45"]
 
 sources:
@@ -33,41 +34,48 @@ sources:
       - "István Kolossváry"
       - "Sascha Troscheit"
     type: "paper"
-    location: "Theorems 1.4, 1.5 and 1.12, Proposition 1.8, Sections 2 to 5"
+    id: "arXiv:2509.07888"
+    location: "Working manuscript analytic.tex, 5 October 2026: Sections 1 to 5"
     relationship: "formalizes"
     note: >-
       The paper whose results are formalised here. paper-correspondence.yaml records the
       statement-by-statement correspondence with the Lean declarations. The formalisation and the
-      paper are developed by the same authors.
+      paper are developed by the same authors. The source is the revised working manuscript,
+      including corrections after arXiv v2; the correspondence does not claim to verify v2 as printed.
     author_endorsement: "participated"
   - title: "Dimension of self-conformal measures associated to an exponentially separated analytic IFS on R"
     authors:
       - "Ariel Rapaport"
     type: "preprint"
+    id: "arXiv:2412.16753"
+    location: "Theorem 1.2 and Corollary 1.3"
     relationship: "background"
-    note: "Source of the exponential separation condition for analytic systems. Its main theorem is not formalised."
+    note: "These results are explicit named hypotheses of the dimension endpoints; their proofs are not formalised."
+  - title: "Equilibrium states and the ergodic theory of Anosov diffeomorphisms"
+    authors: ["Rufus Bowen"]
+    type: "book"
+    location: "Lecture Notes in Mathematics 470, Springer, 1975, Theorem 1.4"
+    relationship: "background"
+    note: "Gibbs-measure existence for the one-sided full shift is an explicit named hypothesis."
+  - title: "Dimension theory of iterated function systems"
+    authors: ["De-Jun Feng", "Huyi Hu"]
+    type: "paper"
+    location: "Comm. Pure Appl. Math. 62 (2009)"
+    relationship: "background"
+    note: "Exact dimensionality is included in RapaportMeasureStatement; its proof is not formalised."
 
 related_formalizations: []
 
 status:
   scope: >-
-    Audited: Theorem 1.4 (an open and dense set of strongly exponentially separated systems in
-    the C2 topology), Theorem 1.5 (the sufficient condition for the strong exponential
-    separation condition), Proposition 1.8 (an explicit criterion), the example of Section 1.2.2
-    with its dimensions and the local and L^q dimensions of its natural measure, Theorem 1.6
-    (Rapaport, in the class of the paper), Corollary 1.7 (for N ≥ 2) and Theorem 1.12 (conjugacy and
-    sub-conjugacy to self-similar systems), stated in Challenge.lean and proved in Solution.lean.
-    Five of them take results from the literature as explicit hypotheses, stated as in their
-    sources and defined identically in Challenge.lean and Solution.lean: Bowen's theorem on Gibbs
-    measures (BowenGibbsStatement), Rapaport's Theorem 1.2 with the exact dimensionality of Feng
-    and Hu (RapaportMeasureStatement) and Rapaport's Corollary 1.3 (RapaportSetStatement).
-    Formalised in the library: the exponential separation conditions and Definition 1.2 (failure
-    of the SESC is weak super-exponential
-    condensation), Definition 1.9, Theorems 2.2 and 2.3, Lemmas 2.1, 2.4, 2.5, 2.6, 2.7, 2.8,
-    2.10, 3.1, 3.2, 4.1, 4.2, 4.3 and 5.1, Corollary 2.9, Proposition 4.4, the bound (4.3) and
-    the remark after the conjecture of Section 1 (exact overlaps and sub-conjugation), and the
-    local dimension s(Φ) - 1/3 at 0 of the natural measure of the example of Section 1.2.2, for
-    a measure with the Gibbs property.
+    Twelve comparator endpoints cover Theorems 1.4, 1.5, 1.6 and 1.12, Corollary 1.7 for
+    N ≥ 2, Proposition 1.8, and the separation and dimension properties of the example in
+    Section 1.2.2. Seven endpoints are unconditional and five use the explicit named
+    literature hypotheses BowenGibbsStatement, RapaportMeasureStatement or RapaportSetStatement,
+    defined in Challenge, Solution and Dimension/Defs.lean. The library also proves the
+    supporting statements of Sections 2 to 5, with the qualifications in
+    paper-correspondence.yaml. The N = 1 case of Corollary 1.7 is omitted. Proof counts below
+    exclude the twelve intentional holes in Challenge.lean.
   sorry_count: 0
   sorry_in_definitions: 0
   axioms: ["propext", "Classical.choice", "Quot.sound"]
@@ -83,6 +91,10 @@ automation:
         spend_usd: "subscription-based"
         hardware: "local machine"
       prompting_notes: "n/a"
+    - method: "agent"
+      models: ["GPT-6 (OpenAI)"]
+      framework: "Codex (OpenAI)"
+      tool_setup: "Review of paper correspondence, challenge minimality and upload support files."
     - method: "manual"
       models: []
       framework: "n/a"
@@ -101,50 +113,45 @@ automation:
 
 fidelity:
   divergences: >-
-    Maps of the IFS are given by their holomorphic extensions f : ℂ → ℂ, real at the real points
-    of B_{2ε}; statements about [0,1] evaluate at real points, where the complex derivatives
-    agree with the derivatives of the real restrictions. Finite words are lists and infinite
-    words are sequences ℕ → Fin N, read from the left. In Challenge.lean the hypothesis of
-    Theorem 1.5, over distinct words of Σ ∪ Σ_* of equal length, is split into finite words of
-    the same length and infinite words. Suprema over [0,1] are real iSups of bounded families.
-    The Lean proofs of Theorems 1.5 and 2.2 use an internal condensation dichotomy. The paper
-    gives the case analysis directly in the proof of Theorem 2.2 in Section 3 and deduces
-    Theorem 1.5 by compactness and Lemma 2.5. In the finite-word case the paper uses finite
-    order of vanishing, whereas Lean proves equality of all derivatives at the limit point.
-    Lean bounds the derivatives of the dual natural
-    projection by Cauchy estimates
-    instead of the Faà di Bruno formula of Lemma 2.7. Lemma 2.7 itself is formalised with the
-    partitions of {1, …, k+1} represented by Mathlib's OrderedFinpartition and φ_i^{(m)} by the
-    (m-1)-th derivative of f_i''/f_i'; its proof uses a local primitive of f_i''/f_i' in place of
-    log|f_i'|. The space C^ω_ε([0,1]) of Lemma 2.1 is
-    modelled by restrictions to B_ε with the topology of uniform convergence on B_ε. In
-    Theorem 1.4 the space 𝔖_N is the union over ε > 0 of the IFSs with maps in S^ω_ε(I), as in
-    the manuscript; the open set consists of the systems whose dual IFS satisfies the SSC, and of
-    all systems when N = 0, where the Lean dual attractor would be empty. The preliminary
-    interpolation in the density proof is retained as the internal lemma IFS.lemma_4_2,
-    using complex analyticity in the parameter and preserving the fixed-epsilon class.
-    Proposition 4.4 is proved with an
-    additive perturbation by Gaussian bumps and Cauchy estimates in place of the multiplicative
-    perturbation f exp(φψA), with the absolute constant C = 8. In the density step Lean fixes
-    uniform derivative bounds before δ, while the paper uses continuity to preserve the strict
-    cylinder inclusions. In the remark after the conjecture of Section 1, that a
-    non-singleton attractor is infinite is proved from the invariance of Λ under the compositions
-    and a pigeonhole argument, without fixed points. Bowen's theorem and Rapaport's Theorem 1.2
-    and Corollary 1.3 are hypotheses, stated as in their sources (Rapaport's for real analytic
-    maps of [0,1]). The natural measure of the
-    example is the image of a Gibbs measure in Bowen's sense of s(Φ) log|f'_{ω₀}(π(σω))|, and the
-    bounds on f_w and f_w' for words over {1,2} are proved by induction on the word, with
-    polynomial bounds in place of the product estimate. The pressure and s(Φ) come from Fekete's
-    lemma. The dimension of a self-conformal measure is its almost everywhere local dimension.
-    Theorem 1.6 assumes N > 0. The open set of Corollary 1.7 (N ≥ 2) is the open set of
-    Theorem 1.4 intersected with the systems without a common fixed point.
+    Maps are represented by holomorphic extensions, with complex derivatives at real points.
+    Finite and infinite words are separated in Challenge and represented together internally.
+    The space analyticSpace omits the manuscript's continuity requirement on the closure of
+    B_epsilon, so Lemmas 2.1, 2.4 and 5.1 are formalised in a different ambient function space.
+    The dual attractor is constructed directly by coding rather than Hutchinson's theorem.
+    Cauchy estimates replace the Faà di Bruno argument for Lemmas 2.8 and 2.10; Lemma 2.7 is
+    proved separately, using a local primitive in place of log|f'|, and is not used thereafter.
+    Theorems 1.5 and 2.2 use a condensation dichotomy, splitting on bounded prefix lengths
+    and using equality of all derivatives. The manuscript splits into three cases, uses
+    finite order of vanishing for finite limit words and derives Theorem 1.5 from Theorem 2.2.
+    For equation (3.3), Lean uses norms and a positive interval-length bound.
+    Theorem 1.4 uses the union class, as in the manuscript. Its density proof uses the same
+    affine interpolation and multiplicative perturbation. Proposition 4.2 uses equal widths,
+    corrects the factors 16Q² + 12Q and 8Q to 16Q² + 12Q + 1 and 8Q + 2 for an empty Z,
+    supplies the two second-derivative estimates left to the reader and obtains C = 40/m
+    for a margin m of f. The manuscript handles an empty Z by adjoining an auxiliary point.
+    Lean preserves invariant cylinders by quantitative bounds; the manuscript uses continuity.
+    Lemma 5.1 constructs the linearising map as the uniform limit (5.2) and derives its ODE;
+    the manuscript starts with the ODE. Theorem 1.12(a) follows the periodic-point argument.
+    Part (b) and Theorem 2.3 use general equivalences without the non-singleton assumption.
+    Literature inputs are explicit hypotheses, not axioms: a one-sided full-shift
+    specialisation of Bowen's theorem and Rapaport's results together with Feng–Hu exact
+    dimensionality. The natural measure, not defined in the manuscript, is the image of
+    any probability Gibbs measure for s(Phi) log|f'| under the natural projection. Lean
+    computes its local dimension at 0 and bounds its L^q dimensions directly, rather than
+    invoking Shmerkin's Lemma 1.7. Summability and boundedness needed for the L^q definition
+    are proved in the library. The pressure zero is constructed using Fekete's lemma.
+    Theorem 1.6 assumes N > 0, and Corollary 1.7 is restricted to N ≥ 2. Measure dimension is
+    stated as almost everywhere local dimension. Full statement-level qualifications are
+    recorded in paper-correspondence.yaml.
 
 review:
   status: "unchecked"
   reviewers: []
   notes: >-
-    The statements were written against the paper and checked by the comparator against
-    Solution.lean, but have not yet been reviewed by the authors.
+    Automated review compares the challenge statements and the main proof routes with the
+    revised working manuscript. This is not independent human review or author approval.
+    Mechanical verification of a submitted snapshot is recorded by CI and Palomar, not inferred
+    from the correspondence manifest.
 
 alignment:
   namespace: "Challenge"
@@ -178,12 +185,12 @@ alignment:
       lean: "Challenge.audit_conj_iff"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Conjugation.Characterisation; the hypothesis on the attractor is not needed."
+      note: "Proved in Solution from AnalyticESC.Conjugation.PeriodicPoints (IFS.theorem_1_12), along the paper's proof, which uses the hypothesis on the attractor. IFS.conjSelfSimilar_iff proves the equivalence without it."
     - source: "Theorem 1.12 (b) (sub-conjugacy to a self-similar IFS)"
       lean: "Challenge.audit_subconj_iff"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Conjugation.Characterisation; the hypothesis on the attractor is not needed."
+      note: "Proved in Solution from AnalyticESC.Conjugation.PeriodicPoints (IFS.theorem_1_12), whose part (b) is IFS.subConjSelfSimilar_iff from AnalyticESC.Conjugation.Characterisation; the hypothesis on the attractor is not needed."
     - source: "Theorem 1.6 (Rapaport: dimension under the ESC)"
       lean: "Challenge.audit_dim_of_esc"
       module: "Challenge"
@@ -208,7 +215,7 @@ alignment:
       lean: "Challenge.audit_example_lq"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Dimension.Lq assuming Bowen's theorem (BowenGibbsStatement). The statement also asserts that the L^q sums converge and that the liminf defining the L^q spectrum is not a junk value."
+      note: "Proved in Solution from AnalyticESC.Dimension.Lq assuming Bowen's theorem (BowenGibbsStatement). Summability and boundedness for the L^q definition remain proved in the library, outside the headline statement."
 
 acknowledgements: >-
   Lean 4 and Mathlib (leanprover-community), the leanprover comparator, lean4export and nanoda.

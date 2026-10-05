@@ -1,9 +1,11 @@
 # Lean working guide
 
 Durable working agreements for the Lean formalisation of *On exponential separation of analytic
-self-conformal sets on the real line*. [PLAN.md](PLAN.md) holds the formalisation plan, the open
-decisions and the issues found in the paper; [README.md](README.md) holds build and audit
-instructions. The manuscript is `../analytic.tex`.
+self-conformal sets on the real line*. [README.md](README.md) holds scope, limitations and build
+instructions. Current proof differences and manuscript issues belong in
+`paper-correspondence.yaml` and `formalization.yaml`. The manuscript is `../analytic.tex`.
+Historical plans are preserved locally under `Archive/RepositoryReview-2026-10-05/`, outside
+the upload. Keep development history in git and verification evidence in CI logs.
 
 ## Repositories
 
@@ -21,7 +23,7 @@ instructions. The manuscript is `../analytic.tex`.
   all projects sharing the packages.
 - Every Lean source begins with `module` on its own line and uses `public import`; check with
   `python3 scripts/check_module_headers.py`.
-- Code copied from other projects (see PLAN.md, Section 5) records its source in the module
+- Code copied from other projects records its source in the module
   docstring and is adapted to the module system.
 
 ## Library
@@ -30,7 +32,9 @@ instructions. The manuscript is `../analytic.tex`.
   module. Modules imported by the root, and `Solution`, must be free of `sorry`. Unfinished work
   stays in modules outside the root's imports.
 - Only `propext`, `Classical.choice` and `Quot.sound` are permitted. Introducing a literature
-  axiom requires the authors' explicit decision (PLAN.md, D5).
+  axiom requires the authors' explicit decision. The agreed literature inputs are the named
+  hypotheses `BowenGibbsStatement`, `RapaportMeasureStatement` and `RapaportSetStatement`,
+  repeated in Challenge, Solution and `Dimension/Defs.lean`.
 - Where the Lean proof departs from the paper's proof or statement, record it in the
   manifest note and in `formalization.yaml` under `fidelity.divergences`.
 
@@ -54,8 +58,9 @@ instructions. The manuscript is `../analytic.tex`.
   challenge vocabulary without importing `Challenge.lean`.
 - Before handing off a challenge, list its endpoints and audit the file for non-hole theorem
   bodies and for definitions the endpoints do not need.
-- The headline statements are fixed by the authors. If it is unclear whether a result is a
-  headline, ask rather than expanding the challenge.
+- Preserve the twelve headline endpoints listed in `comparator.json`. Their scope is fixed by
+  the authors. If it is unclear whether a result is a headline, ask rather than expanding the
+  challenge.
 
 ## Correspondence
 

@@ -6,14 +6,14 @@ public import AnalyticESC.Analysis
 @[expose] public section
 
 /-!
-# Lemma 4.2
+# The interpolation in the proof of Theorem 1.4
 
 A `d₂`-small perturbation of an IFS whose maps send `[0,1]` into `(0,1)` and whose compositions
 along distinct finite words differ on `[0,1]`.
 
 The perturbation is `f_i^t = (1 - t) f_i + t h_i` for a small `t > 0`, where the affine maps
 `h_i(z) = a z + b_i` have pairwise disjoint images `h_i(I) ⊆ (0,1)`, so that distinct compositions
-of the `h_i` differ on `I` (the paper takes a transcendental slope `a`). For fixed words and a
+of the `h_i` differ on `I`. For fixed words and a
 fixed point of `I`, compositions of the `f_i^t` are holomorphic in the complex parameter `t` on an
 open set containing `[0,1]`, so two of them agree for finitely many `t ∈ [0,1]` only. A countable
 union of finite sets misses some small `t > 0`. Auxiliary results are in the namespace
@@ -394,9 +394,9 @@ open Coincidences
 
 variable {N : ℕ} {ε : ℝ}
 
-/-- Lemma 4.2. Every `Φ ∈ 𝔖_N(ε)` has, for every `r > 0`, a perturbation `Ψ ∈ 𝔖_N(ε)` with
-`d₂(Φ, Ψ) < r` whose maps send `[0,1]` into `(0,1)` and whose compositions along distinct finite
-words differ on `[0,1]`. -/
+/-- The interpolation at the start of the density proof of Theorem 1.4. Every `Φ ∈ 𝔖_N(ε)` has, for
+every `r > 0`, a perturbation `Ψ ∈ 𝔖_N(ε)` with `d₂(Φ, Ψ) < r` whose maps send `[0,1]` into `(0,1)`
+and whose compositions along distinct finite words differ on `[0,1]`. -/
 theorem lemma_4_2 (Φ : IFS N ε) {r : ℝ} (hr : 0 < r) :
     ∃ Ψ : IFS N ε, d2 Φ Ψ < r ∧ (∀ i, ∀ x ∈ I, (Ψ.f i x).re ∈ Ioo 0 1) ∧ Ψ.NoCoincidence := by
   rcases Nat.eq_zero_or_pos N with hN | hN

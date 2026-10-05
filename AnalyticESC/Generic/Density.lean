@@ -1,7 +1,7 @@
 module
 
 public import AnalyticESC.Generic.Agreement
-public import AnalyticESC.Generic.Bump
+public import AnalyticESC.Generic.MultiplicativeBump
 public import AnalyticESC.Generic.Points
 
 @[expose] public section
@@ -9,16 +9,16 @@ public import AnalyticESC.Generic.Points
 /-!
 # The density step of Theorem 1.4
 
-The proof of Theorem 1.4 in Section 4.2, after the reduction by Lemma 4.2: an IFS whose maps send
-`[0,1]` into `(0,1)` and whose compositions along distinct finite words differ on `[0,1]` has
+The proof of Theorem 1.4 in Section 4.2, after the interpolation `IFS.lemma_4_2`: an IFS whose maps
+send `[0,1]` into `(0,1)` and whose compositions along distinct finite words differ on `[0,1]` has
 arbitrarily `d₂`-close perturbations whose dual IFS satisfies the SSC.
 
 The proof follows the paper with words of length `n + 1`, to match Lemma 2.5. The points of
-Lemma 4.3 and their orbits are split, for each letter `ℓ`, into the set `𝒴_ℓ` of the points
+Lemma 4.1 and their orbits are split, for each letter `ℓ`, into the set `𝒴_ℓ` of the points
 `x_{i,j}` of the bad pairs with `i₁ = ℓ` and the set `𝒵_ℓ` of the remaining orbit points, and
-Proposition 4.4 perturbs each map accordingly. The bound for `g_i''/g_i'` on `[0,1]` is
+Proposition 4.2 perturbs each map accordingly. The bound for `g_i''/g_i'` on `[0,1]` is
 `M = 2 (B + C + 1) / c_min`, with `B` a bound for `f_i''/f_i'` and `C` the sum of the constants
-of Proposition 4.4; it does not depend on `δ ≤ 1`.
+of Proposition 4.2; it does not depend on `δ ≤ 1`.
 -/
 
 namespace AnalyticESC
@@ -105,7 +105,7 @@ private theorem mem_goodPoints {Φ : IFS N ε} {k K : ℝ} {n : ℕ}
     y ∈ Φ.goodPoints k K n x ℓ ↔ y ∈ Φ.orbitPoints n x ∧ y ∉ Φ.badPoints k K n x ℓ := by
   simp only [goodPoints, Finset.mem_sdiff]
 
-/-- The conclusions of Lemma 4.3 for the points `x` and words of length `n + 1`, without the
+/-- The conclusions of Lemma 4.1 for the points `x` and words of length `n + 1`, without the
 condition that the two orbits of a pair meet only at the base point, which is not needed. -/
 private structure IsPointChoice (Φ : IFS N ε) (k K : ℝ) (n : ℕ)
     (x : (Fin (n + 1) → Fin N) × (Fin (n + 1) → Fin N) → ℝ) : Prop where
@@ -377,8 +377,8 @@ private theorem d2_le (hN : 0 < N) (Φ : IFS N ε) (Ψ : IFS N ε') {a b e : ℝ
 theorem exists_dualSSC_near (hN : 0 < N) (Φ : IFS N ε)
     (hI : ∀ i, ∀ x ∈ I, (Φ.f i x).re ∈ Ioo 0 1) (hnc : Φ.NoCoincidence) {r : ℝ} (hr : 0 < r) :
     ∃ ε' : ℝ, ∃ Ψ : IFS N ε', d2 Φ Ψ < r ∧ Ψ.DualSSC := by
-  -- the constants of Proposition 4.4 and their sum `C`
-  choose C₀ hC₀ hbump using fun i => proposition_4_4 Φ.ε_pos (Φ.inClass i) (hI i)
+  -- the constants of Proposition 4.2 and their sum `C`
+  choose C₀ hC₀ hbump using fun i => proposition_4_2 Φ.ε_pos (Φ.inClass i) (hI i)
   set C := ∑ i, C₀ i with hC_def
   have hCle : ∀ i, C₀ i ≤ C := fun i =>
     Finset.single_le_sum (f := C₀) (fun j _ => (hC₀ j).le) (Finset.mem_univ i)
@@ -412,11 +412,11 @@ theorem exists_dualSSC_near (hN : 0 < N) (Φ : IFS N ε)
     rw [lt_div_iff₀ (by linarith)] at hn
     exact (mul_le_mul_of_nonneg_right (pow_le_pow_of_le_one hc0 hc1.le (Nat.le_succ n))
       (by linarith)).trans_lt hn
-  -- the points of Lemma 4.3
+  -- the points of Lemma 4.1
   obtain ⟨x, hxI, hxd, hxo, hxs⟩ := Φ.lemma_4_3 (n + 1) (-K) K hnc
   have hx : IsPointChoice Φ (-K) K n x :=
     ⟨hxI, hxd, fun p hp => (hxo p hp).1, fun p hp => (hxo p hp).2.1, hxs⟩
-  -- the perturbation of Proposition 4.4
+  -- the perturbation of Proposition 4.2
   choose g hg using fun i => hbump i (Φ.badPoints (-K) K n x i) (Φ.goodPoints (-K) K n x i)
     (hx.badPoints_subset_I i) (hx.goodPoints_subset_I i)
     (Φ.disjoint_badPoints_goodPoints (-K) K n x i) δ hδ δ hδ

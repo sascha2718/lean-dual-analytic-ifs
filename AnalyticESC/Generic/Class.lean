@@ -5,7 +5,7 @@ public import AnalyticESC.Basic
 @[expose] public section
 
 /-!
-# Lemma 4.1
+# The classes `S^ω_ε(I)` and `S^ω(I)`
 
 The inclusion `f(cl B_ε) ⊆ B_ε` in condition (B) of the class `S^ω_ε(I)` follows from the other
 conditions. Hence the classes `S^ω_ε(I)` decrease as `ε` increases, and their union `S^ω(I)` is
@@ -24,7 +24,7 @@ private theorem exists_mem_I_norm_sub_le {ε : ℝ} (hε : 0 ≤ ε) {z : ℂ} (
   obtain ⟨_, ⟨x, hx, rfl⟩, hzx⟩ := mem_iUnion₂.1 hz'
   exact ⟨x, hx, mem_closedBall_iff_norm.1 hzx⟩
 
-/-- Lemma 4.1: a map complex analytic on `B_{2ε}`, real at the real points of `B_{2ε}`, with
+/-- A map complex analytic on `B_{2ε}`, real at the real points of `B_{2ε}`, with
 `f(I) ⊆ I` and `0 < |f'| < 1` on `cl B_ε`, lies in `S^ω_ε(I)`. -/
 theorem InClass.of_deriv {ε : ℝ} (hε : 0 < ε) {f : ℂ → ℂ}
     (hd : DifferentiableOn ℂ f (nbhd (2 * ε)))
@@ -58,7 +58,7 @@ theorem InClass.of_deriv {ε : ℝ} (hε : 0 < ε) {f : ℂ → ℂ}
     _ < 1 * ε := mul_lt_mul_of_pos_right hc hε
     _ = ε := one_mul ε
 
-/-- Lemma 4.1 (a): `S^ω_ε(I) ⊆ S^ω_{ε'}(I)` for `0 < ε' ≤ ε`. -/
+/-- Nesting of the classes: `S^ω_ε(I) ⊆ S^ω_{ε'}(I)` for `0 < ε' ≤ ε`. -/
 theorem InClass.mono {ε ε' : ℝ} {f : ℂ → ℂ} (h : InClass ε f) (hε' : 0 < ε') (hle : ε' ≤ ε) :
     InClass ε' f := by
   have h2 : nbhd (2 * ε') ⊆ nbhd (2 * ε) := nbhd_mono (by linarith)
@@ -67,7 +67,7 @@ theorem InClass.mono {ε ε' : ℝ} {f : ℂ → ℂ} (h : InClass ε f) (hε' :
     h.re_mem_I (fun z hz => h.deriv_ne_zero z (hcl hz))
     (fun z hz => h.norm_deriv_lt_one z (hcl hz))
 
-/-- Lemma 4.1 (b), the direction used for perturbations: a map complex analytic on an open
+/-- The direction used for perturbations: a map complex analytic on an open
 neighbourhood `U` of `I`, real at the real points of `U`, with `f(I) ⊆ I` and `0 < |f'| < 1` on
 `I`, lies in `S^ω_ε(I)` for some `ε > 0`. -/
 theorem exists_inClass {U : Set ℂ} (hU : IsOpen U) (hIU : ((↑) : ℝ → ℂ) '' I ⊆ U) {f : ℂ → ℂ}
@@ -92,7 +92,7 @@ theorem exists_inClass {U : Set ℂ} (hU : IsOpen U) (hIU : ((↑) : ℝ → ℂ
   exact ⟨ε, hε, InClass.of_deriv hε (hd.mono h2) (fun x hx => him x (h2 hx)) hI
     (fun z hz => (hcl hz).2.1) (fun z hz => mem_ball_zero_iff.1 (hcl hz).2.2)⟩
 
-/-- Lemma 4.1 (b): `S^ω(I)` consists of the maps complex analytic on an open neighbourhood of
+/-- `S^ω(I)` consists of the maps complex analytic on an open neighbourhood of
 `I`, real at its real points, with `f(I) ⊆ I` and `0 < |f'| < 1` on `I`. -/
 theorem lemma_4_1 {f : ℂ → ℂ} :
     (∃ ε > 0, InClass ε f) ↔ ∃ U : Set ℂ, IsOpen U ∧ ((↑) : ℝ → ℂ) '' I ⊆ U ∧

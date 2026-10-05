@@ -19,7 +19,7 @@ public import AnalyticESC.Generic.Continuity
 public import AnalyticESC.Generic.Points
 public import AnalyticESC.Generic.Class
 public import AnalyticESC.Generic.Coincidences
-public import AnalyticESC.Generic.Bump
+public import AnalyticESC.Generic.MultiplicativeBump
 public import AnalyticESC.Generic.Agreement
 public import AnalyticESC.Generic.Density
 public import AnalyticESC.Generic.OpenDense
@@ -32,6 +32,7 @@ public import AnalyticESC.Conjugation.Zeros
 public import AnalyticESC.Conjugation.Characterisation
 public import AnalyticESC.Conjugation.DualConj
 public import AnalyticESC.Conjugation.ExactOverlaps
+public import AnalyticESC.Conjugation.PeriodicPoints
 public import AnalyticESC.Dimension.Defs
 public import AnalyticESC.Dimension.Pressure
 public import AnalyticESC.Dimension.NaturalMeasure
@@ -66,10 +67,10 @@ analytic self-conformal sets on the real line*.
 * `Main.LocalDimension`: the local dimension `s(Φ) - 1/3` at `0` of the natural measure of the
   example, for a measure with the Gibbs property.
 * `Generic.Continuity`: the estimate (2.6) and Lemma 2.6.
-* `Generic.Points`: Lemma 4.3.
-* `Generic.Class`: Lemma 4.1, the classes `S^ω_ε(I)` and their union `S^ω(I)`.
-* `Generic.Coincidences`: Lemma 4.2.
-* `Generic.Bump`: Proposition 4.4.
+* `Generic.Points`: Lemma 4.1.
+* `Generic.Class`: the classes `S^ω_ε(I)` and their union `S^ω(I)`.
+* `Generic.Coincidences`: the interpolation at the start of the density proof of Theorem 1.4.
+* `Generic.MultiplicativeBump`: Proposition 4.2 by the paper's proof, with `g = f e^{φ ψ A}`.
 * `Generic.Agreement`: dual compositions of two systems that agree along an orbit.
 * `Generic.Density`: the density step of the proof of Theorem 1.4.
 * `Generic.OpenDense`: Theorem 1.4.
@@ -79,10 +80,11 @@ analytic self-conformal sets on the real line*.
 * `Conjugation.Uniqueness`: uniqueness of linearisations of a single map.
 * `Conjugation.Composite`: compositions along words and periodic dual projections.
 * `Conjugation.Zeros`: conjugacies by injective analytic maps.
-* `Conjugation.Characterisation`: Theorem 1.12.
+* `Conjugation.Characterisation`: Theorem 1.12 without the hypothesis on the attractor.
 * `Conjugation.DualConj`: Theorem 2.3.
-* `Conjugation.ExactOverlaps`: the remark after the conjecture of Section 1, exact overlaps
-  and sub-conjugation.
+* `Conjugation.ExactOverlaps`: the remark on exact overlaps and sub-conjugation in
+  Section 1.2.3.
+* `Conjugation.PeriodicPoints`: the paper's proof of Theorem 1.12 (a), and Theorem 1.12.
 * `Dimension.Defs`: entropy, Lyapunov exponents, self-conformal measures, equality in (1.6),
   Gibbs measures, and the statements of the cited results of Bowen and Rapaport.
 * `Dimension.Pressure`: the pressure and its unique zero, the conformality dimension `s(Φ)`.

@@ -11,11 +11,11 @@ public import AnalyticESC.Main.Dichotomy
 # Theorem 1.4
 
 The IFSs of `𝔖_N` that satisfy the SESC contain a `d₂`-open and `d₂`-dense subset of `𝔖_N`, the
-union class of decision D1. The open set consists of the systems whose dual IFS satisfies the
-SSC: it is open by Lemma 2.6, its systems satisfy the SESC by Theorem 2.2, and it is dense by
-Lemma 4.2 and the density step. The density step combines two perturbations, so it uses the
-triangle inequality for `d₂` between systems of `𝔖_N(ε)` for different `ε`. For `N = 0` the
-dual IFS has no attractor, and the open set consists of all systems.
+union class of decision D1. The open set consists of the systems whose dual IFS satisfies the SSC:
+it is open by Lemma 2.6, its systems satisfy the SESC by Theorem 2.2, and it is dense by the
+interpolation `IFS.lemma_4_2` and the density step. The density step combines two perturbations, so
+it uses the triangle inequality for `d₂` between systems of `𝔖_N(ε)` for different `ε`. For `N = 0`
+the dual IFS has no attractor, and the open set consists of all systems.
 -/
 
 namespace AnalyticESC
@@ -108,7 +108,7 @@ theorem theorem_1_4 (N : ℕ) :
     obtain ⟨δ, hδ, hΨ⟩ := Φ.lemma_2_6_union (hΦ hN)
     exact ⟨δ, hδ, fun g ⟨ε', hε', hg⟩ hfg =>
       ⟨ε', ⟨g, hε', hg⟩, rfl, fun _ => hΨ (⟨g, hε', hg⟩ : IFS N ε') hfg⟩⟩
-  · -- Density, by Lemma 4.2 and the density step.
+  · -- Density, by the interpolation and the density step.
     rintro f ⟨ε, hε, hf⟩ r hr
     let Φ : IFS N ε := ⟨f, hε, hf⟩
     rcases Nat.eq_zero_or_pos N with rfl | hN
