@@ -26,9 +26,9 @@ explicit hypotheses of the theorems that use them (decision D5).
 | Lemma 2.7 and (2.10) | `IFS.lemma_2_7`, `IFS.iteratedDeriv_comp_div_deriv`, `gPoly`, `IFS.dualDerivTerm` |
 | Lemma 2.8, Corollary 2.9, Lemma 2.10 | `IFS.lemma_2_8`, `IFS.corollary_2_9`, `IFS.lemma_2_10` |
 | Lemma 3.1 | `lemma_3_1` |
-| Lemma 3.2 | `IFS.condensation_dichotomy` |
+| Case analysis in the proof of Theorem 2.2 (Section 3) | `IFS.condensation_dichotomy` (internal lemma) |
 | Lemma 4.1 | `InClass.of_deriv`, `InClass.mono`, `lemma_4_1`, `exists_inClass` |
-| Lemma 4.2 | `IFS.lemma_4_2` |
+| Preliminary interpolation in the density proof | `IFS.lemma_4_2` (internal lemma) |
 | Lemma 4.3 and (4.3) | `IFS.lemma_4_3`, `gaussian_bound` |
 | Proposition 4.4 | `proposition_4_4` |
 | The density step of Section 4.2 | `IFS.exists_dualSSC_near` |
@@ -46,14 +46,16 @@ explicit hypotheses of the theorems that use them (decision D5).
 The manuscript now corrects the statements of Proposition 1.8, Theorem 2.3 and Lemma 5.1 and the
 proofs affected by issues I5 to I14. Decision D1 is taken (the union class), and the manuscript
 now contains the fixes for issues I1 to I3, I16 and I17 in Section 4. Theorem 1.4 is proved in
-the union class; Lemma 4.2 uses affine target maps with disjoint images of `[0,1]`, and
+the union class; `IFS.lemma_4_2` uses affine target maps with disjoint images of `[0,1]`, and
 Proposition 4.4 an additive perturbation by Gaussian bumps with Cauchy estimates (constant
 `C = 8`).
 Lemma 5.1 is proved through the linearising map (5.2), constructed as a uniform limit on `B_ε`, so
 no primitive of `Ĥ_f` is needed. Lemma 2.7 is formalised but not used: Lemmas 2.8 to 2.10 are
-proved by Cauchy estimates. The proof of Theorem 1.5 uses the condensation dichotomy
+proved by Cauchy estimates. The Lean proof of Theorem 1.5 uses the condensation dichotomy
 `IFS.condensation_dichotomy`, with a single case split on whether the prefix lengths `|a_k|` stay
-bounded.
+bounded. In the manuscript, this argument now forms the proof of Theorem 2.2, and Theorem 1.5
+follows by compactness and Lemma 2.5. The former Lemma 3.2 was removed as a separate statement
+at the author's request on 5 October 2026.
 
 ## 1. Proposed headline endpoints
 
@@ -260,7 +262,8 @@ Theorem 1.4 is not established for fixed `ε`. It does hold for the union class 
 only conditions on `[0,1]` and analyticity on some neighbourhood are required.
 
 **I2. Proposition 4.4 assumes `f([0,1]) ⊂ (0,1)`.** *Resolved in the manuscript: the
-proposition assumes `f([0,1]) ⊆ (0,1)`, and Lemma 4.2 provides it by a small perturbation.* The
+proposition assumes `f([0,1]) ⊆ (0,1)`, and the preliminary interpolation in the density proof
+provides it by a small perturbation.* The
 proof divides by `f(y_i)` and states the
 constant `C` depends only on `f`; the class only gives `f(I) ⊆ I`, and the paper's own example has
 `f_1(0) = 0` and `f_3(1) = 1`. Then `a_i` is undefined at zeros of `f`, `C` is not uniform as
@@ -268,9 +271,11 @@ points approach a zero, and `g(I) ⊆ I` can fail (for `f(1) = 1`, `g(1) > 1`). 
 replace `f_i` by `(1-t)f_i + t/2`, which stays in `𝔖_N(ε)` for fixed `ε` (as `B_ε` is convex),
 is `d₂`-close, and maps `I` into `(0,1)`.
 
-**I3. "We may assume that Φ has no exact overlaps."** *Resolved in the manuscript: Lemma 4.2
-perturbs `Φ` to `(1-t)f_i + t h_i` with affine `h_i(x) = ax + i/(N+2)`, `a` transcendental, and a
-generic small `t`, so that `g_u ≢ g_v` on `[0,1]` for all distinct finite words. Lemma 4.3 now
+**I3. "We may assume that Φ has no exact overlaps."** *Resolved in the manuscript: the density
+proof perturbs `Φ` to `(1-t)f_i + t h_i` with affine target maps having a common contraction
+ratio and disjoint images in `(0,1)`, and a generic small `t`, so that `g_u ≢ g_v` on `[0,1]`
+for all distinct finite words. The separate lemma was removed at the author's request.
+The orbit-point lemma now
 assumes exactly this, which is implied by having no exact overlaps. A singleton attractor has
 exact overlaps; the Lean `IFS.lemma_4_3` assumes `IFS.NoCoincidence`.* No argument is given for removing exact
 overlaps by a small perturbation. Lemma 4.3 only needs `f_u ≢ f_v` on `[0,1]` for the finitely
@@ -282,14 +287,15 @@ suffices. It still needs a written proof (for example, generic parameters in the
 claimed that for a bad pair either `(F_i k)(x) ∈ conv((F_j k)(x), (F_j K)(x))` or the same with `i`
 and `j` swapped. This fails when exactly one of the compositions reverses orientation. The proof
 now always perturbs the map `f_{i_1}` at a bad pair: the interval of `G_i` at `x` is the interval
-of `F_i` shifted by `τ` with `|τ| ≥ δ`, and two intersecting intervals of length `< δ/3` are
+of `F_i` shifted by a distance at least `δ`, and two intersecting intervals of length `< δ/3` are
 separated by any such shift.
 
 **I17. Proof of Theorem 1.4: cylinders for the perturbed system.** *Resolved in the manuscript.*
 Lemma 2.5 (b) for `Ψ*` needs `G_i cl(k,K) ⊆ (k,K)`, which the proof did not check. The proof now
-fixes `K > M/(1-c')` with `c' = (1+c_max)/2` and `M = 1 + max sup |f_i''/f_i'|`, `k = -K`, and
-chooses `δ` so small that every `Ψ` within `(C+3)δ` has `|g_i'| ≤ c'` and `|g_i''/g_i'| ≤ M` on
-`[0,1]`. It also makes the bound `d₂(Φ,Ψ) < (C+3)δ` explicit.
+chooses a strictly invariant cylinder before `δ`, and uses continuity to preserve its strict
+inclusions for every `Ψ` within `(C+3)δ`. It retains the bound `d₂(Φ,Ψ) < (C+3)δ` explicitly.
+Lean keeps the quantitative argument with uniform derivative bounds; the manuscript's extra
+constants and endpoint estimates were removed at the author's request.
 
 **I18. Remark after the conjecture: exact overlaps and sub-conjugation.** *Resolved in the
 manuscript.* The remark claimed that every analytic IFS with an exact overlap is sub-conjugated to
@@ -313,7 +319,9 @@ Corollary 1.7, a genericity statement, for `dim_H Λ = s(Φ)` and `dim μ_p = H(
 from Theorem 1.6, since the attractor is not a singleton, with `s(Φ) < 1` and `H(p) < χ` because
 `∑_i sup |f_i'| = 7/16 < 1`. Lean: `example_dim`.
 
-**I4. Lemma 2.5(d) and the proof of Theorem 2.2.** *Resolved in the manuscript: (d) is removed, and Theorems 1.5 and 2.2 follow from the new Lemma 3.2.* For a finite word, `H_i = F_i(0)` and `0` is
+**I4. Lemma 2.5(d) and the proof of Theorem 2.2.** *Resolved in the manuscript: (d) is removed,
+Theorem 2.2 is proved directly in Section 3, and Theorem 1.5 follows from it by compactness and
+Lemma 2.5.* For a finite word, `H_i = F_i(0)` and `0` is
 not in `Λ*` in general, so (a) ⇒ (d) is not a consequence of the strong separation of `Λ*` for
 short words; the proof is left to the reader. Theorem 2.2 is deduced from 2.5 and 1.5, which
 needs `H_a ≢ H_b` for distinct finite words of equal length. The Lean route avoids (d): the

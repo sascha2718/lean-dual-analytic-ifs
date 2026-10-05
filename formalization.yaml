@@ -107,8 +107,12 @@ fidelity:
     words are sequences ℕ → Fin N, read from the left. In Challenge.lean the hypothesis of
     Theorem 1.5, over distinct words of Σ ∪ Σ_* of equal length, is split into finite words of
     the same length and infinite words. Suprema over [0,1] are real iSups of bounded families.
-    The proof of Theorem 1.5 goes through a condensation dichotomy instead of the case analysis
-    of Section 3, and bounds the derivatives of the dual natural projection by Cauchy estimates
+    The Lean proofs of Theorems 1.5 and 2.2 use an internal condensation dichotomy. The paper
+    gives the case analysis directly in the proof of Theorem 2.2 in Section 3 and deduces
+    Theorem 1.5 by compactness and Lemma 2.5. In the finite-word case the paper uses finite
+    order of vanishing, whereas Lean proves equality of all derivatives at the limit point.
+    Lean bounds the derivatives of the dual natural
+    projection by Cauchy estimates
     instead of the Faà di Bruno formula of Lemma 2.7. Lemma 2.7 itself is formalised with the
     partitions of {1, …, k+1} represented by Mathlib's OrderedFinpartition and φ_i^{(m)} by the
     (m-1)-th derivative of f_i''/f_i'; its proof uses a local primitive of f_i''/f_i' in place of
@@ -116,12 +120,14 @@ fidelity:
     modelled by restrictions to B_ε with the topology of uniform convergence on B_ε. In
     Theorem 1.4 the space 𝔖_N is the union over ε > 0 of the IFSs with maps in S^ω_ε(I), as in
     the manuscript; the open set consists of the systems whose dual IFS satisfies the SSC, and of
-    all systems when N = 0, where the Lean dual attractor would be empty. Lemma 4.2 is proved
-    with affine target maps with pairwise disjoint images of [0,1] in place of a transcendental
-    slope, and with complex analyticity in the parameter. Proposition 4.4 is proved with an
+    all systems when N = 0, where the Lean dual attractor would be empty. The preliminary
+    interpolation in the density proof is retained as the internal lemma IFS.lemma_4_2,
+    using complex analyticity in the parameter and preserving the fixed-epsilon class.
+    Proposition 4.4 is proved with an
     additive perturbation by Gaussian bumps and Cauchy estimates in place of the multiplicative
-    perturbation f exp(φψA), with the absolute constant C = 8. In the density step the bound M
-    on g''/g' is fixed before δ. In the remark after the conjecture of Section 1, that a
+    perturbation f exp(φψA), with the absolute constant C = 8. In the density step Lean fixes
+    uniform derivative bounds before δ, while the paper uses continuity to preserve the strict
+    cylinder inclusions. In the remark after the conjecture of Section 1, that a
     non-singleton attractor is infinite is proved from the invariance of Λ under the compositions
     and a pigeonhole argument, without fixed points. Bowen's theorem and Rapaport's Theorem 1.2
     and Corollary 1.3 are hypotheses, stated as in their sources (Rapaport's for real analytic

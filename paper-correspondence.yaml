@@ -39,7 +39,7 @@ entries:
     lean: ["Challenge.audit_sesc_open_dense"]
     relation: exact
     headline: true
-    note: "Library form AnalyticESC.theorem_1_4. The space of IFSs is the union class of decision D1 (AnalyticESC.InUnionClass), with the d2 metric between families (AnalyticESC.d2Sys); open and dense are relative to this space. The open set consists of the systems whose dual IFS satisfies the SSC, as in the paper, and of all systems when N = 0, where the dual attractor would be empty. Density goes through Lemma 4.2, Lemma 4.3, Proposition 4.4 and the density step AnalyticESC.IFS.exists_dualSSC_near; openness through AnalyticESC.IFS.lemma_2_6_union."
+    note: "Library form AnalyticESC.theorem_1_4. The space of IFSs is the union class of decision D1 (AnalyticESC.InUnionClass), with the d2 metric between families (AnalyticESC.d2Sys); open and dense are relative to this space. The open set consists of the systems whose dual IFS satisfies the SSC, as in the paper, and of all systems when N = 0, where the dual attractor would be empty. The preliminary interpolation argument is now inside the paper's density proof; Lean retains it as AnalyticESC.IFS.lemma_4_2, using complex analyticity in the parameter and preserving the fixed-epsilon class. Density then uses AnalyticESC.IFS.lemma_4_3, AnalyticESC.proposition_4_4 and AnalyticESC.IFS.exists_dualSSC_near; openness uses AnalyticESC.IFS.lemma_2_6_union. Lean uses explicit uniform derivative bounds to preserve the invariant cylinder; the paper uses continuity of the strict inclusions."
 
   - source: "thm:main"
     kind: theorem
@@ -47,7 +47,7 @@ entries:
     lean: ["Challenge.audit_sesc_of_dualProj"]
     relation: exact
     headline: true
-    note: "Library form AnalyticESC.IFS.theorem_1_5, over finite and infinite words (AnalyticESC.Word). The challenge splits the hypothesis into finite words of equal length and infinite words, which are the pairs of equal length. Maps are holomorphic extensions; H_w is evaluated at real points with complex derivatives, which equal the real ones there. Proved from Lemma 3.2 (AnalyticESC.IFS.condensation_dichotomy), as in the paper."
+    note: "Library form AnalyticESC.IFS.theorem_1_5, over finite and infinite words (AnalyticESC.Word). The challenge splits the hypothesis into finite words of equal length and infinite words, which are the pairs of equal length. Maps are holomorphic extensions; H_w is evaluated at real points with complex derivatives, which equal the real ones there. The Lean proof uses AnalyticESC.IFS.condensation_dichotomy; the paper deduces the theorem from Theorem 2.2 by compactness and Lemma 2.5."
 
   - source: "thm:RapaportMain"
     kind: theorem
@@ -105,21 +105,13 @@ entries:
     headline: false
     note: "C^omega_eps([0,1]) is AnalyticESC.analyticSpace, the restrictions to B_eps of maps holomorphic there and real on I, with the topology of uniform convergence on B_eps. The hypothesis 0 < N is the paper's implicit assumption that the IFS has a map."
 
-  - source: "thm:dichotomy"
-    kind: lemma
-    status: formalized
-    lean: ["AnalyticESC.IFS.condensation_dichotomy"]
-    relation: exact
-    headline: false
-    note: "The Lean hypothesis is the failure of the SESC, which is weak super-exponential condensation by AnalyticESC.IFS.not_sesc_iff. The Lean proof splits only on whether the prefix lengths stay bounded and works at the limit of the left end points of f_u([0,1])."
-
   - source: "thm:DualSSC"
     kind: theorem
     status: formalized
     lean: ["AnalyticESC.IFS.theorem_2_2"]
     relation: exact
     headline: false
-    note: "Proved from Lemma 3.2 (AnalyticESC.IFS.condensation_dichotomy), as in the paper."
+    note: "The paper proves this directly in Section 3, using finite order of vanishing for the exact-coincidence argument when the remaining words have bounded length. Lean instead proves equality of all derivatives at the limit point and keeps AnalyticESC.IFS.condensation_dichotomy as an internal lemma. Its hypothesis is the failure of the SESC, equivalent to weak super-exponential condensation by AnalyticESC.IFS.not_sesc_iff; its proof splits only on whether the prefix lengths stay bounded and works at the limit of the left end points of f_u([0,1])."
 
   - source: "thm:DualConj"
     kind: theorem
@@ -200,14 +192,6 @@ entries:
     relation: split
     headline: false
     note: "The first claim is InClass.of_deriv, item (a) is InClass.mono and item (b) is lemma_4_1, with exists_inClass the direction used for perturbations. Realness is required at the real points of the neighbourhood."
-
-  - source: "thm:remove-coincidences"
-    kind: lemma
-    status: formalized
-    lean: ["AnalyticESC.IFS.lemma_4_2"]
-    relation: exact
-    headline: false
-    note: "The perturbation stays in the same class S^omega_eps. The Lean proof takes affine maps h_i with pairwise disjoint images of [0,1] in place of a transcendental slope, proves that their compositions along distinct words differ by induction on the words, uses complex analyticity in t at a fixed point in place of joint real analyticity in (t, x), and bounds d2(Phi, Phi^t) by a constant multiple of t."
 
   - source: "lem:Pointsx_ij"
     kind: lemma
