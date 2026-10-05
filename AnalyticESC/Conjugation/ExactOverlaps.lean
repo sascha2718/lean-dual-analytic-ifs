@@ -80,6 +80,17 @@ private theorem exact_re_comp_mem_attractor (a : List (Fin N)) {x : ℝ}
   obtain ⟨w, rfl⟩ := hx
   exact ⟨_, Φ.exact_natProj_prepend a w⟩
 
+/-- If the attractor is `{p}`, every map fixes `p`. -/
+theorem fixedPoint_of_attractor_singleton {p : ℝ} (hp : Φ.attractor = {p}) (k : Fin N) :
+    Φ.f k p = p := by
+  have hpA : p ∈ Φ.attractor := hp ▸ mem_singleton p
+  have h := Φ.exact_re_comp_mem_attractor [k] hpA
+  rw [hp] at h
+  have hr : (Φ.f k p).re = p := by simpa using h
+  have hi := (Φ.inClass k).im_eq_zero p
+    (ofReal_mem_nbhd (by linarith [Φ.ε_pos]) (Φ.attractor_subset_I hpA))
+  exact Complex.ext (by simpa using hr) (by simpa using hi)
+
 /-- A finite attractor has at most one point. -/
 private theorem exact_attractor_subsingleton (k : Fin N) (hfin : Φ.attractor.Finite) :
     Φ.attractor.Subsingleton := by

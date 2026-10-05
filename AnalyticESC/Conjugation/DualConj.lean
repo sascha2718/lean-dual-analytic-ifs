@@ -1,6 +1,6 @@
 module
 
-public import AnalyticESC.Conjugation.Characterisation
+public import AnalyticESC.Conjugation.PeriodicPoints
 
 @[expose] public section
 

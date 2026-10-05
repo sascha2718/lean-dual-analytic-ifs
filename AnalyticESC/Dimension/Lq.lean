@@ -12,7 +12,8 @@ The end of Section 1.2.2: for `q > 1`, the `L^q` spectrum
 `D_μ(q) = τ_μ(q)/(q - 1)` of the natural measure `μ` of the example satisfy
 `D_μ(q) ≤ q (s(Φ) - 1/3) / (q - 1)`, which is smaller than `s(Φ)` for `q > 3 s(Φ)`. The sum
 contains the term `μ([0,r))^q ≥ μ(B(0,r/2))^q`, and `μ(B(0,r))` has local dimension `s(Φ) - 1/3`
-at `0` (`example_localDim`).
+at `0` (`example_localDim`). The bound is deduced by contradiction through the ball-mass
+estimate of Shmerkin's Lemma 1.7, proved here in the form needed at `0`.
 -/
 
 namespace AnalyticESC
@@ -146,6 +147,79 @@ private theorem lq_liminf_le (μ : Measure ℝ) [IsProbabilityMeasure μ] (h0 : 
   · rw [← hg.liminf_eq]
     exact liminf_le_liminf hle hbdd (isCoboundedUnder_ge_of_eventually_le _ hg1)
 
+/-- The ball-mass estimate in Shmerkin's Lemma 1.7, specialised to the point `0` of a
+measure supported on `[0,∞)`. At scale `r`, one grid interval covers `B(0,r/2)` up to a null
+set. This is proved here, not assumed. See P. Shmerkin, Ann. of Math. 189 (2019), 319–391,
+Lemma 1.7, DOI 10.4007/annals.2019.189.2.1. -/
+theorem shmerkin_ball_bound_zero (μ : Measure ℝ) [IsProbabilityMeasure μ]
+    (h0 : μ (Iio 0) = 0) (hpos : ∀ r > 0, 0 < μ.real (closedBall 0 r))
+    {q s : ℝ} (hq : 1 < q)
+    (hbdd : IsBoundedUnder (· ≥ ·) (𝓝[>] 0) (lqRatio μ q)) (hs : s < lqDim μ q) :
+    ∀ᶠ r in 𝓝[>] (0 : ℝ), μ.real (closedBall 0 (r / 2)) ≤ r ^ ((1 - 1 / q) * s) := by
+  have hq0 : 0 < q := lt_trans zero_lt_one hq
+  have ht : (q - 1) * s < liminf (lqRatio μ q) (𝓝[>] 0) := by
+    have := (lt_div_iff₀ (sub_pos.2 hq)).1 hs
+    linarith
+  filter_upwards [eventually_lt_of_lt_liminf ht hbdd, (show Ioo (0 : ℝ) 1 ∈ 𝓝[>] 0 from Ioo_mem_nhdsGT one_pos)]
+    with r hr hrI
+  have hm := hpos (r / 2) (half_pos hrI.1)
+  have hl := Real.log_neg hrI.1 hrI.2
+  have he := (lt_div_iff_of_neg hl).1 (hr.trans_le (lqRatio_le μ h0 hq.le hrI.1 hrI.2 hm))
+  apply (Real.log_le_log_iff hm (Real.rpow_pos_of_pos hrI.1 _)).1
+  rw [Real.log_rpow hrI.1]
+  have halg : q * ((1 - 1 / q) * s * Real.log r) = (q - 1) * s * Real.log r := by
+    field_simp
+  nlinarith
+
+/-- A local dimension is at least a ball-mass exponent; replacing `r` by `r/2` does not
+change the logarithmic limit. -/
+private theorem localDim_ge_of_ball_bound (μ : Measure ℝ)
+    (hpos : ∀ r > 0, 0 < μ.real (closedBall 0 r)) {d a : ℝ}
+    (hlim : Tendsto (fun r => Real.log (μ.real (closedBall 0 r)) / Real.log r) (𝓝[>] 0) (𝓝 d))
+    (hball : ∀ᶠ r in 𝓝[>] (0 : ℝ), μ.real (closedBall 0 (r / 2)) ≤ r ^ a) : a ≤ d := by
+  have hev : ∀ᶠ r in 𝓝[>] (0 : ℝ), r ∈ Ioo 0 1 := Ioo_mem_nhdsGT one_pos
+  have h2 : Tendsto (fun r : ℝ => r / 2) (𝓝[>] 0) (𝓝[>] 0) := by
+    refine tendsto_nhdsWithin_of_tendsto_nhds_of_eventually_within _ ?_ ?_
+    · exact ((continuous_id.div_const 2).tendsto' 0 0 (by simp)).mono_left nhdsWithin_le_nhds
+    · exact eventually_mem_nhdsWithin.mono fun r hr => half_pos hr
+  have hlog : Tendsto (fun r => Real.log (r / 2) / Real.log r) (𝓝[>] 0) (𝓝 1) := by
+    have h := (tendsto_const_nhds (x := (1 : ℝ))).sub
+      ((tendsto_const_nhds (x := Real.log 2)).div_atBot Real.tendsto_log_nhdsGT_zero)
+    rw [sub_zero] at h
+    refine h.congr' (hev.mono fun r hr => ?_)
+    change 1 - Real.log 2 / Real.log r = Real.log (r / 2) / Real.log r
+    rw [Real.log_div hr.1.ne' two_ne_zero, sub_div, div_self (Real.log_neg hr.1 hr.2).ne]
+  have ht : Tendsto (fun r => Real.log (μ.real (closedBall 0 (r / 2))) / Real.log r)
+      (𝓝[>] 0) (𝓝 d) := by
+    have h := (hlim.comp h2).mul hlog
+    rw [mul_one] at h
+    refine h.congr' (hev.mono fun r hr => ?_)
+    have hl : Real.log (r / 2) ≠ 0 := (Real.log_neg (half_pos hr.1) (by linarith [hr.2])).ne
+    dsimp only [Function.comp_apply]
+    field_simp
+  apply ge_of_tendsto ht
+  filter_upwards [hev, hball] with r hr hb
+  have he := Real.log_le_log (hpos _ (half_pos hr.1)) hb
+  rw [Real.log_rpow hr.1] at he
+  exact (le_div_iff_of_neg (Real.log_neg hr.1 hr.2)).2 he
+
+/-- The contradiction used in Section 1.2.2: a larger `L^q` dimension would, by the
+ball-mass estimate of Lemma 1.7, force a larger local dimension at `0`. -/
+theorem lqDim_le_of_localDim (μ : Measure ℝ) [IsProbabilityMeasure μ]
+    (h0 : μ (Iio 0) = 0) (hpos : ∀ r > 0, 0 < μ.real (closedBall 0 r)) {d : ℝ}
+    (hlim : Tendsto (fun r => Real.log (μ.real (closedBall 0 r)) / Real.log r) (𝓝[>] 0) (𝓝 d))
+    {q : ℝ} (hq : 1 < q) (hbdd : IsBoundedUnder (· ≥ ·) (𝓝[>] 0) (lqRatio μ q)) :
+    lqDim μ q ≤ q / (q - 1) * d := by
+  by_contra! h
+  obtain ⟨s, hs, hsD⟩ := exists_between h
+  have hd := localDim_ge_of_ball_bound μ hpos hlim (shmerkin_ball_bound_zero μ h0 hpos hq hbdd hsD)
+  have hq0 : 0 < q := lt_trans zero_lt_one hq
+  have he : q * ((1 - 1 / q) * s) = (q - 1) * s := by field_simp
+  have hs' : q * d < s * (q - 1) := by
+    rw [div_mul_eq_mul_div] at hs
+    exact (div_lt_iff₀ (sub_pos.2 hq)).1 hs
+  nlinarith [mul_le_mul_of_nonneg_left hd hq0.le]
+
 /-! ### The natural measure of the example near `0` -/
 
 /-- If the first `m` letters of `ω` are `0`, then `π(ω) ≤ 8^{-m}`, as `f_0(z) = z/8`. -/
@@ -209,12 +283,11 @@ theorem example_lq_of_bowen (hB : BowenGibbsStatement) :
     not_lt.2 (exampleIFS.attractor_subset_I ⟨ω, rfl⟩).1 hω
   have h0 : (ν.map exampleIFS.natProj) (Iio 0) = 0 := by
     rw [Measure.map_apply exampleIFS.measurable_natProj measurableSet_Iio, hE, measure_empty]
-  obtain ⟨hbdd, hcob, hlim⟩ := lq_liminf_le _ h0
+  obtain ⟨hbdd, hcob, -⟩ := lq_liminf_le _ h0
     (fun _ hr => lq_measureReal_closedBall_pos hG hr) (hloc ν hν hG) hq
   have hq1 : 0 < q - 1 := sub_pos.2 hq
-  have hdim : lqDim (ν.map exampleIFS.natProj) q ≤ q / (q - 1) * (s - 1 / 3) := by
-    rw [lqDim, div_mul_eq_mul_div]
-    exact div_le_div_of_nonneg_right hlim hq1.le
+  have hdim := lqDim_le_of_localDim _ h0
+    (fun _ hr => lq_measureReal_closedBall_pos hG hr) (hloc ν hν hG) hq hbdd
   refine ⟨fun r hr => (lq_summable_and_bounds _ hq.le hr).1, hbdd, hcob, hdim,
     fun h3 => hdim.trans_lt ?_⟩
   rw [div_mul_eq_mul_div, div_lt_iff₀ hq1]

@@ -1,5 +1,6 @@
 module
 
+public import AnalyticESC.Generic.Continuity
 public import AnalyticESC.Generic.Agreement
 public import AnalyticESC.Generic.MultiplicativeBump
 public import AnalyticESC.Generic.Points
@@ -16,9 +17,9 @@ arbitrarily `d₂`-close perturbations whose dual IFS satisfies the SSC.
 The proof follows the paper with words of length `n + 1`, to match Lemma 2.5. The points of
 Lemma 4.1 and their orbits are split, for each letter `ℓ`, into the set `𝒴_ℓ` of the points
 `x_{i,j}` of the bad pairs with `i₁ = ℓ` and the set `𝒵_ℓ` of the remaining orbit points, and
-Proposition 4.2 perturbs each map accordingly. The bound for `g_i''/g_i'` on `[0,1]` is
-`M = 2 (B + C + 1) / c_min`, with `B` a bound for `f_i''/f_i'` and `C` the sum of the constants
-of Proposition 4.2; it does not depend on `δ ≤ 1`.
+Proposition 4.2 perturbs each map accordingly. A strictly invariant cylinder is fixed first;
+uniform continuity estimates in the `d₂` metric give a neighbourhood where its strict
+inclusions persist. Only then are `δ` and the word length chosen, as in the manuscript.
 -/
 
 namespace AnalyticESC
@@ -328,35 +329,52 @@ private theorem exists_delta {a b C r : ℝ} (ha : 0 < a) (hb : 0 < b) (hC : 0 �
     _ = r / 2 := by field_simp
     _ < r := by linarith
 
-/-- A bound for `b'/a'` when `a'` and `b'` are close to `a` and `b`, with `|a| ≥ m`. -/
-private theorem norm_div_le_of_close {a b a' b' : ℂ} {m B C δ : ℝ} (hm : 0 < m) (ha : m ≤ ‖a‖)
-    (hb : ‖b‖ ≤ B) (ha' : ‖a' - a‖ < δ) (hb' : ‖b' - b‖ < C * δ + δ) (hδm : δ ≤ m / 2)
-    (hδ1 : δ ≤ 1) (hC : 0 ≤ C) : ‖b' / a'‖ ≤ 2 * (B + C + 1) / m := by
-  have h1 : m / 2 ≤ ‖a'‖ := by
-    have := norm_sub_norm_le a a'
-    rw [norm_sub_rev] at this
+/-- A strictly invariant cylinder persists in a `d₂` neighbourhood. This is the continuity
+step in Section 4.2, before choosing the perturbation size and the word length. -/
+theorem exists_invariant_cylinder_near (Φ : IFS N ε) :
+    ∃ K > 0, ∃ η > 0, ∀ {ε' : ℝ} (Ψ : IFS N ε'), d2 Φ Ψ < η →
+      ∀ i, MapsTo (Ψ.dualOp i) (dualCylClosed ε' (-K) K) (dualCyl ε' (-K) K) := by
+  obtain ⟨B, hB0, hB⟩ := Φ.exists_nonlin_bound
+  obtain ⟨A, η₀, hη₀, hcont⟩ := Φ.exists_dualProj_sub_le_d2
+  let c := (1 + Φ.cmax) / 2
+  let M := B + 1
+  let K := M / (1 - c) + 1
+  have hc : 0 < 1 - c := by dsimp [c]; linarith [Φ.cmax_lt_one]
+  have hM : 0 < M := by dsimp [M]; linarith
+  have hK : 0 < K := by dsimp [K]; positivity
+  have hmargin : c * K + M < K := by
+    have he := mul_div_cancel₀ M hc.ne'
+    change (1 - c) * (M / (1 - c)) = M at he
+    dsimp [K]
+    nlinarith
+  let η := min η₀ (min ((1 - Φ.cmax) / 2) (1 / (|A| + 1)))
+  have hcmax : 0 < 1 - Φ.cmax := sub_pos.2 Φ.cmax_lt_one
+  have hη : 0 < η := by dsimp [η]; positivity
+  refine ⟨K, hK, η, hη, fun {ε'} Ψ hΨ => ?_⟩
+  have hηA : d2 Φ Ψ < 1 / (|A| + 1) :=
+    hΨ.trans_le ((min_le_right _ _).trans (min_le_right _ _))
+  have hA : A * d2 Φ Ψ < 1 := by
+    have hd := Continuity.d2_nonneg Φ Ψ
+    have h := (lt_div_iff₀ (by positivity : 0 < |A| + 1)).1 hηA
+    nlinarith [le_abs_self A, mul_le_mul_of_nonneg_right (le_abs_self A) hd]
+  apply Ψ.mapsTo_dualOp_dualCylClosed_of_le (c := c) (M := M) (K := K) _ _ hmargin
+  · intro i x hx
+    have he := (Continuity.norm_sub_le_d2 Φ Ψ i hx).2.1
+    have hd := Φ.norm_deriv_le_cmax i (subset_closure (ofReal_mem_nbhd Φ.ε_pos hx))
+    have hsmall : d2 Φ Ψ < (1 - Φ.cmax) / 2 :=
+      hΨ.trans_le ((min_le_right _ _).trans (min_le_left _ _))
+    have ht := norm_sub_norm_le (deriv (Ψ.f i) x) (deriv (Φ.f i) x)
+    rw [norm_sub_rev] at ht
+    dsimp [c]
     linarith
-  have h2 : ‖b'‖ ≤ B + C + 1 := by
-    have := norm_sub_norm_le b' b
-    have : C * δ ≤ C := mul_le_of_le_one_right hC hδ1
+  · intro i x hx
+    have he := hcont Ψ (hΨ.trans_le (min_le_left _ _)) (.fin [i]) x hx
+    simp only [Φ.dualProj_singleton, Ψ.dualProj_singleton] at he
+    have hb := hB i x (subset_closure (ofReal_mem_nbhd Φ.ε_pos hx))
+    have ht := norm_sub_norm_le (Ψ.nonlin i x) (Φ.nonlin i x)
+    rw [norm_sub_rev] at ht
+    dsimp [M]
     linarith
-  rw [norm_div, div_le_div_iff₀ (by linarith) hm]
-  nlinarith [norm_nonneg b']
-
-/-- `|f_i''| ≤ B` on `cl B_ε` if `|f_i''/f_i'| ≤ B` there. -/
-private theorem norm_deriv_deriv_le (Φ : IFS N ε) {B : ℝ}
-    (hB : ∀ i, ∀ z ∈ closure (nbhd ε), ‖Φ.nonlin i z‖ ≤ B) (i : Fin N) {z : ℂ}
-    (hz : z ∈ closure (nbhd ε)) : ‖deriv (deriv (Φ.f i)) z‖ ≤ B := by
-  have hne := (Φ.inClass i).deriv_ne_zero z hz
-  have h : deriv (deriv (Φ.f i)) z = Φ.nonlin i z * deriv (Φ.f i) z :=
-    (div_mul_cancel₀ _ hne).symm
-  have h1 := Φ.norm_deriv_le_cmax i hz
-  have h2 := Φ.cmax_lt_one
-  have hB0 : 0 ≤ B := (norm_nonneg _).trans (hB i z hz)
-  rw [h, norm_mul]
-  calc ‖Φ.nonlin i z‖ * ‖deriv (Φ.f i) z‖ ≤ B * 1 :=
-        mul_le_mul (hB i z hz) (by linarith) (norm_nonneg _) hB0
-    _ = B := mul_one B
 
 /-- The `d₂` distance from bounds on the three differences on `I`. -/
 private theorem d2_le (hN : 0 < N) (Φ : IFS N ε) (Ψ : IFS N ε') {a b e : ℝ}
@@ -383,27 +401,13 @@ theorem exists_dualSSC_near (hN : 0 < N) (Φ : IFS N ε)
   have hCle : ∀ i, C₀ i ≤ C := fun i =>
     Finset.single_le_sum (f := C₀) (fun j _ => (hC₀ j).le) (Finset.mem_univ i)
   have hC : 0 ≤ C := Finset.sum_nonneg fun j _ => (hC₀ j).le
-  -- the bounds `B` for `f_i''/f_i'` and `c_max`, `c_min` for `f_i'`
-  obtain ⟨B, hB0, hB⟩ := Φ.exists_nonlin_bound
+  -- Fix an invariant cylinder, then choose `δ` within its continuity neighbourhood.
+  obtain ⟨K, hK0, η, hη, hstable⟩ := Φ.exists_invariant_cylinder_near
+  obtain ⟨δ, hδ, -, -, -, hδr⟩ :=
+    exists_delta (a := 1) (b := 1) one_pos one_pos hC (lt_min hr hη)
+  have hkK : -K ≤ K := by linarith
   have hc1 := Φ.cmax_lt_one
   have hc0 := Φ.cmax_nonneg
-  have hm := Φ.cmin_pos hN
-  obtain ⟨δ, hδ, hδ1, hδc, hδm, hδr⟩ :=
-    exists_delta (a := (1 - Φ.cmax) / 2) (b := Φ.cmin / 2) (by linarith) (by linarith) hC hr
-  -- the cylinder `(-K, K)`
-  set M := 2 * (B + C + 1) / Φ.cmin with hM_def
-  set c' := (1 + Φ.cmax) / 2 with hc'_def
-  set K := M / (1 - c') + 1 with hK_def
-  have hM0 : 0 ≤ M := div_nonneg (by linarith) hm.le
-  have hc'1 : 0 < 1 - c' := by rw [hc'_def]; linarith
-  have hK0 : 0 < K := by
-    have : 0 ≤ M / (1 - c') := div_nonneg hM0 hc'1.le
-    linarith
-  have hK : c' * K + M < K := by
-    have h1 : (1 - c') * (M / (1 - c')) = M := mul_div_cancel₀ M hc'1.ne'
-    have h2 : c' * K + M = K - (1 - c') := by rw [hK_def]; linear_combination -h1
-    linarith
-  have hkK : -K ≤ K := by linarith
   -- the length `n + 1` of the words
   obtain ⟨n, hn⟩ : ∃ n : ℕ, Φ.cmax ^ (n + 1) * (K - -K) < δ / 3 := by
     obtain ⟨n, hn⟩ := exists_pow_lt_of_lt_one
@@ -422,27 +426,13 @@ theorem exists_dualSSC_near (hN : 0 < N) (Φ : IFS N ε)
     (Φ.disjoint_badPoints_goodPoints (-K) K n x i) δ hδ δ hδ
   obtain ⟨ε', hε', hgε'⟩ := exists_inClass_forall fun i => (hg i).1
   obtain ⟨Ψ, rfl⟩ : ∃ Ψ : IFS N ε', Ψ.f = g := ⟨⟨g, hε', hgε'⟩, rfl⟩
-  refine ⟨ε', Ψ, ?_, ?_⟩
-  · -- `d₂(Φ, Ψ) ≤ (C + 3) δ < r`
+  have hd : d2 Φ Ψ < min r η := by
     refine lt_of_le_of_lt (d2_le hN Φ Ψ (a := δ) (b := δ) (e := C * δ + δ)
       (fun i y hy => ((hg i).2.2.2.2.1 y hy).le) (fun i y hy => ((hg i).2.2.2.2.2.1 y hy).le)
       (fun i y hy => ((hg i).2.2.2.2.2.2 y hy).le.trans ?_)) ?_
     · linarith [mul_le_mul_of_nonneg_right (hCle i) hδ.le]
     · linarith
-  -- `Ψ*` satisfies the SSC by Lemma 2.5
-  have hderiv : ∀ i, ∀ y ∈ I, ‖deriv (Ψ.f i) y‖ ≤ c' := by
-    intro i y hy
-    have h1 := Φ.norm_deriv_le_cmax i (subset_closure (ofReal_mem_nbhd Φ.ε_pos hy))
-    have h2 := (hg i).2.2.2.2.2.1 y hy
-    have h3 := norm_sub_norm_le (deriv (Ψ.f i) y) (deriv (Φ.f i) y)
-    rw [hc'_def]
-    linarith
-  have hnonlin : ∀ i, ∀ y ∈ I, ‖Ψ.nonlin i y‖ ≤ M := by
-    intro i y hy
-    have hy' : (y : ℂ) ∈ closure (nbhd ε) := subset_closure (ofReal_mem_nbhd Φ.ε_pos hy)
-    refine norm_div_le_of_close hm (Φ.cmin_le_norm_deriv i hy') (Φ.norm_deriv_deriv_le hB i hy')
-      ((hg i).2.2.2.2.2.1 y hy) (((hg i).2.2.2.2.2.2 y hy).trans_le ?_) hδm hδ1 hC
-    linarith [mul_le_mul_of_nonneg_right (hCle i) hδ.le]
+  refine ⟨ε', Ψ, hd.trans_le (min_le_left _ _), ?_⟩
   have hY : ∀ ℓ, ∀ y ∈ Φ.badPoints (-K) K n x ℓ, Ψ.f ℓ y = Φ.f ℓ y ∧
       deriv (Ψ.f ℓ) y = deriv (Φ.f ℓ) y ∧ δ ≤ ‖Ψ.nonlin ℓ y - Φ.nonlin ℓ y‖ :=
     fun ℓ y hy => ⟨((hg ℓ).2.1 y (Finset.mem_union_left _ hy)).1,
@@ -451,7 +441,7 @@ theorem exists_dualSSC_near (hN : 0 < N) (Φ : IFS N ε)
     fun ℓ z hz => ⟨((hg ℓ).2.1 z (Finset.mem_union_right _ hz)).1,
       ((hg ℓ).2.1 z (Finset.mem_union_right _ hz)).2, (hg ℓ).2.2.1 z hz⟩
   refine (Ψ.lemma_2_5 hN).1.2 ⟨-K, K, by linarith, n,
-    fun i => Ψ.mapsTo_dualOp_dualCylClosed_of_le hderiv hnonlin hK i, fun i j hij => ?_⟩
+    hstable Ψ (hd.trans_le (min_le_right _ _)), fun i j hij => ?_⟩
   rcases lt_or_gt_of_ne hij with h | h
   · exact hx.dualCylDisjoint Ψ hkK hn hY hZ (p := (i, j)) ⟨Nat.succ_pos n, h⟩
   · obtain ⟨t, ht, hd⟩ := hx.dualCylDisjoint Ψ hkK hn hY hZ (p := (j, i)) ⟨Nat.succ_pos n, h⟩

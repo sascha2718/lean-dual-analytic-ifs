@@ -21,8 +21,8 @@ made after arXiv v2.
   `D_μ(q) ≤ q(s(Φ) - 1/3)/(q - 1)`, assuming Bowen's Gibbs-measure theorem.
 
 The library also proves the supporting statements of Sections 2–5. Five of the twelve headline
-statements have explicit literature hypotheses. These results are stated and cited in the challenge,
-not proved here. The precise references are:
+statements have explicit literature hypotheses. The external results used as hypotheses are stated
+and cited in the challenge but are not proved here. Their precise references are:
 
 - **Bowen:** Rufus Bowen,
   [*Equilibrium states and the ergodic theory of Anosov diffeomorphisms*](https://doi.org/10.1007/BFb0081279),
@@ -54,12 +54,9 @@ summarises the differences.
 The main differences are:
 
 - Corollary 1.7 is formalised for `N ≥ 2`; its trivial `N = 1` case is omitted.
-- Several proof routes differ slightly: Cauchy derivative estimates, the condensation dichotomy,
-  direct construction of the dual attractor, and construction of the linearising map by a limit.
-  Theorem 1.12(a) follows the manuscript's periodic-point argument.
-- Proposition 4.2 uses the manuscript's multiplicative perturbation but additionally proves the two omitted
-  second-derivative estimates. Lean handles empty `𝒵` by enlarging the constants; the manuscript
-  adjoins an auxiliary point to `𝒵`.
+- Complex derivatives of holomorphic extensions represent derivatives of the real analytic maps.
+- Some constants are chosen differently without affecting the validity of the result.
+ Proposition 4.2 chooses equal widths and proves the two omitted second-derivative estimates.
 
 ## Build and verification
 

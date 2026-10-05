@@ -80,17 +80,17 @@ namespace IFS
 variable {N : ℕ} {ε : ℝ} (Φ : IFS N ε)
 
 /-- Compositions along nonempty words lie in the class for some `ε' > 0`. -/
-theorem exists_inClass_comp {w : List (Fin N)} (hw : w ≠ []) :
-    ∃ ε' > 0, InClass ε' (Φ.comp w) := by
+theorem inClass_comp {w : List (Fin N)} (hw : w ≠ []) :
+    InClass (ε / 4) (Φ.comp w) := by
   have hε := Φ.ε_pos
   have hc : Φ.cmax ^ w.length < 1 :=
     pow_lt_one₀ Φ.cmax_nonneg Φ.cmax_lt_one (List.length_pos_iff.2 hw).ne'
   have hsub : nbhd (2 * (ε / 4)) ⊆ nbhd ε := nbhd_mono (by linarith)
   have hcl : closure (nbhd (ε / 4)) ⊆ closure (nbhd ε) := closure_mono (nbhd_mono (by linarith))
-  refine ⟨ε / 4, by positivity, ⟨(Φ.differentiableOn_comp w).mono hsub,
+  refine ⟨(Φ.differentiableOn_comp w).mono hsub,
     fun x hx => Φ.im_comp_ofReal w (hsub hx), fun x hx => Φ.re_comp_mem_I w hx, ?_,
     fun z hz => Φ.deriv_comp_ne_zero w (hcl hz),
-    fun z hz => (Φ.norm_deriv_comp_le w (hcl hz)).trans_lt hc⟩⟩
+    fun z hz => (Φ.norm_deriv_comp_le w (hcl hz)).trans_lt hc⟩
   intro z hz
   have h1 : z ∈ cthickening (ε / 4) (((↑) : ℝ → ℂ) '' I) :=
     closure_thickening_subset_cthickening _ _ hz
@@ -106,6 +106,11 @@ theorem exists_inClass_comp {w : List (Fin N)} (hw : w ≠ []) :
     _ ≤ Φ.cmax ^ w.length * (ε / 4) :=
         mul_le_mul_of_nonneg_left hzx (pow_nonneg Φ.cmax_nonneg _)
     _ < ε / 4 := mul_lt_of_lt_one_left (by positivity) hc
+
+/-- Compositions along nonempty words lie in the class for some positive radius. -/
+theorem exists_inClass_comp {w : List (Fin N)} (hw : w ≠ []) :
+    ∃ ε' > 0, InClass ε' (Φ.comp w) :=
+  ⟨ε / 4, by linarith [Φ.ε_pos], Φ.inClass_comp hw⟩
 
 /-- Iterates of `f_l` are compositions along repetitions of `l`. -/
 private theorem composite_comp_flatten_replicate (l : List (Fin N)) (k : ℕ) :

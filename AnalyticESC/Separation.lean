@@ -87,7 +87,7 @@ private theorem supDist_append_le (i j u : List (Fin N)) :
   exact Φ.norm_le_supDist i j (Φ.re_comp_mem_I u hx)
 
 /-- Without the SESC, close pairs occur at arbitrarily high levels. -/
-private theorem exists_close_pair_ge (h : ¬ Φ.SESC) {c : ℝ} (hc : 0 < c) (B : ℕ) :
+theorem exists_close_pair_ge (h : ¬ Φ.SESC) {c : ℝ} (hc : 0 < c) (B : ℕ) :
     ∃ n, B ≤ n ∧ ∃ i j : Fin n → Fin N, i ≠ j ∧
       Φ.supDist (List.ofFn i) (List.ofFn j) < c ^ n := by
   by_contra hcon

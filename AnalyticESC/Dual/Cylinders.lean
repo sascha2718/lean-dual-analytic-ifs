@@ -18,13 +18,15 @@ open Set Metric Filter Topology
 /-- The cylinder set `(k,K)` of Section 2.1: maps in `C^ω_ε([0,1])` with values in `(k,K)` on
 `[0,1]`. -/
 def dualCyl (ε k K : ℝ) : Set (ℂ → ℂ) :=
-  {g | DifferentiableOn ℂ g (nbhd ε) ∧ (∀ x ∈ I, (g x).im = 0) ∧
+  {g | DifferentiableOn ℂ g (nbhd ε) ∧ ContinuousOn g (closure (nbhd ε)) ∧
+    (∀ x ∈ I, (g x).im = 0) ∧
     ∀ x ∈ I, k < (g x).re ∧ (g x).re < K}
 
 /-- The closed cylinder set `cl (k,K)`: maps in `C^ω_ε([0,1])` with values in `[k,K]` on
 `[0,1]`. -/
 def dualCylClosed (ε k K : ℝ) : Set (ℂ → ℂ) :=
-  {g | DifferentiableOn ℂ g (nbhd ε) ∧ (∀ x ∈ I, (g x).im = 0) ∧
+  {g | DifferentiableOn ℂ g (nbhd ε) ∧ ContinuousOn g (closure (nbhd ε)) ∧
+    (∀ x ∈ I, (g x).im = 0) ∧
     ∀ x ∈ I, k ≤ (g x).re ∧ (g x).re ≤ K}
 
 namespace IFS
@@ -73,6 +75,16 @@ private theorem abs_re_deriv_comp_reverse_le (w : List (Fin N)) {x : ℝ} (hx : 
   rw [List.length_reverse] at h
   exact (Complex.abs_re_le_norm _).trans h
 
+/-- Dual operators preserve continuity on the closure: the image of that closure lies
+inside the open analytic domain of the input function. -/
+theorem continuousOn_dualOp_closure (i : Fin N) {h : ℂ → ℂ}
+    (hd : DifferentiableOn ℂ h (nbhd ε)) : ContinuousOn (Φ.dualOp i h) (closure (nbhd ε)) := by
+  obtain ⟨U, -, hU, _, hn⟩ := Φ.exists_differentiableOn_nonlin i
+  exact ((((Φ.differentiableOn_f i).deriv (isOpen_nbhd _)).continuousOn.mono
+    closure_nbhd_subset_two).mul (hd.continuousOn.comp
+      ((Φ.differentiableOn_f i).continuousOn.mono closure_nbhd_subset_two)
+      (Φ.inClass i).mapsTo)).add (hn.continuousOn.mono hU)
+
 /-- `F_w` maps the closed cylinder into itself if every `F_i` does. -/
 private theorem dualComp_mem_dualCylClosed {k K : ℝ}
     (hmaps : ∀ i, MapsTo (Φ.dualOp i) (dualCylClosed ε k K) (dualCyl ε k K))
@@ -81,8 +93,8 @@ private theorem dualComp_mem_dualCylClosed {k K : ℝ}
   induction w with
   | nil => exact hh
   | cons i w ih =>
-    obtain ⟨h1, h2, h3⟩ := hmaps i ih
-    exact ⟨h1, h2, fun x hx => ⟨(h3 x hx).1.le, (h3 x hx).2.le⟩⟩
+    obtain ⟨h1, hcl, h2, h3⟩ := hmaps i ih
+    exact ⟨h1, hcl, h2, fun x hx => ⟨(h3 x hx).1.le, (h3 x hx).2.le⟩⟩
 
 /-- If every `F_i` maps `cl (k,K)` into `(k,K)`, then `H_u` takes values in `[k,K]` on `I`, as
 the limit of `F_{u|m} k`. -/
@@ -92,10 +104,10 @@ private theorem re_dualProj_mem_Icc {k K : ℝ} (hkK : k ≤ K)
     (Φ.dualProj (.inf u) y).re ∈ Icc k K := by
   obtain ⟨M, -, hM⟩ := Φ.exists_norm_dualProj_le
   have hconst : (fun _ => (k : ℂ)) ∈ dualCylClosed ε k K :=
-    ⟨differentiableOn_const _, fun _ _ => Complex.ofReal_im k, fun _ _ => ⟨le_rfl, hkK⟩⟩
+    ⟨differentiableOn_const _, continuousOn_const, fun _ _ => Complex.ofReal_im k, fun _ _ => ⟨le_rfl, hkK⟩⟩
   have hmem : ∀ m : ℕ, (Φ.dualComp (List.ofFn fun i : Fin m => u i)
       (fun _ => (k : ℂ)) y).re ∈ Icc k K := fun m =>
-    (Φ.dualComp_mem_dualCylClosed hmaps _ hconst).2.2 y hy
+    (Φ.dualComp_mem_dualCylClosed hmaps _ hconst).2.2.2 y hy
   have hclose : ∀ m : ℕ, |(Φ.dualProj (.inf u) y).re -
       (Φ.dualComp (List.ofFn fun i : Fin m => u i) (fun _ => (k : ℂ)) y).re| ≤
         Φ.cmax ^ m * (M + |k|) := by
@@ -162,7 +174,7 @@ theorem abs_sub_le_cmax_pow_of_mem_dualCylAt {k K : ℝ} (hkK : k ≤ K) (w : Li
 private theorem mapsTo_dualOp_dualCylClosed {M K : ℝ}
     (hM : ∀ i, ∀ z ∈ closure (nbhd ε), ‖Φ.nonlin i z‖ ≤ M) (hK : Φ.cmax * K + M < K)
     (i : Fin N) : MapsTo (Φ.dualOp i) (dualCylClosed ε (-K) K) (dualCyl ε (-K) K) := by
-  rintro h ⟨hd, hre, hb⟩
+  rintro h ⟨hd, _, hre, hb⟩
   have hfx : ∀ x ∈ I, Φ.f i x = (((Φ.f i x).re : ℝ) : ℂ) ∧ (Φ.f i x).re ∈ I := fun x hx =>
     ⟨Complex.ext (by simp)
       (by simp [Φ.im_f_ofReal i (nbhd_subset_two (ofReal_mem_nbhd Φ.ε_pos hx))]),
@@ -174,7 +186,7 @@ private theorem mapsTo_dualOp_dualCylClosed {M K : ℝ}
     rw [(hfx x hx).1]
     simp [Complex.mul_im, Φ.im_deriv_f_ofReal i (nbhd_subset_two hxn), hre _ (hfx x hx).2,
       Φ.im_nonlin_ofReal i hxn]
-  refine ⟨?_, him, fun x hx => ?_⟩
+  refine ⟨?_, Φ.continuousOn_dualOp_closure i hd, him, fun x hx => ?_⟩
   · obtain ⟨U, -, hU, -, hnl⟩ := Φ.exists_differentiableOn_nonlin i
     have h1 : DifferentiableOn ℂ (deriv (Φ.f i)) (nbhd ε) :=
       ((Φ.differentiableOn_f i).deriv (isOpen_nbhd _)).mono nbhd_subset_two
@@ -206,7 +218,7 @@ theorem lemma_2_5 (hN : 0 < N) :
     (Φ.DualSSC ↔ ∃ δ > 0, ∀ i j : ℕ → Fin N, i 0 ≠ j 0 →
       δ < ⨆ x : I, ‖Φ.dualProj (.inf i) ((x : ℝ) : ℂ) - Φ.dualProj (.inf j) ((x : ℝ) : ℂ)‖) := by
   refine ⟨⟨fun hssc => ?_, ?_⟩, Φ.dualSSC_iff_exists_delta hN⟩
-  · -- (a) ⇒ (b), through (c): cylinder intervals of level `n + 1` are shorter than `δ / 2`
+  · -- (a) ⇒ (b): compactness of pairs of infinite words, as in the manuscript.
     obtain ⟨M, hM0, hM⟩ := Φ.exists_nonlin_bound
     have hc := Φ.cmax_lt_one
     set K := M / (1 - Φ.cmax) + 1 with hK_def
@@ -218,37 +230,77 @@ theorem lemma_2_5 (hN : 0 < N) :
       nlinarith
     have hmaps := Φ.mapsTo_dualOp_dualCylClosed hM hK
     have hH := Φ.re_dualProj_mem_Icc (by linarith) hmaps
-    obtain ⟨δ, hδ, hsep⟩ := (Φ.dualSSC_iff_exists_delta hN).1 hssc
-    have hK2 : 0 < 2 * (K - -K) := by linarith
-    obtain ⟨n, hn⟩ := exists_pow_lt_of_lt_one (div_pos hδ hK2) hc
-    have hn' : Φ.cmax ^ (n + 1) * (2 * (K - -K)) < δ :=
-      ((lt_div_iff₀ hK2).1 hn).trans_le' (mul_le_mul_of_nonneg_right
-        (pow_le_pow_of_le_one Φ.cmax_nonneg hc.le (Nat.le_succ n)) hK2.le)
-    refine ⟨-K, K, by linarith, n, hmaps, fun i j hij => ?_⟩
-    -- extend `i` and `j` to infinite words
+    refine ⟨-K, K, by linarith, ?_⟩
+    by_contra hnone
+    have hbad : ∀ n : ℕ, ∃ i j : Fin (n + 1) → Fin N,
+        i 0 ≠ j 0 ∧ ¬ Φ.DualCylDisjoint (-K) K (List.ofFn i) (List.ofFn j) := by
+      intro n
+      by_contra h
+      push Not at h
+      exact hnone ⟨n, hmaps, h⟩
+    choose i j hij hbad using hbad
     let z₀ : ℕ → Fin N := fun _ => ⟨0, hN⟩
-    obtain ⟨i', hi', hi0⟩ : ∃ i' : ℕ → Fin N,
-        (Word.inf z₀).prepend (List.ofFn i) = .inf i' ∧ i' 0 = i 0 := ⟨_, rfl, by simp⟩
-    obtain ⟨j', hj', hj0⟩ : ∃ j' : ℕ → Fin N,
-        (Word.inf z₀).prepend (List.ofFn j) = .inf j' ∧ j' 0 = j 0 := ⟨_, rfl, by simp⟩
-    have : Nonempty I := ⟨⟨0, left_mem_Icc.2 zero_le_one⟩⟩
-    obtain ⟨⟨x, hx⟩, hlt⟩ := exists_lt_of_lt_ciSup (hsep i' j' (by rw [hi0, hj0]; exact hij))
-    refine ⟨x, hx, Set.disjoint_left.2 fun p hpi hpj => ?_⟩
-    have h1 := Φ.re_dualProj_prepend_mem_dualCylAt hH (List.ofFn i) z₀ hx
-    have h2 := Φ.re_dualProj_prepend_mem_dualCylAt hH (List.ofFn j) z₀ hx
-    rw [hi'] at h1
-    rw [hj'] at h2
-    have e1 := Φ.abs_sub_le_cmax_pow_of_mem_dualCylAt (by linarith) _ hx h1 hpi
-    have e2 := Φ.abs_sub_le_cmax_pow_of_mem_dualCylAt (by linarith) _ hx hpj h2
-    rw [List.length_ofFn] at e1 e2
-    have hxn := ofReal_mem_nbhd Φ.ε_pos hx
-    have hnorm : ‖Φ.dualProj (.inf i') (x : ℂ) - Φ.dualProj (.inf j') (x : ℂ)‖ ≤
-        |(Φ.dualProj (.inf i') (x : ℂ)).re - (Φ.dualProj (.inf j') (x : ℂ)).re| := by
-      refine (Complex.norm_le_abs_re_add_abs_im _).trans_eq ?_
-      simp [Φ.im_dualProj_ofReal _ hxn]
-    have e3 := abs_sub_le (Φ.dualProj (.inf i') (x : ℂ)).re p (Φ.dualProj (.inf j') (x : ℂ)).re
-    simp only at hlt
-    linarith
+    let extend (n : ℕ) (w : Fin (n + 1) → Fin N) : ℕ → Fin N :=
+      fun m => if hm : m < n + 1 then w ⟨m, hm⟩ else z₀ (m - (n + 1))
+    have hprepend : ∀ n w, (Word.inf z₀).prepend (List.ofFn w) = .inf (extend n w) := by
+      intro n w
+      simp only [Word.prepend, List.length_ofFn, List.getElem_ofFn]
+      rfl
+    obtain ⟨w, φ, hφ, hlim⟩ := CompactSpace.tendsto_subseq
+      (fun n => (extend n (i n), extend n (j n)))
+    have hi : Tendsto (fun n => extend (φ n) (i (φ n))) atTop (𝓝 w.1) := by simpa only [Function.comp_def] using (continuous_fst.tendsto w).comp hlim
+    have hj : Tendsto (fun n => extend (φ n) (j (φ n))) atTop (𝓝 w.2) := by simpa only [Function.comp_def] using (continuous_snd.tendsto w).comp hlim
+    have hfirst : w.1 0 ≠ w.2 0 := by
+      have he1 := (tendsto_pi_nhds.1 hi 0).eventually (isOpen_discrete {w.1 0} |>.mem_nhds rfl)
+      have he2 := (tendsto_pi_nhds.1 hj 0).eventually (isOpen_discrete {w.2 0} |>.mem_nhds rfl)
+      obtain ⟨n, h1, h2⟩ := (he1.and he2).exists
+      have h1' : i (φ n) 0 = w.1 0 := by
+        change extend (φ n) (i (φ n)) 0 = w.1 0 at h1
+        simp only [extend, dite_eq_left (Nat.zero_lt_succ _)] at h1
+        have hz : (⟨0, Nat.zero_lt_succ (φ n)⟩ : Fin (φ n + 1)) = 0 := Fin.ext rfl
+        exact (congrArg (i (φ n)) hz).symm.trans h1
+      have h2' : j (φ n) 0 = w.2 0 := by
+        change extend (φ n) (j (φ n)) 0 = w.2 0 at h2
+        simp only [extend, dite_eq_left (Nat.zero_lt_succ _)] at h2
+        have hz : (⟨0, Nat.zero_lt_succ (φ n)⟩ : Fin (φ n + 1)) = 0 := Fin.ext rfl
+        exact (congrArg (j (φ n)) hz).symm.trans h2
+      exact fun he => hij (φ n) (h1'.trans (he.trans h2'.symm))
+    obtain ⟨x, hx, hne⟩ := (Φ.dualSSC_iff_ne hN).1 hssc w.1 w.2 hfirst
+    apply hne
+    have hbound : ∀ n,
+        ‖Φ.dualProj (.inf (extend n (i n))) x - Φ.dualProj (.inf (extend n (j n))) x‖ ≤
+          Φ.cmax ^ (n + 1) * (2 * (K - -K)) := by
+      intro n
+      have hnd : ¬ Disjoint (Φ.dualCylAt (-K) K (List.ofFn (i n)) x)
+          (Φ.dualCylAt (-K) K (List.ofFn (j n)) x) := fun hd => hbad n ⟨x, hx, hd⟩
+      obtain ⟨p, hpi, hpj⟩ := Set.not_disjoint_iff.1 hnd
+      have h1 := Φ.re_dualProj_prepend_mem_dualCylAt hH (List.ofFn (i n)) z₀ hx
+      have h2 := Φ.re_dualProj_prepend_mem_dualCylAt hH (List.ofFn (j n)) z₀ hx
+      rw [hprepend] at h1 h2
+      have e1 := Φ.abs_sub_le_cmax_pow_of_mem_dualCylAt (by linarith) _ hx h1 hpi
+      have e2 := Φ.abs_sub_le_cmax_pow_of_mem_dualCylAt (by linarith) _ hx hpj h2
+      rw [List.length_ofFn] at e1 e2
+      have hxn := ofReal_mem_nbhd Φ.ε_pos hx
+      have hnorm : ‖Φ.dualProj (.inf (extend n (i n))) (x : ℂ) -
+          Φ.dualProj (.inf (extend n (j n))) (x : ℂ)‖ ≤
+          |(Φ.dualProj (.inf (extend n (i n))) (x : ℂ)).re -
+            (Φ.dualProj (.inf (extend n (j n))) (x : ℂ)).re| := by
+        refine (Complex.norm_le_abs_re_add_abs_im _).trans_eq ?_
+        simp [Φ.im_dualProj_ofReal _ hxn]
+      have e3 := abs_sub_le (Φ.dualProj (.inf (extend n (i n))) (x : ℂ)).re p
+        (Φ.dualProj (.inf (extend n (j n))) (x : ℂ)).re
+      linarith
+    have h1 := (UniformFun.tendsto_iff_tendstoUniformly.1
+      (Φ.continuous_toNbhd_dualProj.tendsto w.1 |>.comp hi)).tendsto_at
+        ⟨(x : ℂ), ofReal_mem_nbhd Φ.ε_pos hx⟩
+    have h2 := (UniformFun.tendsto_iff_tendstoUniformly.1
+      (Φ.continuous_toNbhd_dualProj.tendsto w.2 |>.comp hj)).tendsto_at
+        ⟨(x : ℂ), ofReal_mem_nbhd Φ.ε_pos hx⟩
+    have hzero : Tendsto (fun n => Φ.cmax ^ (φ n + 1) * (2 * (K - -K))) atTop (𝓝 0) := by
+      simpa using ((tendsto_pow_atTop_nhds_zero_of_lt_one Φ.cmax_nonneg hc).comp
+        ((tendsto_add_atTop_nat 1).comp hφ.tendsto_atTop)).mul_const (2 * (K - -K))
+    exact sub_eq_zero.1 (norm_le_zero_iff.1 (le_of_tendsto_of_tendsto' (h1.sub h2).norm
+      hzero (fun n => hbound (φ n))))
   · -- (b) ⇒ (a): `H_i` and `H_j` lie in disjoint cylinder intervals at some `x`
     rintro ⟨k, K, hkK, n, hmaps, hdisj⟩
     rw [Φ.dualSSC_iff_ne hN]

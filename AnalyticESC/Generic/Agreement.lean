@@ -103,7 +103,7 @@ theorem mapsTo_dualOp_dualCylClosed_of_le (Ψ : IFS N ε') {c M K : ℝ}
     (hc : ∀ i, ∀ x ∈ I, ‖deriv (Ψ.f i) x‖ ≤ c) (hM : ∀ i, ∀ x ∈ I, ‖Ψ.nonlin i x‖ ≤ M)
     (hK : c * K + M < K) (i : Fin N) :
     MapsTo (Ψ.dualOp i) (dualCylClosed ε' (-K) K) (dualCyl ε' (-K) K) := by
-  rintro h ⟨hd, hre, hb⟩
+  rintro h ⟨hd, _, hre, hb⟩
   have hfx : ∀ x ∈ I, Ψ.f i x = (((Ψ.f i x).re : ℝ) : ℂ) ∧ (Ψ.f i x).re ∈ I := fun x hx =>
     ⟨Complex.ext (by simp)
       (by simp [Ψ.im_f_ofReal i (nbhd_subset_two (ofReal_mem_nbhd Ψ.ε_pos hx))]),
@@ -115,7 +115,7 @@ theorem mapsTo_dualOp_dualCylClosed_of_le (Ψ : IFS N ε') {c M K : ℝ}
     rw [(hfx x hx).1]
     simp [Complex.mul_im, Ψ.im_deriv_f_ofReal i (nbhd_subset_two hxn), hre _ (hfx x hx).2,
       Ψ.im_nonlin_ofReal i hxn]
-  refine ⟨?_, him, fun x hx => ?_⟩
+  refine ⟨?_, Ψ.continuousOn_dualOp_closure i hd, him, fun x hx => ?_⟩
   · obtain ⟨U, -, hU, -, hnl⟩ := Ψ.exists_differentiableOn_nonlin i
     have h1 : DifferentiableOn ℂ (deriv (Ψ.f i)) (nbhd ε') :=
       ((Ψ.differentiableOn_f i).deriv (isOpen_nbhd _)).mono nbhd_subset_two

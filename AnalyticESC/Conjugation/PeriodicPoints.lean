@@ -1,6 +1,7 @@
 module
 
 public import AnalyticESC.Conjugation.ExactOverlaps
+public import AnalyticESC.Conjugation.Zeros
 
 @[expose] public section
 
@@ -409,6 +410,159 @@ theorem conjSelfSimilar_of_dualProj_eq
         (periodic_re_deriv_ne_zero_abs_lt_one hε (Φ.inClass k) (hp k)).2, ?_⟩⟩
   exact (lemma_5_1 hε (Φ.inClass k) (hp k) (hfp k)).2 φ
     (fun x hx => (hφd x hx).differentiableAt.differentiableWithinAt) hφwd (hodek k)
+
+/-- In the singleton case, commutativity and (5.2) give one common linearising map;
+differentiating its conjugacy equations twice makes all dual projections equal. -/
+theorem dualProj_eq_of_conjSelfSimilar_singleton (hN : 0 < N) {p : ℝ}
+    (hpA : Φ.attractor = {p}) (hconj : ConjSelfSimilar Φ.realMaps) :
+    ∀ i j : ℕ → Fin N, ∀ x ∈ I, Φ.dualProj (.inf i) x = Φ.dualProj (.inf j) x := by
+  obtain ⟨g, ⟨hg, hinj⟩, lam, t, hc⟩ := hconj
+  have hp : p ∈ I := Φ.attractor_subset_I (hpA ▸ mem_singleton p)
+  have hfix := Φ.fixedPoint_of_attractor_singleton hpA
+  let k₀ : Fin N := ⟨0, hN⟩
+  obtain ⟨hG, hGd, -, -⟩ := char_re_koenigs_spec Φ.ε_pos (Φ.inClass k₀) hp (hfix k₀)
+  have hGconj : ∀ k, ∀ x ∈ I,
+      (koenigs (Φ.f k₀) p (Φ.f k x)).re =
+        (deriv (Φ.f k) p).re * (koenigs (Φ.f k₀) p x).re := by
+    intro k x hx
+    have hr := comp_comm_of_conj hinj
+      (fun y hy => (Φ.inClass k₀).re_mem_I y hy)
+      (fun y hy => (Φ.inClass k).re_mem_I y hy) (hc k₀).2.2 (hc k).2.2 hp
+      (by simpa [realMaps] using congrArg Complex.re (hfix k₀))
+      (by simpa [realMaps] using congrArg Complex.re (hfix k))
+    have hcomm : ∀ z ∈ nbhd ε, Φ.f k₀ (Φ.f k z) = Φ.f k (Φ.f k₀ z) := by
+      apply eqOn_nbhd_of_eqOn_Icc Φ.ε_pos
+        (((Φ.differentiableOn_f k₀).mono IFS.nbhd_subset_two).comp
+          ((Φ.differentiableOn_f k).mono IFS.nbhd_subset_two) (Φ.mapsTo_f k))
+        (((Φ.differentiableOn_f k).mono IFS.nbhd_subset_two).comp
+          ((Φ.differentiableOn_f k₀).mono IFS.nbhd_subset_two) (Φ.mapsTo_f k₀))
+        zero_lt_one subset_rfl
+      intro y hy
+      have hreal : ∀ l, ∀ z ∈ I, ((Φ.f l z).re : ℂ) = Φ.f l z := fun l z hz =>
+        Complex.ext rfl (by simp [(Φ.inClass l).im_eq_zero z
+          (ofReal_mem_nbhd (by linarith [Φ.ε_pos]) hz)])
+      have he := congrArg (fun r : ℝ => (r : ℂ)) (hr y hy)
+      rw [hreal k₀ _ ((Φ.inClass k).re_mem_I y hy),
+        hreal k _ ((Φ.inClass k₀).re_mem_I y hy), hreal k y hy, hreal k₀ y hy] at he
+      exact he
+    have he := koenigs_commuting Φ.ε_pos (Φ.inClass k₀) (ofReal_mem_nbhd Φ.ε_pos hp)
+      (hfix k₀) (Φ.inClass k) (hfix k) hcomm (ofReal_mem_nbhd Φ.ε_pos hx)
+    rw [he, Complex.mul_re, im_koenigs_ofReal Φ.ε_pos (Φ.inClass k₀) hp (hfix k₀)
+      (ofReal_mem_nbhd Φ.ε_pos hx), mul_zero, sub_zero]
+  apply Φ.dualProj_eq_of_forall_const
+  intro k l x hx
+  rw [← Φ.periodic_hatH_f_eq_dualProj_const k x hx,
+    ← Φ.periodic_hatH_f_eq_dualProj_const l x hx]
+  apply char_hatH_eq_of_conj Φ.ε_pos (Φ.inClass k) Φ.ε_pos (Φ.inClass l)
+    hG.1 (fun y hy => (hGd y hy).ne') (a₁ := (deriv (Φ.f k) p).re) (b₁ := 0)
+    (a₂ := (deriv (Φ.f l) p).re) (b₂ := 0) ?_ ?_ x hx
+  all_goals
+    intro y hy
+    have hr : ∀ j, ((Φ.f j y).re : ℂ) = Φ.f j y := fun j =>
+      Complex.ext rfl (by simp [(Φ.inClass j).im_eq_zero y
+        (ofReal_mem_nbhd (by linarith [Φ.ε_pos]) hy)])
+    simpa only [hr, add_zero] using hGconj _ y hy
+
+/-- Theorem 1.12 (a), extended to singleton attractors by the argument of Theorem 2.3. -/
+theorem conjSelfSimilar_iff :
+    ConjSelfSimilar Φ.realMaps ↔
+      ∀ i j : ℕ → Fin N, ∀ x ∈ I, Φ.dualProj (.inf i) x = Φ.dualProj (.inf j) x := by
+  constructor
+  · intro h
+    by_cases hnd : ¬ ∃ p, Φ.attractor = {p}
+    · exact Φ.dualProj_eq_of_conjSelfSimilar hnd h
+    · obtain ⟨p, hp⟩ := not_not.1 hnd
+      intro i j
+      exact Φ.dualProj_eq_of_conjSelfSimilar_singleton (i 0).pos hp h i j
+  · exact Φ.conjSelfSimilar_of_dualProj_eq
+
+/-- Theorem 1.12 (b), for every system. -/
+theorem subConjSelfSimilar_iff :
+    Φ.SubConjSelfSimilar ↔
+      ∃ (m : ℕ) (hm : 0 < m) (i j : Fin m → Fin N), i ≠ j ∧
+        ∀ x ∈ I, Φ.dualProj (.inf (periodic hm i)) x = Φ.dualProj (.inf (periodic hm j)) x := by
+  have hε := Φ.ε_pos
+  have hne : ∀ {m : ℕ} (w : Fin m → Fin N), 0 < m → List.ofFn w ≠ [] := fun w hm h =>
+    hm.ne' (List.ofFn_eq_nil_iff.1 h)
+  have hrev : ∀ {m : ℕ} (w : Fin m → Fin N), (w ∘ Fin.rev) ∘ Fin.rev = w := fun w =>
+    funext fun k => by simp
+  have hrev_ne : ∀ {m : ℕ} {u v : Fin m → Fin N}, u ≠ v → u ∘ Fin.rev ≠ v ∘ Fin.rev :=
+    fun {m u v} huv h => huv (by rw [← hrev u, h, hrev])
+  constructor
+  · rintro ⟨m, i, j, hij, g, ⟨hg, hinj⟩, lam, t, hconj⟩
+    have hm : 0 < m := Nat.pos_of_ne_zero fun h => hij (by subst h; exact Subsingleton.elim _ _)
+    obtain ⟨ε₁, hε₁, hf₁⟩ := Φ.exists_inClass_comp (hne i hm)
+    obtain ⟨ε₂, hε₂, hf₂⟩ := Φ.exists_inClass_comp (hne j hm)
+    obtain ⟨p₁, ⟨hp₁, hfp₁⟩, -⟩ := existsUnique_fixedPoint hε₁ hf₁
+    obtain ⟨p₂, ⟨hp₂, hfp₂⟩, -⟩ := existsUnique_fixedPoint hε₂ hf₂
+    have hci : ∀ x ∈ I, g (Φ.comp (List.ofFn i) x).re = lam 0 * g x + t 0 := (hconj 0).2.2
+    have hcj : ∀ x ∈ I, g (Φ.comp (List.ofFn j) x).re = lam 1 * g x + t 1 := (hconj 1).2.2
+    have hmi : MapsTo (fun x : ℝ => (Φ.comp (List.ofFn i) x).re) I I := fun x hx =>
+      hf₁.re_mem_I x hx
+    have hmj : MapsTo (fun x : ℝ => (Φ.comp (List.ofFn j) x).re) I I := fun x hx =>
+      hf₂.re_mem_I x hx
+    have hFi : (Φ.comp (List.ofFn i) p₁).re = p₁ := by rw [hfp₁, Complex.ofReal_re]
+    have hFj : (Φ.comp (List.ofFn j) p₂).re = p₂ := by rw [hfp₂, Complex.ofReal_re]
+    by_cases hpq : p₁ = p₂
+    · -- a common fixed point: `f_i` and `f_j` commute on `[0,1]`, so `f_{ij} = f_{ji}` there
+      subst hpq
+      have hcomm := comp_comm_of_conj hinj hmi hmj hci hcj hp₁ hFi hFj
+      have hm' : 0 < m + m := by omega
+      have hcomp : ∀ {u v : Fin m → Fin N}, ∀ y ∈ I, Φ.comp (List.ofFn (Fin.append u v)) y =
+          ((Φ.comp (List.ofFn u) ((Φ.comp (List.ofFn v) y).re : ℂ)).re : ℂ) := fun y hy => by
+        rw [List.ofFn_fin_append, Φ.comp_append, Function.comp_apply]
+        conv_lhs => rw [Φ.comp_ofReal _ hy]
+        exact Φ.comp_ofReal _ (Φ.re_comp_mem_I _ hy)
+      obtain ⟨ε₃, hε₃, hf₃⟩ := Φ.exists_inClass_comp (hne (Fin.append i j) hm')
+      obtain ⟨ε₄, hε₄, hf₄⟩ := Φ.exists_inClass_comp (hne (Fin.append j i) hm')
+      have hH := hatH_eq_of_eqOn_I hε₃ hf₃ hε₄ hf₄ fun y hy => by
+        rw [hcomp y hy, hcomp y hy]
+        exact congrArg _ (hcomm y hy)
+      refine ⟨m + m, hm', Fin.append i j ∘ Fin.rev, Fin.append j i ∘ Fin.rev,
+        hrev_ne fun h => hij (funext fun k => ?_), fun x hx => ?_⟩
+      · simpa using congrFun h (Fin.castAdd m k)
+      · rw [← Φ.hatH_comp_eq_dualProj hm' _ x hx, ← Φ.hatH_comp_eq_dualProj hm' _ x hx]
+        exact hH x hx
+    · -- Apply part (a) to the two-map subsystem, whose fixed points differ.
+      let Ψ : IFS 2 (ε / 4) := ⟨![Φ.comp (List.ofFn i), Φ.comp (List.ofFn j)],
+        by linarith [Φ.ε_pos], Fin.forall_fin_two.2
+          ⟨Φ.inClass_comp (hne i hm), Φ.inClass_comp (hne j hm)⟩⟩
+      have hnd : ¬ ∃ x, Ψ.attractor = {x} := by
+        rintro ⟨x, hx⟩
+        have hxI : x ∈ I := Ψ.attractor_subset_I (hx ▸ mem_singleton x)
+        have hfix := Ψ.fixedPoint_of_attractor_singleton hx
+        have hi : Φ.comp (List.ofFn i) x = x := by simpa [Ψ] using hfix 0
+        have hj : Φ.comp (List.ofFn j) x = x := by simpa [Ψ] using hfix 1
+        exact hpq (((existsUnique_fixedPoint hε₁ hf₁).unique ⟨hp₁, hfp₁⟩ ⟨hxI, hi⟩).trans
+          ((existsUnique_fixedPoint hε₂ hf₂).unique ⟨hxI, hj⟩ ⟨hp₂, hfp₂⟩))
+      have hall := Ψ.dualProj_eq_of_conjSelfSimilar hnd ⟨g, ⟨hg, hinj⟩, lam, t,
+        Fin.forall_fin_two.2 ⟨by simpa [Ψ, realMaps] using hconj 0,
+          by simpa [Ψ, realMaps] using hconj 1⟩⟩
+      have hH : ∀ x ∈ I, hatH (Φ.comp (List.ofFn i)) x =
+          hatH (Φ.comp (List.ofFn j)) x := by
+        intro x hx
+        have h := hall (fun _ => 0) (fun _ => 1) x hx
+        rw [← Ψ.periodic_hatH_f_eq_dualProj_const 0 x hx,
+          ← Ψ.periodic_hatH_f_eq_dualProj_const 1 x hx] at h
+        simpa [Ψ] using h
+      refine ⟨m, hm, i ∘ Fin.rev, j ∘ Fin.rev, hrev_ne hij, fun x hx => ?_⟩
+      rw [← Φ.hatH_comp_eq_dualProj hm _ x hx, ← Φ.hatH_comp_eq_dualProj hm _ x hx]
+      exact hH x hx
+  · rintro ⟨m, hm, i, j, hij, h⟩
+    have hH : ∀ x ∈ I, hatH (Φ.comp (List.ofFn (i ∘ Fin.rev))) x =
+        hatH (Φ.comp (List.ofFn (j ∘ Fin.rev))) x := fun x hx => by
+      rw [Φ.hatH_comp_eq_dualProj hm _ x hx, Φ.hatH_comp_eq_dualProj hm _ x hx, hrev, hrev]
+      exact h x hx
+    obtain ⟨ε₁, hε₁, hf₁⟩ := Φ.exists_inClass_comp (hne (i ∘ Fin.rev) hm)
+    obtain ⟨ε₂, hε₂, hf₂⟩ := Φ.exists_inClass_comp (hne (j ∘ Fin.rev) hm)
+    obtain ⟨p₁, ⟨hp₁, hfp₁⟩, -⟩ := existsUnique_fixedPoint hε₁ hf₁
+    obtain ⟨p₂, ⟨hp₂, hfp₂⟩, -⟩ := existsUnique_fixedPoint hε₂ hf₂
+    obtain ⟨hco, -, -, hode⟩ := char_re_koenigs_spec hε₁ hf₁ hp₁ hfp₁
+    obtain ⟨l₁, t₁, c₁⟩ := char_exists_conj_of_ode hε₁ hf₁ hp₁ hfp₁ hco.1 hode
+    obtain ⟨l₂, t₂, c₂⟩ := char_exists_conj_of_ode hε₂ hf₂ hp₂ hfp₂ hco.1 fun x hx => by
+      rw [← hH x hx]; exact hode x hx
+    exact ⟨m, i ∘ Fin.rev, j ∘ Fin.rev, hrev_ne hij, _, hco, ![l₁, l₂], ![t₁, t₂],
+      Fin.forall_fin_two.2 ⟨c₁, c₂⟩⟩
 
 /-! ## Theorem 1.12 -/
 

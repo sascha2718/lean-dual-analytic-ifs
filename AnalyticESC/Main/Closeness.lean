@@ -9,7 +9,7 @@ public import AnalyticESC.Analysis
 # Closeness estimates for the proof of Theorem 1.5
 
 Section 3: if `f_{a u}` and `f_{b u}` are `η`-close on `I`, then `H_{a^←}` and `H_{b^←}` are close
-on `f_u(I)` (the estimate (3.2)); and closeness of dual projections, or of compositions, on an
+on `f_u(I)` (the estimate (3.2)); and closeness of dual projections on an
 interval of `I` passes to all their derivatives, as in (3.3).
 -/
 
@@ -86,29 +86,49 @@ namespace IFS
 
 variable {N : ℕ} {ε : ℝ} (Φ : IFS N ε)
 
-/-- Cauchy estimates on circles of radius `ε/2` about points of `I`: the derivatives of all
-compositions are bounded on `I`, uniformly in the word. -/
-theorem norm_iteratedDeriv_comp_le {R : ℝ} (hR : ∀ w, ∀ z ∈ closure (nbhd ε), ‖Φ.comp w z‖ ≤ R)
-    (j : ℕ) (w : List (Fin N)) {x : ℝ} (hx : x ∈ I) :
-    ‖iteratedDeriv j (Φ.comp w) x‖ ≤ j.factorial * R / (ε / 2) ^ j := by
-  have hε := Φ.ε_pos
-  have hball : closedBall (x : ℂ) (ε / 2) ⊆ nbhd ε :=
-    (closedBall_subset_ball (by linarith)).trans (ball_subset_nbhd hx)
-  apply Complex.norm_iteratedDeriv_le_of_forall_mem_sphere_norm_le j (by positivity)
-    ((Φ.differentiableOn_comp w).diffContOnCl_ball hball)
-  intro z hz
-  exact hR w z (subset_closure (hball (sphere_subset_closedBall hz)))
+/-- Equation (2.9) and the polynomial bounds from Lemma 2.8 give
+`|f_w^{(k+1)}| ≤ E_k c_max^{|w|}`. For `k = 1, 2` these are the second- and
+third-derivative bounds used at the start of Section 3. -/
+theorem exists_iteratedDeriv_comp_decay (k : ℕ) :
+    ∃ E ≥ 0, ∀ w : List (Fin N), ∀ x ∈ I,
+      ‖iteratedDeriv (k + 1) (Φ.comp w) x‖ ≤ E * Φ.cmax ^ w.length := by
+  obtain ⟨C, hC0, hC, -⟩ := Φ.exists_iteratedDeriv_bounds
+  obtain ⟨E, hE0, hE⟩ := exists_norm_aeval_le_of_supported (gPoly_mem_supported k)
+    C (fun ℓ _ => (hC0 ℓ).le)
+  refine ⟨E, hE0, fun w x hx => ?_⟩
+  have hz := ofReal_mem_nbhd Φ.ε_pos hx
+  have heq := Φ.iteratedDeriv_succ_comp_reverse w.reverse k hz
+  simp only [List.reverse_reverse] at heq
+  rw [heq, norm_mul]
+  calc _ ≤ Φ.cmax ^ w.length * E :=
+      mul_le_mul (Φ.norm_deriv_comp_le w (subset_closure hz))
+        (hE _ fun ℓ _ => hC ℓ x hx _) (norm_nonneg _) (pow_nonneg Φ.cmax_nonneg _)
+    _ = _ := mul_comm _ _
 
-/-- A common bound on `I` for the derivatives of order at most `k` of all compositions. -/
+/-- A common bound on `I` for the derivatives of order at most `k` of all compositions,
+obtained from the polynomial identity and Lemma 2.8. -/
 theorem exists_iteratedDeriv_comp_bound (k : ℕ) :
     ∃ Q, 0 ≤ Q ∧ ∀ j ≤ k, ∀ w : List (Fin N), ∀ x ∈ I, ‖iteratedDeriv j (Φ.comp w) x‖ ≤ Q := by
-  obtain ⟨R, hR0, hR⟩ := Φ.exists_comp_bound
-  have hε := Φ.ε_pos
-  refine ⟨∑ j ∈ Finset.range (k + 1), (j.factorial * R / (ε / 2) ^ j : ℝ),
-    Finset.sum_nonneg fun j _ => by positivity, fun j hj w x hx => ?_⟩
-  refine (Φ.norm_iteratedDeriv_comp_le hR j w hx).trans ?_
-  exact Finset.single_le_sum (f := fun j => (j.factorial * R / (ε / 2) ^ j : ℝ))
-    (fun j _ => by positivity) (Finset.mem_range.2 (Nat.lt_succ_of_le hj))
+  choose E hE0 hE using Φ.exists_iteratedDeriv_comp_decay
+  have hb : ∀ j, ∃ B ≥ 0, ∀ w : List (Fin N), ∀ x ∈ I,
+      ‖iteratedDeriv j (Φ.comp w) x‖ ≤ B := by
+    intro j
+    cases j with
+    | zero =>
+      refine ⟨1, zero_le_one, fun w x hx => ?_⟩
+      simp only [iteratedDeriv_zero]
+      rw [Φ.comp_ofReal w hx, Complex.norm_real, Real.norm_eq_abs,
+        abs_of_nonneg (Φ.re_comp_mem_I w hx).1]
+      exact (Φ.re_comp_mem_I w hx).2
+    | succ j =>
+      refine ⟨E j, hE0 j, fun w x hx => (hE j w x hx).trans ?_⟩
+      exact mul_le_of_le_one_right (hE0 j)
+        (pow_le_one₀ Φ.cmax_nonneg Φ.cmax_lt_one.le)
+  choose B hB0 hB using hb
+  refine ⟨∑ j ∈ Finset.range (k + 1), B j,
+    Finset.sum_nonneg fun j _ => hB0 j, fun j hj w x hx => ?_⟩
+  exact (hB j w x hx).trans (Finset.single_le_sum (fun j _ => hB0 j)
+    (Finset.mem_range.2 (Nat.lt_succ_of_le hj)))
 
 /-- The estimate (3.2): with `|a| = |b| ≥ 1` and different last letters, `η`-closeness of `f_{a u}`
 and `f_{b u}` on `I` gives closeness `K c_min^{-2n} η^{1/4}` of `H_{a^←}` and `H_{b^←}` along
@@ -251,20 +271,34 @@ theorem exists_iteratedDeriv_dualProj_closeness (k : ℕ) :
     (fun j hj x hx => (hC j x (Icc_subset_Icc hp hq hx) v).trans (hCQ j hj))
     (fun j hj x hx => (hC j x (Icc_subset_Icc hp hq hx) w).trans (hCQ j hj)) hJ hvw
 
-/-- (3.3) for two fixed compositions. -/
-theorem exists_iteratedDeriv_comp_closeness (k : ℕ) (a b : List (Fin N)) :
-    ∃ K Q : ℝ, 0 ≤ Q ∧ ∀ p q η : ℝ, 0 ≤ p → p < q → q ≤ 1 → 0 < η → η ≤ 1 →
-      2 * (2 + Q) * η ^ ((2 : ℝ)⁻¹ ^ k) < q - p →
-      (∀ x ∈ Icc p q, ‖Φ.comp a x - Φ.comp b x‖ ≤ η) →
-        ∀ x ∈ Icc p q, ‖iteratedDeriv k (Φ.comp a) x - iteratedDeriv k (Φ.comp b) x‖ ≤
-          K * η ^ ((2 : ℝ)⁻¹ ^ k) := by
-  obtain ⟨Q, hQ0, hQ⟩ := Φ.exists_iteratedDeriv_comp_bound (k + 1)
-  refine ⟨(2 + Q) ^ 2, Q, hQ0, fun p q η hp _ hq hη hη1 hJ hab => ?_⟩
-  exact norm_iteratedDeriv_sub_le_of_real Φ.ε_pos (Φ.differentiableOn_comp a)
-    (Φ.differentiableOn_comp b) (fun t ht => Φ.im_comp_ofReal a ht)
-    (fun t ht => Φ.im_comp_ofReal b ht) k hp hq hη hη1 hQ0
-    (fun j hj x hx => hQ j hj a x (Icc_subset_Icc hp hq hx))
-    (fun j hj x hx => hQ j hj b x (Icc_subset_Icc hp hq hx)) hJ hab
+/-- The denominator in (3.3) is a norm, including for orientation-reversing words.
+The interval estimate implies the displayed bound and its `c_min` bound. -/
+theorem norm_iteratedDeriv_sub_le_on_image (hN : 0 < N) (k : ℕ) (u : List (Fin N))
+    {v w : Word N} {K η : ℝ} (hK : 0 ≤ K) (hη : 0 ≤ η)
+    (hclose : ∀ y ∈ (fun t : ℝ => (Φ.comp u t).re) '' I,
+      ‖iteratedDeriv k (Φ.dualProj v) y - iteratedDeriv k (Φ.dualProj w) y‖ ≤ K * η)
+    {x : ℝ} (hx : x ∈ I) :
+    ‖iteratedDeriv k (Φ.dualProj v) (Φ.comp u x) -
+      iteratedDeriv k (Φ.dualProj w) (Φ.comp u x)‖ ≤
+        K / ‖deriv (Φ.comp u) x‖ ^ k * η ∧
+      K / ‖deriv (Φ.comp u) x‖ ^ k * η ≤ K * (Φ.cmin⁻¹ ^ k) ^ u.length * η := by
+  have hx' := subset_closure (ofReal_mem_nbhd Φ.ε_pos hx)
+  have hd0 := norm_pos_iff.2 (Φ.deriv_comp_ne_zero u hx')
+  have hd1 : ‖deriv (Φ.comp u) x‖ ^ k ≤ 1 :=
+    pow_le_one₀ (norm_nonneg _) ((Φ.norm_deriv_comp_le u hx').trans
+      (pow_le_one₀ Φ.cmax_nonneg Φ.cmax_lt_one.le))
+  constructor
+  · rw [Φ.comp_ofReal u hx]
+    exact (hclose _ ⟨x, hx, rfl⟩).trans (mul_le_mul_of_nonneg_right
+      ((le_div_iff₀ (pow_pos hd0 k)).2 (mul_le_of_le_one_right hK hd1)) hη)
+  · have hc := Φ.cmin_pos hN
+    have hlow := pow_le_pow_left₀ (pow_nonneg hc.le u.length) (Φ.cmin_pow_le_norm_deriv_comp u hx') k
+    apply mul_le_mul_of_nonneg_right _ hη
+    calc K / ‖deriv (Φ.comp u) x‖ ^ k ≤ K / (Φ.cmin ^ u.length) ^ k :=
+        div_le_div_of_nonneg_left hK (by positivity) hlow
+      _ = K * (Φ.cmin⁻¹ ^ k) ^ u.length := by
+        rw [div_eq_mul_inv, ← inv_pow, ← inv_pow, ← pow_mul, ← pow_mul, Nat.mul_comm]
+
 
 end IFS
 

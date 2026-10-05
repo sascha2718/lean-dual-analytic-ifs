@@ -1,5 +1,6 @@
 module
 
+public import AnalyticESC.Separation
 public import AnalyticESC.Main.Closeness
 public import AnalyticESC.Dual.Attractor
 
@@ -8,17 +9,17 @@ public import AnalyticESC.Dual.Attractor
 /-!
 # Theorems 1.5 and 2.2
 
-If the strong exponential separation condition fails, either two infinite words with different
-first letters have equal dual natural projections on `I`, or two finite words of equal length
-with different last letters give equal compositions on `I`. Theorem 1.5 and Theorem 2.2 follow.
+The three cases in the proof of Theorem 2.2, after extracting pairs `a_k u_k`, `b_k u_k`
+whose compositions are super-exponentially close:
 
-The failure of the SESC gives a sequence of pairs `a_k u_k`, `b_k u_k` of words of length `n_k`,
-with `|a_k| = |b_k| ≥ 1` and different last letters of `a_k` and `b_k`, whose compositions are
-`η_k`-close on `I`, where `η_k` is super-exponentially small in `n_k` (a `CondSeq`). Along a
-subsequence the left endpoints `p_k` of `f_{u_k}(I) = [p_k, q_k]` converge to some `p₀ ∈ I`. If
-`|a_k|` is bounded, then along a subsequence `a_k = a` and `b_k = b` are constant, all derivatives
-of `f_a` and `f_b` agree at `p₀` by (3.3), and `f_a = f_b`. Otherwise `a_k^← → i` and `b_k^← → j`
-along a subsequence, and all derivatives of `H_i` and `H_j` agree at `p₀` by (3.2) and (3.3).
+1. Bounded common suffixes: fix `u_k = u`, pass to the limit on the nondegenerate interval
+   `f_u(I)`, and apply the identity theorem.
+2. Unbounded suffixes and finite limit words: finite order of vanishing at the limiting point
+   contradicts the interval-length lower bound unless the two fixed compositions coincide.
+3. Infinite limit words: (3.2), Lemma 3.1 and Lemma 2.8 give (3.3), including the denominator
+   `|f_u'|^k`; Lemma 2.10 and analyticity then identify the limiting dual projections.
+
+Theorem 1.5 follows from compactness, Lemma 2.5(c) and Theorem 2.2.
 -/
 
 namespace AnalyticESC
@@ -154,39 +155,39 @@ structure CondSeq where
   η_pos : ∀ k, 0 < η k
   close : ∀ k, ∀ x ∈ I, ‖Φ.comp (a k ++ u k) x - Φ.comp (b k ++ u k) x‖ ≤ η k
   small : SupExpSmall (fun k => (a k).length + (u k).length) η
+  length_tendsto : Tendsto (fun k => (a k).length + (u k).length) atTop atTop
   p_nonneg : ∀ k, 0 ≤ p k
   p_lt_q : ∀ k, p k < q k
   q_le_one : ∀ k, q k ≤ 1
   cmin_pow_le : ∀ k, Φ.cmin ^ ((a k).length + (u k).length) ≤ q k - p k
+  cmax_pow_ge : ∀ k, q k - p k ≤ Φ.cmax ^ (u k).length
+  image_eq : ∀ k, (fun x : ℝ => (Φ.comp (u k) x).re) '' I = Icc (p k) (q k)
   mem_image : ∀ k, ∀ y ∈ Icc (p k) (q k), ∃ x ∈ I, (y : ℂ) = Φ.comp (u k) x
   p₀_mem : p₀ ∈ I
   tendsto_p : Tendsto p atTop (𝓝 p₀)
 
 /-- The failure of the SESC gives a condensing sequence. -/
 theorem nonempty_condSeq (h : ¬ Φ.SESC) : Nonempty Φ.CondSeq := by
-  have h₁ : ∀ k : ℕ, ∃ n, ∃ i j : Fin n → Fin N, i ≠ j ∧
-      Φ.supDist (List.ofFn i) (List.ofFn j) < ((k : ℝ) + 2)⁻¹ ^ n := by
-    intro k
-    by_contra hk
-    simp only [not_exists, not_and, not_lt] at hk
-    exact h ⟨_, by positivity, hk⟩
+  have h₁ : ∀ k : ℕ, ∃ n ≥ k, ∃ i j : Fin n → Fin N, i ≠ j ∧
+      Φ.supDist (List.ofFn i) (List.ofFn j) < ((k : ℝ) + 2)⁻¹ ^ n :=
+    fun k => Φ.exists_close_pair_ge h (by positivity) k
   have h₂ : ∀ k : ℕ, ∃ a b u : List (Fin N), a.length = b.length ∧ 0 < a.length ∧
-      a.getLast? ≠ b.getLast? ∧ ∀ x ∈ I,
+      a.getLast? ≠ b.getLast? ∧ k ≤ a.length + u.length ∧ ∀ x ∈ I,
         ‖Φ.comp (a ++ u) x - Φ.comp (b ++ u) x‖ ≤ ((k : ℝ) + 2)⁻¹ ^ (a.length + u.length) := by
     intro k
-    obtain ⟨n, i, j, hij, hlt⟩ := h₁ k
+    obtain ⟨n, hnk, i, j, hij, hlt⟩ := h₁ k
     obtain ⟨a, b, u, hi, hj, hlen, hpos, hlast⟩ :=
       List.exists_decomp_of_ne (i := List.ofFn i) (j := List.ofFn j) (by simp)
         fun h => hij (List.ofFn_injective h)
     have hn : a.length + u.length = n := by rw [← List.length_append, ← hi, List.length_ofFn]
-    refine ⟨a, b, u, hlen, hpos, hlast, fun x hx => ?_⟩
+    refine ⟨a, b, u, hlen, hpos, hlast, hn ▸ hnk, fun x hx => ?_⟩
     rw [← hi, ← hj, hn]
     exact (Φ.norm_comp_sub_le_supDist _ _ hx).trans hlt.le
-  choose a b u hlen hpos hlast hclose using h₂
+  choose a b u hlen hpos hlast hnk hclose using h₂
   have hN : 0 < N := ((a 0).head (List.ne_nil_of_length_pos (hpos 0))).pos
   have hcmin : 0 < Φ.cmin := Φ.cmin_pos hN
   have hcmin1 : Φ.cmin ≤ 1 := (Φ.cmin_le_cmax hN).trans Φ.cmax_lt_one.le
-  choose p q hp0 hpq hq1 hmin _ himg using fun k => Φ.exists_image_comp_eq_Icc (u k)
+  choose p q hp0 hpq hq1 hmin hmax himg using fun k => Φ.exists_image_comp_eq_Icc (u k)
   have hpq' : ∀ k, p k < q k := fun k => by
     have := hmin k
     have := pow_pos hcmin (u k).length
@@ -217,11 +218,14 @@ theorem nonempty_condSeq (h : ¬ Φ.SESC) : Nonempty Φ.CondSeq := by
     η_pos := fun k => by positivity
     close := fun k => hclose (φ k)
     small := hsmall.comp hφ.tendsto_atTop
+    length_tendsto := tendsto_atTop_mono (fun k => (hφ.id_le k).trans (hnk (φ k))) tendsto_id
     p_nonneg := fun k => hp0 (φ k)
     p_lt_q := fun k => hpq' (φ k)
     q_le_one := fun k => hq1 (φ k)
     cmin_pow_le := fun k =>
       (pow_le_pow_of_le_one hcmin.le hcmin1 (Nat.le_add_left _ _)).trans (hmin (φ k))
+    cmax_pow_ge := fun k => hmax (φ k)
+    image_eq := fun k => himg (φ k)
     mem_image := fun k y hy => by
       have hy' : y ∈ Icc (p (φ k)) (q (φ k)) := hy
       rw [← himg (φ k)] at hy'
@@ -249,10 +253,13 @@ def comp (S : Φ.CondSeq) (φ : ℕ → ℕ) (hφ : StrictMono φ) : Φ.CondSeq 
   η_pos k := S.η_pos (φ k)
   close k := S.close (φ k)
   small := S.small.comp hφ.tendsto_atTop
+  length_tendsto := S.length_tendsto.comp hφ.tendsto_atTop
   p_nonneg k := S.p_nonneg (φ k)
   p_lt_q k := S.p_lt_q (φ k)
   q_le_one k := S.q_le_one (φ k)
   cmin_pow_le k := S.cmin_pow_le (φ k)
+  cmax_pow_ge k := S.cmax_pow_ge (φ k)
+  image_eq k := S.image_eq (φ k)
   mem_image k := S.mem_image (φ k)
   p₀_mem := S.p₀_mem
   tendsto_p := S.tendsto_p.comp hφ.tendsto_atTop
@@ -267,45 +274,93 @@ theorem one_le_length (S : Φ.CondSeq) (k : ℕ) : 1 ≤ (S.a k).length + (S.u k
 theorem p_mem (S : Φ.CondSeq) (k : ℕ) : S.p k ∈ I :=
   ⟨S.p_nonneg k, (S.p_lt_q k).le.trans (S.q_le_one k)⟩
 
-/-- Bounded case: if `a_k = a` and `b_k = b` are constant, then `f_a = f_b` on `I`. -/
+/-- Finite limit words: finite order of vanishing contradicts super-exponential
+closeness on intervals whose lengths are at least `c_min^{n_k}`. -/
 theorem comp_eq_comp (S : Φ.CondSeq) {a b : List (Fin N)} (ha : ∀ k, S.a k = a)
     (hb : ∀ k, S.b k = b) : ∀ x ∈ I, Φ.comp a x = Φ.comp b x := by
   have hcmin := Φ.cmin_pos S.pos_N
-  have hn := S.one_le_length
-  have hη : ∀ k, 0 ≤ S.η k := fun k => (S.η_pos k).le
-  have heq : EqOn (Φ.comp a) (Φ.comp b) (nbhd ε) := by
-    refine eqOn_nbhd_of_iteratedDeriv_close Φ.ε_pos (Φ.differentiableOn_comp a)
-      (Φ.differentiableOn_comp b) S.p₀_mem S.tendsto_p fun r δ hδ => ?_
-    obtain ⟨K, Q, -, hKQ⟩ := Φ.exists_iteratedDeriv_comp_closeness r a b
-    have hs : (0 : ℝ) < (2 : ℝ)⁻¹ ^ r := by positivity
-    have h1 := S.small.eventually_le hn one_pos
-    have h2 := (S.small.mul_pow_rpow hn hη (2 * (2 + Q)) zero_le_one hs).eventually_lt_pow hn hcmin
-    have h3 := (S.small.mul_pow_rpow hn hη (max K 0) zero_le_one hs).eventually_le hn hδ
-    filter_upwards [h1, h2, h3] with k h1 h2 h3
-    simp only [one_pow, mul_one] at h2 h3
-    have hclose : ∀ y ∈ Icc (S.p k) (S.q k), ‖Φ.comp a y - Φ.comp b y‖ ≤ S.η k := by
-      intro y hy
-      obtain ⟨x, hx, hxy⟩ := S.mem_image k y hy
-      rw [hxy]
-      simpa only [ha k, hb k, Φ.comp_append, Function.comp_apply] using S.close k x hx
-    calc _ ≤ K * S.η k ^ ((2 : ℝ)⁻¹ ^ r) :=
-          hKQ _ _ _ (S.p_nonneg k) (S.p_lt_q k) (S.q_le_one k) (S.η_pos k) h1
-            (h2.trans_le (S.cmin_pow_le k)) hclose _ (left_mem_Icc.2 (S.p_lt_q k).le)
-      _ ≤ max K 0 * S.η k ^ ((2 : ℝ)⁻¹ ^ r) :=
-          mul_le_mul_of_nonneg_right (le_max_left _ _) (Real.rpow_nonneg (hη k) _)
-      _ ≤ δ := h3
-  intro x hx
-  exact heq (ofReal_mem_nbhd Φ.ε_pos hx)
+  have hz := ofReal_mem_nbhd Φ.ε_pos S.p₀_mem
+  have hA := (Φ.differentiableOn_comp a).analyticOnNhd (isOpen_nbhd ε)
+  have hB := (Φ.differentiableOn_comp b).analyticOnNhd (isOpen_nbhd ε)
+  suffices heq : Φ.comp a =ᶠ[𝓝 (S.p₀ : ℂ)] Φ.comp b from
+    fun x hx => hA.eqOn_of_preconnected_of_eventuallyEq hB (isPreconnected_nbhd ε) hz heq
+      (ofReal_mem_nbhd Φ.ε_pos hx)
+  by_contra hne
+  have hne' : ¬ ∀ᶠ z in 𝓝 (S.p₀ : ℂ), Φ.comp a z - Φ.comp b z = 0 := by
+    simpa only [Filter.EventuallyEq, sub_eq_zero] using hne
+  obtain ⟨m, g, hg, hg0, hfactor⟩ :=
+    ((hA _ hz).sub (hB _ hz)).exists_eventuallyEq_pow_smul_nonzero_iff.2 hne'
+  let D := ‖g S.p₀‖ / 2
+  have hD : 0 < D := half_pos (norm_pos_iff.2 hg0)
+  have hgne : ∀ᶠ z in 𝓝 (S.p₀ : ℂ), D ≤ ‖g z‖ :=
+    hg.continuousAt.norm.eventually (le_mem_nhds (half_lt_self (norm_pos_iff.2 hg0)))
+  have hu : Tendsto (fun k => (S.u k).length) atTop atTop := by
+    apply Filter.tendsto_atTop.2
+    intro B
+    filter_upwards [S.length_tendsto.eventually_ge_atTop (B + a.length)] with k hk
+    rw [ha k] at hk
+    omega
+  have hwidth : Tendsto (fun k => S.q k - S.p k) atTop (𝓝 0) :=
+    tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds
+      ((tendsto_pow_atTop_nhds_zero_of_lt_one Φ.cmax_nonneg Φ.cmax_lt_one).comp hu)
+      (fun k => (sub_pos.2 (S.p_lt_q k)).le) S.cmax_pow_ge
+  have hq : Tendsto S.q atTop (𝓝 S.p₀) := by
+    simpa using hwidth.add S.tendsto_p
+  let r (k : ℕ) := if |S.q k - S.p₀| ≤ |S.p k - S.p₀| then S.p k else S.q k
+  have hrmem : ∀ k, r k ∈ Icc (S.p k) (S.q k) := by
+    intro k
+    dsimp [r]
+    split_ifs <;> exact ⟨by linarith [S.p_lt_q k], by linarith [S.p_lt_q k]⟩
+  have hrlim : Tendsto (fun k => (r k : ℂ)) atTop (𝓝 (S.p₀ : ℂ)) :=
+    Complex.continuous_ofReal.continuousAt.tendsto.comp
+      (tendsto_of_tendsto_of_tendsto_of_le_of_le S.tendsto_p hq
+        (fun k => (hrmem k).1) (fun k => (hrmem k).2))
+  have hfar : ∀ k, (S.q k - S.p k) / 2 ≤ |r k - S.p₀| := by
+    intro k
+    have ht : S.q k - S.p k ≤ |S.q k - S.p₀| + |S.p k - S.p₀| := by
+      calc _ = (S.q k - S.p₀) + -(S.p k - S.p₀) := by ring
+        _ ≤ _ := add_le_add (le_abs_self _) (neg_le_abs _)
+    dsimp [r]
+    split_ifs with hr <;> linarith
+  have hsmall := (S.small.mul_pow_rpow S.one_le_length (fun k => (S.η_pos k).le)
+    ((2 : ℝ) ^ m / D) zero_le_one one_pos).eventually_lt_pow S.one_le_length (pow_pos hcmin m)
+  obtain ⟨k, hkfac, hkg, hksmall⟩ :=
+    ((hrlim.eventually hfactor).and ((hrlim.eventually hgne).and hsmall)).exists
+  have hclose : ‖Φ.comp a (r k) - Φ.comp b (r k)‖ ≤ S.η k := by
+    obtain ⟨x, hx, hxy⟩ := S.mem_image k _ (hrmem k)
+    rw [hxy]
+    simpa only [ha k, hb k, Φ.comp_append, Function.comp_apply] using S.close k x hx
+  have hlower : D * (Φ.cmin ^ ((S.a k).length + (S.u k).length) / 2) ^ m ≤ S.η k := by
+    calc _ ≤ ‖g (r k)‖ * |r k - S.p₀| ^ m :=
+        mul_le_mul hkg (pow_le_pow_left₀ (by positivity)
+          ((div_le_div_of_nonneg_right (S.cmin_pow_le k) (by norm_num)).trans (hfar k)) _)
+          (by positivity) (norm_nonneg _)
+      _ = ‖Φ.comp a (r k) - Φ.comp b (r k)‖ := by
+        change ‖g (r k)‖ * |r k - S.p₀| ^ m = ‖(Φ.comp a - Φ.comp b) (r k)‖
+        rw [hkfac, norm_smul, norm_pow, ← Complex.ofReal_sub, Complex.norm_real, Real.norm_eq_abs]
+        exact mul_comm _ _
+      _ ≤ S.η k := hclose
+  simp only [one_pow, mul_one, Real.rpow_one] at hksmall
+  rw [div_pow, ← mul_div_assoc] at hlower
+  have hpow : (Φ.cmin ^ m) ^ ((S.a k).length + (S.u k).length) =
+      (Φ.cmin ^ ((S.a k).length + (S.u k).length)) ^ m := by
+    rw [← pow_mul, ← pow_mul, Nat.mul_comm]
+  rw [hpow] at hksmall
+  have htwo : (0 : ℝ) < 2 ^ m := by positivity
+  have hlo := (div_le_iff₀ htwo).1 hlower
+  have hhi := (div_lt_iff₀ hD).1 (show (2 ^ m * S.η k) / D <
+    (Φ.cmin ^ ((S.a k).length + (S.u k).length)) ^ m by simpa [div_mul_eq_mul_div] using hksmall)
+  nlinarith
 
-/-- Unbounded case: if `a_k^← → i` and `b_k^← → j`, then `H_i = H_j` on `I`. -/
-theorem dualProj_eq (S : Φ.CondSeq) {i j : ℕ → Fin N}
-    (hi : Word.TendstoPrefix (fun k => .fin (S.a k).reverse) (.inf i))
-    (hj : Word.TendstoPrefix (fun k => .fin (S.b k).reverse) (.inf j)) :
-    ∀ x ∈ I, Φ.dualProj (.inf i) x = Φ.dualProj (.inf j) x := by
+/-- Equation (3.2), with a positive super-exponentially small bound on the image interval. -/
+theorem exists_dualProj_small (S : Φ.CondSeq) :
+    ∃ η' : ℕ → ℝ, (∀ k, 0 < η' k) ∧
+      SupExpSmall (fun k => (S.a k).length + (S.u k).length) η' ∧
+      ∀ᶠ k in atTop, ∀ y ∈ Icc (S.p k) (S.q k),
+        ‖Φ.dualProj (.fin (S.a k).reverse) y - Φ.dualProj (.fin (S.b k).reverse) y‖ ≤ η' k := by
   have hcmin := Φ.cmin_pos S.pos_N
   have hn := S.one_le_length
   obtain ⟨K₀, η₀, hη₀, hK₀⟩ := Φ.exists_dualProj_closeness
-  obtain ⟨C, -, -, hC⟩ := Φ.exists_iteratedDeriv_bounds
   set η' : ℕ → ℝ := fun k => max K₀ 1 * (Φ.cmin⁻¹ ^ 2) ^ ((S.a k).length + (S.u k).length) *
     S.η k ^ ((1 : ℝ) / 4)
   have hη'pos : ∀ k, 0 < η' k := fun k => by
@@ -330,6 +385,62 @@ theorem dualProj_eq (S : Φ.CondSeq) {i j : ℕ → Fin N}
           exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right (le_max_left _ _)
             (by positivity)) (by positivity)
   have hη'nonneg : ∀ k, 0 ≤ η' k := fun k => (hη'pos k).le
+  exact ⟨η', hη'pos, hη'small, hη'close⟩
+
+/-- Bounded common suffixes: pass to the limit on the fixed nondegenerate image
+interval using Lemma 2.10, then use the analytic identity theorem. -/
+theorem dualProj_eq_of_fixed_suffix (S : Φ.CondSeq) {u : List (Fin N)}
+    (hu : ∀ k, S.u k = u) {i j : ℕ → Fin N}
+    (hi : Word.TendstoPrefix (fun k => .fin (S.a k).reverse) (.inf i))
+    (hj : Word.TendstoPrefix (fun k => .fin (S.b k).reverse) (.inf j)) :
+    ∀ x ∈ I, Φ.dualProj (.inf i) x = Φ.dualProj (.inf j) x := by
+  obtain ⟨η', hη'pos, hη'small, hη'close⟩ := S.exists_dualProj_small
+  obtain ⟨C, -, -, hC⟩ := Φ.exists_iteratedDeriv_bounds
+  have hsub : Icc (S.p 0) (S.q 0) ⊆ I := Icc_subset_Icc (S.p_nonneg 0) (S.q_le_one 0)
+  have heq : ∀ y ∈ Icc (S.p 0) (S.q 0), Φ.dualProj (.inf i) y = Φ.dualProj (.inf j) y := by
+    intro y hy
+    have hyk : ∀ k, y ∈ Icc (S.p k) (S.q k) := by
+      intro k
+      rw [← S.image_eq k, hu k, ← hu 0, S.image_eq 0]
+      exact hy
+    rw [← sub_eq_zero, ← norm_le_zero_iff]
+    apply le_of_forall_pos_le_add
+    intro δ hδ
+    have hδ3 : 0 < δ / 3 := by positivity
+    obtain ⟨m, hm⟩ : ∃ m : ℕ, 2 * C 0 * Φ.cmax ^ m ≤ δ / 3 := by
+      have ht : Tendsto (fun m : ℕ => 2 * C 0 * Φ.cmax ^ m) atTop (𝓝 0) := by
+        simpa using (tendsto_pow_atTop_nhds_zero_of_lt_one Φ.cmax_nonneg
+          Φ.cmax_lt_one).const_mul (2 * C 0)
+      exact (ht.eventually (ge_mem_nhds hδ3)).exists
+    obtain ⟨k, hkη, hkclose, hki, hkj⟩ := ((hη'small.eventually_le S.one_le_length hδ3).and
+      (hη'close.and ((hi.eventually_le_commonPrefixLength rfl m).and
+        (hj.eventually_le_commonPrefixLength rfl m)))).exists
+    have e1 := hC 0 y (hsub hy) _ _ m hki
+    have e2 := hC 0 y (hsub hy) _ _ m hkj
+    simp only [iteratedDeriv_zero] at e1 e2
+    have e3 := hkclose y (hyk k)
+    set A := Φ.dualProj (.fin (S.a k).reverse) y
+    set B := Φ.dualProj (.fin (S.b k).reverse) y
+    set Hi := Φ.dualProj (.inf i) y
+    set Hj := Φ.dualProj (.inf j) y
+    calc ‖Hi - Hj‖ = ‖-(A - Hi) + (A - B) + (B - Hj)‖ := by congr 1; ring
+      _ ≤ ‖-(A - Hi)‖ + ‖A - B‖ + ‖B - Hj‖ := norm_add₃_le
+      _ = ‖A - Hi‖ + ‖A - B‖ + ‖B - Hj‖ := by rw [norm_neg]
+      _ ≤ 0 + δ := by linarith
+  intro x hx
+  exact eqOn_nbhd_of_eqOn_Icc Φ.ε_pos (Φ.differentiableOn_dualProj _)
+    (Φ.differentiableOn_dualProj _) (S.p_lt_q 0) hsub heq (ofReal_mem_nbhd Φ.ε_pos hx)
+
+/-- Unbounded case: if `a_k^← → i` and `b_k^← → j`, then `H_i = H_j` on `I`. -/
+theorem dualProj_eq (S : Φ.CondSeq) {i j : ℕ → Fin N}
+    (hi : Word.TendstoPrefix (fun k => .fin (S.a k).reverse) (.inf i))
+    (hj : Word.TendstoPrefix (fun k => .fin (S.b k).reverse) (.inf j)) :
+    ∀ x ∈ I, Φ.dualProj (.inf i) x = Φ.dualProj (.inf j) x := by
+  have hcmin := Φ.cmin_pos S.pos_N
+  have hn := S.one_le_length
+  obtain ⟨η', hη'pos, hη'small, hη'close⟩ := S.exists_dualProj_small
+  have hη'nonneg : ∀ k, 0 ≤ η' k := fun k => (hη'pos k).le
+  obtain ⟨C, -, -, hC⟩ := Φ.exists_iteratedDeriv_bounds
   have heq : EqOn (Φ.dualProj (.inf i)) (Φ.dualProj (.inf j)) (nbhd ε) := by
     refine eqOn_nbhd_of_iteratedDeriv_close Φ.ε_pos (Φ.differentiableOn_dualProj _)
       (Φ.differentiableOn_dualProj _) S.p₀_mem S.tendsto_p fun r δ hδ => ?_
@@ -344,16 +455,31 @@ theorem dualProj_eq (S : Φ.CondSeq) {i j : ℕ → Fin N}
     have h1 := hη'small.eventually_le hn one_pos
     have h2 := (hη'small.mul_pow_rpow hn hη'nonneg (2 * (2 + Q)) zero_le_one
       hs).eventually_lt_pow hn hcmin
-    have h3 := (hη'small.mul_pow_rpow hn hη'nonneg (max K 0) zero_le_one hs).eventually_le hn hδ3
+    have h3 := (hη'small.mul_pow_rpow hn hη'nonneg (max K 0) (pow_nonneg (inv_nonneg.2 hcmin.le) r) hs).eventually_le hn hδ3
     filter_upwards [h1, h2, h3, hη'close, hi.eventually_le_commonPrefixLength rfl m,
       hj.eventually_le_commonPrefixLength rfl m] with k h1 h2 h3 h4 h5 h6
     simp only [one_pow, mul_one] at h2 h3
     have e1 := hC r _ (S.p_mem k) _ _ m h5
     have e2 := hC r _ (S.p_mem k) _ _ m h6
-    have e3 := hKQ _ _ _ _ _ (S.p_nonneg k) (S.p_lt_q k) (S.q_le_one k) (hη'pos k) h1
-      (h2.trans_le (S.cmin_pow_le k)) h4 _ (left_mem_Icc.2 (S.p_lt_q k).le)
-    have e3' : K * η' k ^ ((2 : ℝ)⁻¹ ^ r) ≤ max K 0 * η' k ^ ((2 : ℝ)⁻¹ ^ r) :=
-      mul_le_mul_of_nonneg_right (le_max_left _ _) (Real.rpow_nonneg (hη'nonneg k) _)
+    have hall := hKQ _ _ _ _ _ (S.p_nonneg k) (S.p_lt_q k) (S.q_le_one k) (hη'pos k) h1
+      (h2.trans_le (S.cmin_pow_le k)) h4
+    obtain ⟨x, hx, hxp⟩ := S.mem_image k _ (left_mem_Icc.2 (S.p_lt_q k).le)
+    have hwhole : ∀ y ∈ (fun t : ℝ => (Φ.comp (S.u k) t).re) '' I,
+        ‖iteratedDeriv r (Φ.dualProj (.fin (S.a k).reverse)) y -
+          iteratedDeriv r (Φ.dualProj (.fin (S.b k).reverse)) y‖ ≤
+            max K 0 * η' k ^ ((2 : ℝ)⁻¹ ^ r) := by
+      intro y hy
+      rw [S.image_eq k] at hy
+      exact (hall y hy).trans (mul_le_mul_of_nonneg_right (le_max_left _ _)
+        (Real.rpow_nonneg (hη'nonneg k) _))
+    obtain ⟨e3a, e3b⟩ := Φ.norm_iteratedDeriv_sub_le_on_image S.pos_N r (S.u k)
+      (le_max_right _ _) (Real.rpow_nonneg (hη'nonneg k) _) hwhole hx
+    have hbase : 1 ≤ Φ.cmin⁻¹ ^ r := one_le_pow₀ ((one_le_inv₀ hcmin).2
+      ((Φ.cmin_le_cmax S.pos_N).trans Φ.cmax_lt_one.le))
+    have e3 := e3a.trans (e3b.trans (mul_le_mul_of_nonneg_right
+      (mul_le_mul_of_nonneg_left (pow_le_pow_right₀ hbase (Nat.le_add_left (S.u k).length (S.a k).length))
+        (le_max_right _ _)) (Real.rpow_nonneg (hη'nonneg k) _)))
+    rw [← hxp] at e3
     set A := iteratedDeriv r (Φ.dualProj (.fin (S.a k).reverse)) (S.p k)
     set B := iteratedDeriv r (Φ.dualProj (.fin (S.b k).reverse)) (S.p k)
     set Hi := iteratedDeriv r (Φ.dualProj (.inf i)) (S.p k)
@@ -368,7 +494,8 @@ theorem dualProj_eq (S : Φ.CondSeq) {i j : ℕ → Fin N}
 
 /-- Unbounded case: if `|a_k| → ∞`, then two infinite words with different first letters have
 equal dual natural projections on `I`. -/
-theorem exists_dualProj_eq (S : Φ.CondSeq) (h : Tendsto (fun k => (S.a k).length) atTop atTop) :
+theorem exists_dualProj_eq (S : Φ.CondSeq) (h : Tendsto (fun k => (S.a k).length) atTop atTop)
+    (hcase : (∃ u, ∀ k, S.u k = u) ∨ Tendsto (fun k => (S.u k).length) atTop atTop) :
     ∃ i j : ℕ → Fin N, i 0 ≠ j 0 ∧ ∀ x ∈ I, Φ.dualProj (.inf i) x = Φ.dualProj (.inf j) x := by
   obtain ⟨φ₁, hφ₁, w₁, hw₁⟩ := Word.exists_subseq_tendstoPrefix fun k => Word.fin (S.a k).reverse
   obtain ⟨φ₂, hφ₂, w₂, hw₂⟩ :=
@@ -387,7 +514,11 @@ theorem exists_dualProj_eq (S : Φ.CondSeq) (h : Tendsto (fun k => (S.a k).lengt
     exact hlen₁
   obtain ⟨i, rfl⟩ := Word.eq_inf_of_length_eq_top hlen₁
   obtain ⟨j, rfl⟩ := Word.eq_inf_of_length_eq_top hlen₂
-  refine ⟨i, j, fun hij => ?_, T.dualProj_eq hT1 hT2⟩
+  have heq : ∀ x ∈ I, Φ.dualProj (.inf i) x = Φ.dualProj (.inf j) x := by
+    rcases hcase with ⟨u, hu⟩ | hu
+    · exact T.dualProj_eq_of_fixed_suffix (fun k => hu ((φ₁ ∘ φ₂) k)) hT1 hT2
+    · exact T.dualProj_eq hT1 hT2
+  refine ⟨i, j, fun hij => ?_, heq⟩
   obtain ⟨k, hk1, hk2⟩ := ((hT1.eventually_get?_eq 0).and (hT2.eventually_get?_eq 0)).exists
   apply T.getLast?_ne k
   simp only [Word.get?_fin, Word.get?_inf, ← List.head?_eq_getElem?, List.head?_reverse]
@@ -402,58 +533,45 @@ theorem condensation_dichotomy (h : ¬ Φ.SESC) :
       ∃ a b : List (Fin N), a.length = b.length ∧ 0 < a.length ∧ a.getLast? ≠ b.getLast? ∧
         ∀ x ∈ I, Φ.comp a x = Φ.comp b x := by
   obtain ⟨S⟩ := Φ.nonempty_condSeq h
-  by_cases hB : ∃ B, ∃ᶠ k in atTop, (S.a k).length ≤ B
-  · right
-    obtain ⟨B, hB⟩ := hB
-    have hfin := (List.finite_length_le (Fin N) B).prod (List.finite_length_le (Fin N) B)
-    obtain ⟨⟨a, b⟩, -, hab⟩ := exists_frequently_eq_of_frequently_mem hfin
-      (f := fun k => (S.a k, S.b k))
-      (hB.mono fun k hk => ⟨hk, (S.length_eq k ▸ hk : (S.b k).length ≤ B)⟩)
-    obtain ⟨φ, hφ, hφab⟩ := extraction_of_frequently_atTop hab
-    set T := S.comp φ hφ
-    have ha : ∀ k, T.a k = a := fun k => congrArg Prod.fst (hφab k)
-    have hb : ∀ k, T.b k = b := fun k => congrArg Prod.snd (hφab k)
-    refine ⟨a, b, ?_, ?_, ?_, T.comp_eq_comp ha hb⟩
-    · rw [← ha 0, ← hb 0]
-      exact T.length_eq 0
-    · rw [← ha 0]
-      exact T.length_pos 0
-    · rw [← ha 0, ← hb 0]
-      exact T.getLast?_ne 0
+  by_cases hU : ∃ B, ∃ᶠ k in atTop, (S.u k).length ≤ B
   · left
-    simp only [not_exists, not_frequently, not_le] at hB
-    exact S.exists_dualProj_eq (tendsto_atTop.2 fun B => (hB B).mono fun k hk => hk.le)
-
-/-- Theorem 1.5: if `sup_{x ∈ [0,1]} |H_i(x) - H_j(x)| > 0` for all distinct `i, j ∈ Σ ∪ Σ_*` with
-`|i| = |j|`, then `Φ` satisfies the SESC. -/
-theorem theorem_1_5
-    (h : ∀ i j : Word N, i ≠ j → i.length = j.length →
-      0 < ⨆ x : I, ‖Φ.dualProj i ((x : ℝ) : ℂ) - Φ.dualProj j ((x : ℝ) : ℂ)‖) :
-    Φ.SESC := by
-  by_contra hS
-  rcases Φ.condensation_dichotomy hS with ⟨i, j, hij, heq⟩ | ⟨a, b, hlen, -, hlast, heq⟩
-  · have hpos := h (.inf i) (.inf j) (fun hw => hij (congrFun (Word.inf.inj hw) 0)) rfl
-    have h0 : ∀ x : I,
-        ‖Φ.dualProj (.inf i) ((x : ℝ) : ℂ) - Φ.dualProj (.inf j) ((x : ℝ) : ℂ)‖ = 0 :=
-      fun x => by rw [heq x x.2, sub_self, norm_zero]
-    simp only [h0, Real.iSup_const_zero, lt_irrefl] at hpos
-  · have hε := Φ.ε_pos
-    have hEq : EqOn (Φ.comp a) (Φ.comp b) (nbhd ε) :=
-      eqOn_nbhd_of_eqOn_Icc hε (Φ.differentiableOn_comp a) (Φ.differentiableOn_comp b)
-        zero_lt_one subset_rfl heq
-    have hD := hEq.deriv (isOpen_nbhd ε)
-    have hDD := hD.deriv (isOpen_nbhd ε)
-    have hne : Word.fin a.reverse ≠ Word.fin b.reverse := fun hw =>
-      hlast (by rw [List.reverse_inj.1 (Word.fin.inj hw)])
-    have hpos := h _ _ hne (by simp [hlen])
-    have h0 : ∀ x : I,
-        ‖Φ.dualProj (.fin a.reverse) ((x : ℝ) : ℂ) - Φ.dualProj (.fin b.reverse) ((x : ℝ) : ℂ)‖
-          = 0 := by
-      intro x
-      have hx := ofReal_mem_nbhd hε x.2
-      rw [Φ.dualProj_fin_reverse a (subset_closure hx),
-        Φ.dualProj_fin_reverse b (subset_closure hx), hD hx, hDD hx, sub_self, norm_zero]
-    simp only [h0, Real.iSup_const_zero, lt_irrefl] at hpos
+    obtain ⟨B, hB⟩ := hU
+    obtain ⟨u, -, hu⟩ := exists_frequently_eq_of_frequently_mem
+      (List.finite_length_le (Fin N) B) hB
+    obtain ⟨φ, hφ, hφu⟩ := extraction_of_frequently_atTop hu
+    let T := S.comp φ hφ
+    have hTu : ∀ k, T.u k = u := hφu
+    have hTa : Tendsto (fun k => (T.a k).length) atTop atTop := by
+      apply Filter.tendsto_atTop.2
+      intro B
+      filter_upwards [T.length_tendsto.eventually_ge_atTop (B + u.length)] with k hk
+      rw [hTu k] at hk
+      omega
+    exact T.exists_dualProj_eq hTa (Or.inl ⟨u, hTu⟩)
+  · have hU : Tendsto (fun k => (S.u k).length) atTop atTop := by
+      simp only [not_exists, not_frequently, not_le] at hU
+      exact Filter.tendsto_atTop.2 fun B => (hU B).mono fun k hk => hk.le
+    by_cases hB : ∃ B, ∃ᶠ k in atTop, (S.a k).length ≤ B
+    · right
+      obtain ⟨B, hB⟩ := hB
+      have hfin := (List.finite_length_le (Fin N) B).prod (List.finite_length_le (Fin N) B)
+      obtain ⟨⟨a, b⟩, -, hab⟩ := exists_frequently_eq_of_frequently_mem hfin
+        (f := fun k => (S.a k, S.b k))
+        (hB.mono fun k hk => ⟨hk, (S.length_eq k ▸ hk : (S.b k).length ≤ B)⟩)
+      obtain ⟨φ, hφ, hφab⟩ := extraction_of_frequently_atTop hab
+      set T := S.comp φ hφ
+      have ha : ∀ k, T.a k = a := fun k => congrArg Prod.fst (hφab k)
+      have hb : ∀ k, T.b k = b := fun k => congrArg Prod.snd (hφab k)
+      refine ⟨a, b, ?_, ?_, ?_, T.comp_eq_comp ha hb⟩
+      · rw [← ha 0, ← hb 0]
+        exact T.length_eq 0
+      · rw [← ha 0]
+        exact T.length_pos 0
+      · rw [← ha 0, ← hb 0]
+        exact T.getLast?_ne 0
+    · left
+      simp only [not_exists, not_frequently, not_le] at hB
+      exact S.exists_dualProj_eq (Filter.tendsto_atTop.2 fun B => (hB B).mono fun k hk => hk.le) (Or.inr hU)
 
 /-- Theorem 2.2: if the dual IFS satisfies the SSC, then `Φ` satisfies the SESC. -/
 theorem theorem_2_2 (h : Φ.DualSSC) : Φ.SESC := by
@@ -462,6 +580,30 @@ theorem theorem_2_2 (h : Φ.DualSSC) : Φ.SESC := by
   · obtain ⟨x, hx, hne⟩ := (Φ.dualSSC_iff_ne (i 0).pos).1 h i j hij
     exact hne (heq x hx)
   · exact Φ.not_dualSSC_of_comp_eq hlen hlast heq h
+
+/-- Theorem 1.5: if `sup_{x ∈ [0,1]} |H_i(x) - H_j(x)| > 0` for all distinct `i, j ∈ Σ ∪ Σ_*` with
+`|i| = |j|`, then `Φ` satisfies the SESC. -/
+theorem theorem_1_5
+    (h : ∀ i j : Word N, i ≠ j → i.length = j.length →
+      0 < ⨆ x : I, ‖Φ.dualProj i ((x : ℝ) : ℂ) - Φ.dualProj j ((x : ℝ) : ℂ)‖) :
+    Φ.SESC := by
+  by_cases hN : 0 < N
+  · apply Φ.theorem_2_2
+    apply (Φ.dualSSC_iff_exists_delta hN).2
+    apply Φ.dualProj_ne_iff_exists_delta.1
+    intro i j hij
+    by_contra heq
+    push Not at heq
+    have hpos := h (.inf i) (.inf j) (fun hw => hij (congrFun (Word.inf.inj hw) 0)) rfl
+    have h0 : ∀ x : I,
+        ‖Φ.dualProj (.inf i) ((x : ℝ) : ℂ) - Φ.dualProj (.inf j) ((x : ℝ) : ℂ)‖ = 0 :=
+      fun x => by rw [heq x x.2, sub_self, norm_zero]
+    simp only [h0, Real.iSup_const_zero, lt_irrefl] at hpos
+  · refine ⟨1, one_pos, fun n i j hij => ?_⟩
+    exfalso
+    apply hij
+    funext k
+    exact False.elim (hN (i k).pos)
 
 end IFS
 

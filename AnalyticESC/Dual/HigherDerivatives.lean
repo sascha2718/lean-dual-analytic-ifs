@@ -1,6 +1,6 @@
 module
 
-public import AnalyticESC.Dual.Derivatives
+public import AnalyticESC.Dual.Projection
 
 @[expose] public section
 
@@ -99,6 +99,32 @@ theorem hasDerivAt_aeval_of_mem_supported {s : Finset ℕ} {p : MvPolynomial ℕ
 
 /-! ## Holomorphic maps -/
 
+/-- A polynomial in finitely many bounded variables is uniformly bounded. This supplies the
+constants `E_k` used after (2.10), without estimating derivatives by Cauchy's formula. -/
+theorem exists_norm_aeval_le_of_supported {s : Set ℕ} {p : MvPolynomial ℕ ℤ}
+    (hp : p ∈ MvPolynomial.supported ℤ s) (C : ℕ → ℝ) (hC : ∀ ℓ ∈ s, 0 ≤ C ℓ) :
+    ∃ E ≥ 0, ∀ y : ℕ → ℂ, (∀ ℓ ∈ s, ‖y ℓ‖ ≤ C ℓ) → ‖MvPolynomial.aeval y p‖ ≤ E := by
+  rw [MvPolynomial.supported_eq_adjoin_X] at hp
+  induction hp using Algebra.adjoin_induction with
+  | mem x hx =>
+    obtain ⟨ℓ, hℓ, rfl⟩ := hx
+    exact ⟨C ℓ, hC ℓ hℓ, fun y hy => by simpa using hy ℓ hℓ⟩
+  | algebraMap r =>
+    refine ⟨‖(r : ℂ)‖, norm_nonneg _, fun y _ => ?_⟩
+    simp
+  | add p q _ _ hp hq =>
+    obtain ⟨E, hE, hp⟩ := hp
+    obtain ⟨F, hF, hq⟩ := hq
+    refine ⟨E + F, add_nonneg hE hF, fun y hy => ?_⟩
+    rw [map_add]
+    exact (norm_add_le _ _).trans (add_le_add (hp y hy) (hq y hy))
+  | mul p q _ _ hp hq =>
+    obtain ⟨E, hE, hp⟩ := hp
+    obtain ⟨F, hF, hq⟩ := hq
+    refine ⟨E * F, mul_nonneg hE hF, fun y hy => ?_⟩
+    rw [map_mul, norm_mul]
+    exact mul_le_mul (hp y hy) (hq y hy) (norm_nonneg _) hE
+
 /-- Iterated derivatives of a map holomorphic on an open set are holomorphic there. -/
 theorem differentiableAt_iteratedDeriv {g : ℂ → ℂ} {U : Set ℂ} (hU : IsOpen U)
     (hg : DifferentiableOn ℂ g U) (k : ℕ) {z : ℂ} (hz : z ∈ U) :
@@ -156,6 +182,38 @@ theorem iteratedDeriv_comp_mul_deriv {h f : ℂ → ℂ} {z : ℂ} {r : ℝ} (hr
 namespace IFS
 
 variable {N : ℕ} {ε : ℝ} (Φ : IFS N ε)
+
+/-- The manuscript's `φ_i = log|f_i'|`, on the real line. -/
+noncomputable def logAbsDeriv (i : Fin N) (x : ℝ) : ℝ := Real.log |(deriv (Φ.f i) x).re|
+
+/-- The local primitive used in the complex Faà di Bruno formula has the same positive-order
+real derivatives as `φ_i = log|f_i'|`. This identifies the coefficients in (2.8). -/
+theorem iteratedDeriv_logAbsDeriv (i : Fin N) (k : ℕ) {x : ℝ} (hx : x ∈ I) :
+    iteratedDeriv (k + 1) (Φ.logAbsDeriv i) x =
+      (iteratedDeriv k (Φ.nonlin i) x).re := by
+  have hd : DifferentiableOn ℂ (deriv (Φ.f i)) (nbhd (2 * ε)) :=
+    (Φ.differentiableOn_f i).deriv (isOpen_nbhd _)
+  have hfirst : ∀ t : ℝ, (t : ℂ) ∈ nbhd ε →
+      deriv (Φ.logAbsDeriv i) t = (Φ.nonlin i t).re := by
+    intro t ht
+    have hr := Φ.im_deriv_f_ofReal i (IFS.nbhd_subset_two ht)
+    have hre : deriv (Φ.f i) t = ((deriv (Φ.f i) t).re : ℂ) :=
+      Complex.ext rfl (by simpa using hr)
+    have hne : (deriv (Φ.f i) t).re ≠ 0 := fun he =>
+      (Φ.inClass i).deriv_ne_zero _ (subset_closure ht) (by rw [hre, he]; simp)
+    have h := (hasDerivAt_re_ofReal (hd.differentiableAt
+      ((isOpen_nbhd _).mem_nhds (IFS.nbhd_subset_two ht)))).log hne
+    have he : Φ.logAbsDeriv i = fun u : ℝ => Real.log (deriv (Φ.f i) u).re := by
+      funext u
+      exact Real.log_abs _
+    rw [he, h.deriv, nonlin, hre, Complex.div_ofReal_re, Complex.ofReal_re]
+  have hx' := ofReal_mem_nbhd Φ.ε_pos hx
+  have heq : deriv (Φ.logAbsDeriv i) =ᶠ[𝓝 x] fun t : ℝ => (Φ.nonlin i t).re := by
+    filter_upwards [Complex.continuous_ofReal.continuousAt.preimage_mem_nhds
+      ((isOpen_nbhd ε).mem_nhds hx')] with t ht using hfirst t ht
+  obtain ⟨U, hUo, hU, -, hnl⟩ := Φ.exists_differentiableOn_nonlin i
+  rw [iteratedDeriv_succ', heq.iteratedDeriv_eq]
+  exact iteratedDeriv_re_ofReal hUo hnl k (hU (subset_closure hx'))
 
 /-- The term with index `n` (from `0`) of the formula of Lemma 2.7 for `H_w^{(k)}`: with `v` the
 first `n` letters of `w` and `i` the next one, the sum over partitions `π` of `{1, …, k+1}` of

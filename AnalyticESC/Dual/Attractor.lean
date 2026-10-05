@@ -1,6 +1,7 @@
 module
 
 public import AnalyticESC.Dual.Projection
+public import AnalyticESC.Dual.Hutchinson
 public import AnalyticESC.Analysis
 
 @[expose] public section
@@ -225,7 +226,7 @@ private theorem toNbhd_dualProj_inf_eq (w : ℕ → Fin N) (n : ℕ) :
 /-! ## The attractor `{H_i : i ∈ Σ}` -/
 
 /-- The coding map `w ↦ H_w` is continuous from `Σ` to the functions on `B_ε`. -/
-private theorem continuous_toNbhd_dualProj :
+theorem continuous_toNbhd_dualProj :
     Continuous fun w : ℕ → Fin N => toNbhd ε (Φ.dualProj (.inf w)) := by
   obtain ⟨M, -, -, hMd⟩ := Φ.exists_dualProj_bounds
   rw [continuous_iff_continuousAt]
@@ -242,24 +243,7 @@ private theorem continuous_toNbhd_dualProj :
     _ = Φ.cmax ^ m * (2 * M) := by ring
     _ < δ := hm
 
-/-- Lemma 2.4, last claim: `{H_i : i ∈ Σ}` is an attractor of the dual IFS. -/
-theorem isDualAttractor_range (hN : 0 < N) :
-    Φ.IsDualAttractor (range fun w : ℕ → Fin N => toNbhd ε (Φ.dualProj (.inf w))) := by
-  refine ⟨?_, ⟨_, ⟨fun _ => ⟨0, hN⟩, rfl⟩⟩, isCompact_range Φ.continuous_toNbhd_dualProj, ?_⟩
-  · rintro _ ⟨w, rfl⟩
-    exact Φ.dualProj_mem_analyticSpace w
-  · ext u
-    simp only [mem_iUnion, mem_image, mem_range]
-    constructor
-    · rintro ⟨w, rfl⟩
-      refine ⟨w 0, _, ⟨fun k => w (k + 1), rfl⟩, ?_⟩
-      rw [dualOpU_toNbhd_dualProj]
-      conv_rhs => rw [Word.inf_eq_prepend_singleton w]
-    · rintro ⟨i, _, ⟨w, rfl⟩, rfl⟩
-      obtain ⟨v, hv, -⟩ := Word.exists_prepend_singleton_inf i w
-      exact ⟨v, by rw [dualOpU_toNbhd_dualProj, hv]⟩
-
-/-! ## Uniqueness of the attractor -/
+/-! ## Coding the Hutchinson attractor -/
 
 private theorem dualOpU_mem_of_isDualAttractor {Λ : Set (nbhd ε →ᵤ ℂ)} (hΛ : Φ.IsDualAttractor Λ)
     (i : Fin N) {u : nbhd ε →ᵤ ℂ} (hu : u ∈ Λ) : Φ.dualOpU i u ∈ Λ := by
@@ -370,7 +354,13 @@ private theorem eq_range_of_isDualAttractor {Λ : Set (nbhd ε →ᵤ ℂ)} (hΛ
 
 /-- Lemma 2.1: the dual IFS has a unique attractor. -/
 theorem existsUnique_isDualAttractor (hN : 0 < N) : ∃! Λ, Φ.IsDualAttractor Λ :=
-  ⟨_, Φ.isDualAttractor_range hN, fun _ hΛ => Φ.eq_range_of_isDualAttractor hΛ⟩
+  Φ.existsUnique_isDualAttractor_hutchinson hN
+
+/-- Lemma 2.4, last claim: the Hutchinson attractor is `{H_i : i ∈ Σ}`. -/
+theorem isDualAttractor_range (hN : 0 < N) :
+    Φ.IsDualAttractor (range fun w : ℕ → Fin N => toNbhd ε (Φ.dualProj (.inf w))) := by
+  obtain ⟨Λ, hΛ, -⟩ := Φ.existsUnique_isDualAttractor hN
+  exact Φ.eq_range_of_isDualAttractor hΛ ▸ hΛ
 
 /-! ## Strong separation of the dual IFS -/
 
@@ -432,9 +422,9 @@ private theorem abs_ciSup_sub_ciSup_le {ι : Type*} [Nonempty ι] {f g : ι → 
   rw [abs_sub_le_iff, sub_le_iff_le_add, sub_le_iff_le_add]
   exact ⟨ciSup_le h1, ciSup_le h2⟩
 
-/-- Lemma 2.5, (a) ⇔ (c). -/
-theorem dualSSC_iff_exists_delta (hN : 0 < N) :
-    Φ.DualSSC ↔ ∃ δ > 0, ∀ i j : ℕ → Fin N, i 0 ≠ j 0 →
+/-- Compactness turns pointwise separation of first-letter branches into a uniform gap. -/
+theorem dualProj_ne_iff_exists_delta :
+    (∀ i j : ℕ → Fin N, i 0 ≠ j 0 → ∃ x ∈ I, Φ.dualProj (.inf i) x ≠ Φ.dualProj (.inf j) x) ↔ ∃ δ > 0, ∀ i j : ℕ → Fin N, i 0 ≠ j 0 →
       δ < ⨆ x : I, ‖Φ.dualProj (.inf i) ((x : ℝ) : ℂ) - Φ.dualProj (.inf j) ((x : ℝ) : ℂ)‖ := by
   obtain ⟨M, -, hM, hMd⟩ := Φ.exists_dualProj_bounds
   have : Nonempty I := ⟨⟨0, left_mem_Icc.2 zero_le_one⟩⟩
@@ -448,7 +438,6 @@ theorem dualSSC_iff_exists_delta (hN : 0 < N) :
     refine ⟨M + M, ?_⟩
     rintro _ ⟨x, rfl⟩
     exact (norm_sub_le _ _).trans (add_le_add (hM _ _ (hx x)) (hM _ _ (hx x)))
-  rw [Φ.dualSSC_iff_ne hN]
   constructor
   · intro h
     let S : Set ((ℕ → Fin N) × (ℕ → Fin N)) := {p | p.1 0 ≠ p.2 0}
@@ -501,6 +490,12 @@ theorem dualSSC_iff_exists_delta (hN : 0 < N) :
     have := h i j hij
     simp only [h0, ciSup_const] at this
     linarith
+
+/-- Lemma 2.5, (a) ⇔ (c). -/
+theorem dualSSC_iff_exists_delta (hN : 0 < N) :
+    Φ.DualSSC ↔ ∃ δ > 0, ∀ i j : ℕ → Fin N, i 0 ≠ j 0 →
+      δ < ⨆ x : I, ‖Φ.dualProj (.inf i) ((x : ℝ) : ℂ) - Φ.dualProj (.inf j) ((x : ℝ) : ℂ)‖ :=
+  (Φ.dualSSC_iff_ne hN).trans Φ.dualProj_ne_iff_exists_delta
 
 /-- An exact coincidence `f_a = f_b` on `I`, for words of equal length with different last
 letters, contradicts the strong separation of the dual. -/

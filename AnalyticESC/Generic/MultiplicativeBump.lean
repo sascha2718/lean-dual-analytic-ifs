@@ -40,13 +40,13 @@ with `F(t) = |4t² - 2t| e^{-t}`, and for `‖φ' ψ A'‖` it is the diagonal p
 point `y` of `𝒴`, which by (4.5) is far from the others, the choice (4.4) of `a_y` bounds the
 summand by `F_max δ |f'(y)|/|f(y)|`. The paper's "Hence `g ∈ S^ω([0,1])`" is `exists_inClass`.
 
-## Choices, details and repairs
+## Choices and details
 
 * All widths are equal, `η_y = ρ³`, and `(C1)`-`(C4)`, (4.5), (4.6) and the comparison near `𝒴`
   are conditions on `ρ`, which is taken small last. The conditions from (4.3) are imposed with
   `c = a_y` and a common right-hand side `ν`, which absorbs the fixed factors.
-* The bounds used with `(C1)` and `(C2)` take the factors `16Q² + 12Q` and `8Q` for `ψ`, `ψ'`,
-  `ψ''`. They fail for `𝒵 = ∅`, where `ψ = 1`; we use `16Q² + 12Q + 1` and `2(4Q + 1)`.
+* An empty `𝒵` is padded by a point outside `𝒴`, as in the manuscript. Thus `Q ≥ 1`, and the
+  factors `16Q² + 12Q` and `8Q` in `(C1)` and `(C2)` apply without changing them.
 * The paper writes out the near/far split for `‖φ'' ψ A‖` and leaves `‖φ ψ A''‖` and
   `‖φ' ψ A'‖` to the reader. These two norms are not small: near `y` they are of order
   `a_y ψ(y) ∏_{y' ≠ y} (y - y')² = δ |f'(y)|/(2 |f(y)|)`, so they contribute to `C δ`. Their
@@ -988,10 +988,10 @@ theorem sum_near_far_le (hY : ∀ y ∈ Y, y ∈ I) (hx : x ∈ I) {ρ B : ℝ} 
       linarith
   linarith
 
-/-- The factor `Λ(M, Q) = M (4M² + 10M + 3 L₀ + 4(4Q + 1))` with `L₀ = 2M(16Q² + 12Q + 1)`,
+/-- The factor `Λ(M, Q) = M (4M² + 10M + 3 L₀ + 16Q)` with `L₀ = 2M(16Q² + 12Q)`,
 collecting the small terms of `h`, `h'` and `h''`. -/
 noncomputable def coef (M Q : ℝ) : ℝ :=
-  M * (4 * M ^ 2 + 10 * M + 3 * (2 * M * (16 * Q ^ 2 + 12 * Q + 1)) + 4 * (4 * Q + 1))
+  M * (4 * M ^ 2 + 10 * M + 3 * (2 * M * (16 * Q ^ 2 + 12 * Q)) + 4 * (4 * Q))
 
 /-- The trivial bounds of the paper on `[0,1]`: `|ψ| ≤ 1`, `|ψ'| ≤ 4Q`, `|ψ''| ≤ 16Q² + 12Q`,
 `|φ| ≤ |x - y|²` and `|φ'| ≤ 2M |x - y|` for `y ∈ 𝒴`. -/
@@ -1015,7 +1015,7 @@ theorem trivial_bounds (hY : ∀ y ∈ Y, y ∈ I) (hZ : ∀ w ∈ Z, w ∈ I) (
 is the comparison of `ψ ∏_{y' ≠ y} (x - y')²` with its value at `y`, used with the choice (4.4)
 of the `a_y`. The terms `φ'' ψ A`, `φ ψ A''` and `φ' ψ A'` contribute `20 B` and the far terms of
 the near/far split. -/
-theorem norm_H_le (hY : ∀ y ∈ Y, y ∈ I) (hZ : ∀ w ∈ Z, w ∈ I) (hx : x ∈ I) {ρ ν B : ℝ}
+theorem norm_H_le (hY : ∀ y ∈ Y, y ∈ I) (hZ : ∀ w ∈ Z, w ∈ I) (hZne : Z.Nonempty) (hx : x ∈ I) {ρ ν B : ℝ}
     (hρ : 0 < ρ) (ha : ∀ k ∈ Y, 0 ≤ a k) (hν : 0 ≤ ν) (hB : 0 ≤ B)
     (h1 : ∀ k ∈ Y, a k * |x - k| * Real.exp (-(x - k) ^ 2 / ρ ^ 3) ≤ ν)
     (h2 : ∀ k ∈ Y, a k * |x - k| ^ 2 * Real.exp (-(x - k) ^ 2 / ρ ^ 3) ≤ ν)
@@ -1032,13 +1032,16 @@ theorem norm_H_le (hY : ∀ y ∈ Y, y ∈ I) (hZ : ∀ w ∈ Z, w ∈ I) (hx : 
   have hη : 0 < ρ ^ 3 := pow_pos hρ 3
   have hM0 : 0 ≤ M := Nat.cast_nonneg _
   have hQ0 : 0 ≤ Q := Nat.cast_nonneg _
+  have hQ1 : 1 ≤ Q := by
+    change (1 : ℝ) ≤ (Z.card : ℝ)
+    exact_mod_cast Nat.succ_le_of_lt (Finset.card_pos.2 hZne)
   have hQ2 : 0 ≤ Q ^ 2 := sq_nonneg Q
   have hxk : ∀ k ∈ Y, |x - k| ≤ 1 := fun k hk => by
     simpa [norm_ofReal_sub] using norm_ofReal_sub_le_one hx (hY k hk)
   have hM1 : ∀ k ∈ Y, 1 ≤ M := fun k hk => by
     rw [hM]
     exact_mod_cast Finset.card_pos.2 ⟨k, hk⟩
-  set Pc := 16 * Q ^ 2 + 12 * Q + 1 with hPc
+  set Pc := 16 * Q ^ 2 + 12 * Q with hPc
   set L₀ := 2 * M * Pc with hL₀
   have hφ0' : ∀ k ∈ Y, ‖P 0 Y x‖ ≤ 2 * M * |x - k| := fun k hk => by
     have h0 := abs_nonneg (x - k)
@@ -1055,10 +1058,10 @@ theorem norm_H_le (hY : ∀ y ∈ Y, y ∈ I) (hZ : ∀ w ∈ Z, w ∈ I) (hx : 
     calc ‖Φ‖ * ‖Ψ‖ ≤ (2 * M * |x - k|) * Pc :=
           mul_le_mul (hΦ k hk) hΨ (norm_nonneg _) (by positivity)
       _ = 2 * M * Pc * |x - k| := by ring
-  have hprod2 : ∀ Ψ : ℂ, ‖Ψ‖ ≤ 4 * Q + 1 →
-      ∀ k ∈ Y, ‖P 0 Y x * Ψ‖ ≤ (4 * Q + 1) * |x - k| ^ 2 := fun Ψ hΨ k hk => by
+  have hprod2 : ∀ Ψ : ℂ, ‖Ψ‖ ≤ 4 * Q →
+      ∀ k ∈ Y, ‖P 0 Y x * Ψ‖ ≤ (4 * Q) * |x - k| ^ 2 := fun Ψ hΨ k hk => by
     rw [norm_mul]
-    calc ‖P 0 Y x‖ * ‖Ψ‖ ≤ |x - k| ^ 2 * (4 * Q + 1) :=
+    calc ‖P 0 Y x‖ * ‖Ψ‖ ≤ |x - k| ^ 2 * (4 * Q) :=
           mul_le_mul (hφ0 k hk) hΨ (norm_nonneg _) (by positivity)
       _ = _ := by ring
   have h1' : ∀ k ∈ Y, a k * |x - k| ^ 1 * Real.exp (-(x - k) ^ 2 / ρ ^ 3) ≤ ν := fun k hk => by
@@ -1077,9 +1080,9 @@ theorem norm_H_le (hY : ∀ y ∈ Y, y ∈ I) (hZ : ∀ w ∈ Z, w ∈ I) (hx : 
   have g5 : ‖P1 0 Y x * P1 2 Z x * A a Y (ρ ^ 3) x‖ ≤ L₀ * (M * ν) :=
     norm_mul_A_le_of hL₀0 ha (hprod _ _ hφ1 hψ1') h1'
   -- the norms handled by `(C2)`
-  have g6 : ‖P 0 Y x * P 2 Z x * A1 a Y (ρ ^ 3) x‖ ≤ 2 * (4 * Q + 1) * (M * ν) :=
+  have g6 : ‖P 0 Y x * P 2 Z x * A1 a Y (ρ ^ 3) x‖ ≤ 2 * (4 * Q) * (M * ν) :=
     norm_mul_A1_le_of hη (by positivity) ha (hprod2 _ (by linarith)) h3
-  have g7 : ‖P 0 Y x * P1 2 Z x * A1 a Y (ρ ^ 3) x‖ ≤ 2 * (4 * Q + 1) * (M * ν) :=
+  have g7 : ‖P 0 Y x * P1 2 Z x * A1 a Y (ρ ^ 3) x‖ ≤ 2 * (4 * Q) * (M * ν) :=
     norm_mul_A1_le_of hη (by positivity) ha (hprod2 _ (by linarith)) h3
   -- the three remaining norms, and the near/far split
   have d1 := norm_P2_mul_A_le hY hZ hx ha h1' h2
@@ -1089,14 +1092,14 @@ theorem norm_H_le (hY : ∀ y ∈ Y, y ∈ I) (hZ : ∀ w ∈ Z, w ∈ I) (hx : 
   -- assembling the estimates
   have hMν : 0 ≤ M * ν := mul_nonneg hM0 hν
   have hcoef : coef M Q * ν = 4 * M ^ 2 * (M * ν) + 2 * M * (M * ν) + L₀ * (M * ν) +
-      2 * (L₀ * (M * ν)) + 2 * (4 * M * (M * ν)) + 2 * (2 * (4 * Q + 1) * (M * ν)) := by
+      2 * (L₀ * (M * ν)) + 2 * (4 * M * (M * ν)) + 2 * (2 * (4 * Q) * (M * ν)) := by
     simp only [coef, hL₀, hPc]
     ring
   have p1 : 0 ≤ 4 * M ^ 2 * (M * ν) := by positivity
   have p2 : 0 ≤ 2 * M * (M * ν) := by positivity
   have p3 : 0 ≤ L₀ * (M * ν) := by positivity
   have p4 : 0 ≤ 4 * M * (M * ν) := by positivity
-  have p5 : 0 ≤ 2 * (4 * Q + 1) * (M * ν) := by positivity
+  have p5 : 0 ≤ 2 * (4 * Q) * (M * ν) := by positivity
   have e2 : ∀ T : ℂ, ‖2 * T‖ = 2 * ‖T‖ := fun T => by rw [norm_mul, Complex.norm_two]
   refine ⟨?_, ?_, ?_⟩
   · show ‖P 0 Y x * P 2 Z x * A a Y (ρ ^ 3) x‖ ≤ coef M Q * ν
@@ -1206,9 +1209,9 @@ There is `C > 0` such that for all finite disjoint `𝒴, 𝒵 ⊆ [0,1]`, `η >
 `|g'' - f''| < C δ + η` on `[0,1]`. The paper writes `ε` for `η`. Here `g = f e^{φ ψ A}` with the
 amplitudes (4.4) and all widths equal to `ρ³` for a small `ρ > 0`, and `C = 40/m` for a margin
 `m` with `m ≤ f ≤ 1 - m` on `[0,1]`. -/
-theorem proposition_4_2 {ε : ℝ} (hε : 0 < ε) {f : ℂ → ℂ} (hf : InClass ε f)
+private theorem proposition_4_2_nonempty {ε : ℝ} (hε : 0 < ε) {f : ℂ → ℂ} (hf : InClass ε f)
     (hI : ∀ x ∈ I, (f x).re ∈ Ioo 0 1) :
-    ∃ C > 0, ∀ Y Z : Finset ℝ, (∀ y ∈ Y, y ∈ I) → (∀ z ∈ Z, z ∈ I) → Disjoint Y Z →
+    ∃ C > 0, ∀ Y Z : Finset ℝ, (∀ y ∈ Y, y ∈ I) → (∀ z ∈ Z, z ∈ I) → Disjoint Y Z → Z.Nonempty →
       ∀ η > 0, ∀ δ > 0, ∃ g : ℂ → ℂ, (∃ ε' > 0, InClass ε' g) ∧
         (∀ y ∈ Y ∪ Z, g y = f y ∧ deriv g y = deriv f y) ∧
         (∀ z ∈ Z, deriv (deriv g) z = deriv (deriv f) z) ∧
@@ -1237,7 +1240,7 @@ theorem proposition_4_2 {ε : ℝ} (hε : 0 < ε) {f : ℂ → ℂ} (hf : InClas
   have hf1 : ∀ x ∈ I, m ≤ ‖deriv f x‖ ∧ ‖deriv f x‖ ≤ 1 := fun x hx => by
     obtain ⟨-, -, h1, h2⟩ := hmar x hx
     constructor <;> linarith
-  refine ⟨40 / m, by positivity, fun Y Z hY hZ hYZ η hη δ hδ => ?_⟩
+  refine ⟨40 / m, by positivity, fun Y Z hY hZ hYZ hZne η hη δ hδ => ?_⟩
   have hWI : ∀ w ∈ Y ∪ Z, w ∈ I := fun w hw => (Finset.mem_union.1 hw).elim (hY w) (hZ w)
   -- the amplitudes (4.4)
   set N : ℝ → ℝ := fun k => ‖P 2 Z k * P 0 (Y.erase k) k‖ with hN_def
@@ -1315,7 +1318,7 @@ theorem proposition_4_2 {ε : ℝ} (hε : 0 < ε) {f : ℂ → ℂ} (hf : InClas
         _ ≤ δ * 1 / m := by
             gcongr
         _ = δ / m := by ring
-    obtain ⟨n0, n1, n2⟩ := norm_H_le hY hZ hx hρ (fun k hk => (ha k hk).le) hν.le
+    obtain ⟨n0, n1, n2⟩ := norm_H_le hY hZ hZne hx hρ (fun k hk => (ha k hk).le) hν.le
       (by positivity : 0 ≤ δ / m) (fun k hk => E1 k hk (x - k)) (fun k hk => E2 k hk (x - k))
       (fun k hk => E3 k hk (x - k)) Esep hnear
     rw [← hΛ] at n0 n1 n2
@@ -1399,5 +1402,38 @@ theorem proposition_4_2 {ε : ℝ} (hε : 0 < ε) {f : ℂ → ℂ} (hf : InClas
   · have h := (hest x hx).2.2
     have e : 2 * (20 * (δ / m)) = 40 / m * δ := by ring
     linarith
+
+/-- Proposition 4.2. As in the manuscript, pad an empty `Z` by a point of `I \ Y`
+before making the multiplicative perturbation. -/
+theorem proposition_4_2 {ε : ℝ} (hε : 0 < ε) {f : ℂ → ℂ} (hf : InClass ε f)
+    (hI : ∀ x ∈ I, (f x).re ∈ Ioo 0 1) :
+    ∃ C > 0, ∀ Y Z : Finset ℝ, (∀ y ∈ Y, y ∈ I) → (∀ z ∈ Z, z ∈ I) → Disjoint Y Z →
+      ∀ η > 0, ∀ δ > 0, ∃ g : ℂ → ℂ, (∃ ε' > 0, InClass ε' g) ∧
+        (∀ y ∈ Y ∪ Z, g y = f y ∧ deriv g y = deriv f y) ∧
+        (∀ z ∈ Z, deriv (deriv g) z = deriv (deriv f) z) ∧
+        (∀ y ∈ Y, δ ≤ ‖deriv (deriv g) y / deriv g y - deriv (deriv f) y / deriv f y‖) ∧
+        (∀ x ∈ I, ‖g x - f x‖ < η) ∧ (∀ x ∈ I, ‖deriv g x - deriv f x‖ < η) ∧
+        (∀ x ∈ I, ‖deriv (deriv g) x - deriv (deriv f) x‖ < C * δ + η) := by
+  classical
+  obtain ⟨C, hC, h⟩ := proposition_4_2_nonempty hε hf hI
+  refine ⟨C, hC, fun Y Z hY hZ hYZ η hη δ hδ => ?_⟩
+  by_cases hYe : Y = ∅
+  · subst Y
+    refine ⟨f, ⟨ε, hε, hf⟩, fun _ _ => ⟨rfl, rfl⟩, fun _ _ => rfl,
+      by simp, ?_, ?_, ?_⟩
+    · intro x hx; simpa using hη
+    · intro x hx; simpa using hη
+    · intro x hx; simpa using add_pos (mul_pos hC hδ) hη
+  by_cases hZe : Z.Nonempty
+  · exact h Y Z hY hZ hYZ hZe η hη δ hδ
+  obtain ⟨z, hzI, hzY⟩ := (Set.Icc_infinite zero_lt_one).sdiff (Y.finite_toSet) |>.nonempty
+  have hZempty : Z = ∅ := Finset.not_nonempty_iff_eq_empty.1 hZe
+  obtain ⟨g, hg, hagree, hsecond, hchange, h0, h1, h2⟩ :=
+    h Y {z} hY (by simpa using hzI) (Finset.disjoint_singleton_right.2 hzY)
+      (Finset.singleton_nonempty z) η hη δ hδ
+  refine ⟨g, hg, fun y hy => hagree y ?_, ?_, hchange, h0, h1, h2⟩
+  · simpa only [hZempty, Finset.union_empty] using Finset.mem_union_left {z}
+      (by simpa [hZempty] using hy : y ∈ Y)
+  · simp [hZempty]
 
 end AnalyticESC

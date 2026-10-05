@@ -2,24 +2,21 @@ module
 
 public import AnalyticESC.Dual.Projection
 public import AnalyticESC.Analysis
+public import AnalyticESC.Analysis.Primitive
 
 @[expose] public section
 
 /-!
 # The linearisation of a single map
 
-For a map `f` of the class with fixed point `p ∈ I`: the function `Ĥ_f` of (5.1), and the
-linearising map `ĝ(z) = lim_{n → ∞} (f^n(z) - p)/f'(p)^n` of (5.2), which is holomorphic on `B_ε`
-and continuous on `cl B_ε`, satisfies `ĝ ∘ f = f'(p) ĝ` and `ĝ'' = Ĥ_f ĝ'`, and has positive
-derivative on `I`.
+For a map `f` of the class with fixed point `p ∈ I`, define `Ĥ_f` by (5.1) and
+`ĝ(z) = ∫ₚᶻ exp(∫ₚʷ Ĥ_f) dw`, as in Lemma 5.1. Segment integration gives holomorphy on
+`B_ε`, continuity on its closure, the ODE `ĝ'' = Ĥ_f ĝ'`, and positivity of `ĝ'` on `I`.
 
-The paper defines `ĝ` by integrating `Ĥ_f` and derives (5.2); here `ĝ` is the limit (5.2). With
-`λ = f'(p)`, the maps `ĝ_n(z) = (f^n(z) - p)/λ^n` have derivatives
-`P_n(z) = (f^n)'(z)/λ^n = ∏_{k<n} f'(f^k(z))/λ`. The factors satisfy
-`|f'(f^k(z))/λ - 1| ≤ A c_max^k` on `B_ε`, so the `P_n` are uniformly bounded, and `|P_{n+1} - P_n|`
-and, by the mean value inequality, `|ĝ_{n+1} - ĝ_n|` decay geometrically. Hence `ĝ` and
-`ĝ' = lim P_n` are sums of uniformly convergent series of holomorphic maps, and
-`ĝ'' = lim P_n' = lim Ĥ_n P_n = Ĥ_f ĝ'`, where `Ĥ_n` is the partial sum of (5.1).
+For the partial sums `Ĥ_n`, integrating the logarithmic derivative gives
+`exp(∫ₚᶻ Ĥ_n) = (f^n)'(z)/f'(p)^n = ∏_{k<n} f'(f^k(z))/f'(p)`. Passing to the limit under the
+integral yields (5.2), and shifting that limit proves `ĝ ∘ f = f'(p) ĝ`. The same limit,
+combined with commutativity, is used in the singleton case of Theorem 2.3.
 -/
 
 namespace AnalyticESC
@@ -30,9 +27,9 @@ open Set Metric Filter Topology
 noncomputable def hatH (f : ℂ → ℂ) (z : ℂ) : ℂ :=
   ∑' k, deriv (deriv f) (f^[k] z) / deriv f (f^[k] z) * deriv (f^[k]) z
 
-/-- The linearising map `ĝ(z) = lim_{n → ∞} (f^n(z) - p)/f'(p)^n` of (5.2). -/
+/-- The ODE solution `ĝ(z) = ∫ₚᶻ exp(∫ₚʷ Ĥ_f) dw` from Lemma 5.1. -/
 noncomputable def koenigs (f : ℂ → ℂ) (p : ℂ) (z : ℂ) : ℂ :=
-  limUnder atTop fun n : ℕ => (f^[n] z - p) / deriv f p ^ n
+  segmentPrimitive (fun w => Complex.exp (segmentPrimitive (hatH f) p w)) p z
 
 /-! ## Auxiliary definitions -/
 
@@ -52,41 +49,11 @@ private noncomputable def gSeq (f : ℂ → ℂ) (p : ℂ) (n : ℕ) (z : ℂ) :
 private noncomputable def PSeq (f : ℂ → ℂ) (p : ℂ) (n : ℕ) (z : ℂ) : ℂ :=
   deriv (f^[n]) z / deriv f p ^ n
 
-private theorem gSeq_zero (f : ℂ → ℂ) (q z : ℂ) : gSeq f q 0 z = z - q := by simp [gSeq]
-
 private theorem PSeq_zero (f : ℂ → ℂ) (q z : ℂ) : PSeq f q 0 z = 1 := by simp [PSeq]
 
 private theorem gSeq_fixed {f : ℂ → ℂ} {q : ℂ} (hfq : f q = q) (n : ℕ) : gSeq f q n q = 0 := by
   simp [gSeq, Function.iterate_fixed hfq n]
 
-/-- `ĝ_n = ĝ_0 + ∑_{k<n} (ĝ_{k+1} - ĝ_k)`. -/
-private theorem gSeq_eq_sum (f : ℂ → ℂ) (q : ℂ) (n : ℕ) (z : ℂ) :
-    gSeq f q n z = z - q + ∑ k ∈ Finset.range n, (gSeq f q (k + 1) z - gSeq f q k z) := by
-  rw [Finset.sum_range_sub (fun k => gSeq f q k z), gSeq_zero]
-  ring
-
-/-- `P_n = P_0 + ∑_{k<n} (P_{k+1} - P_k)`. -/
-private theorem PSeq_eq_sum (f : ℂ → ℂ) (q : ℂ) (n : ℕ) (z : ℂ) :
-    PSeq f q n z = 1 + ∑ k ∈ Finset.range n, (PSeq f q (k + 1) z - PSeq f q k z) := by
-  rw [Finset.sum_range_sub (fun k => PSeq f q k z), PSeq_zero]
-  ring
-
-/-- A complex number with zero imaginary part is real. -/
-private theorem eq_ofReal_re_of_im_eq_zero {w : ℂ} (h : w.im = 0) : w = (w.re : ℂ) :=
-  Complex.ext (by simp) (by simp [h])
-
-/-- A limit of products of positive factors `a_k` with `∑ |a_k - 1| < ∞` is positive. -/
-private theorem pos_of_tendsto_prod {a : ℕ → ℝ} (ha : ∀ k, 0 < a k)
-    (hs : Summable fun k => a k - 1) {r : ℝ}
-    (hr : Tendsto (fun n => ∏ k ∈ Finset.range n, a k) atTop (𝓝 r)) : 0 < r := by
-  have hlog : Summable fun k => Real.log (a k) := by
-    simpa using Real.summable_log_one_add_of_summable hs
-  have h1 : Tendsto (fun n => ∏ k ∈ Finset.range n, a k) atTop
-      (𝓝 (Real.exp (∑' k, Real.log (a k)))) := by
-    refine ((Real.continuous_exp.tendsto _).comp hlog.hasSum.tendsto_sum_nat).congr fun n => ?_
-    simp [Function.comp, Real.exp_sum, Real.exp_log (ha _)]
-  rw [tendsto_nhds_unique hr h1]
-  exact Real.exp_pos _
 
 section
 
@@ -291,175 +258,144 @@ private theorem exists_norm_PSeq_le : ∃ B, 0 ≤ B ∧ ∀ n, ∀ z ∈ nbhd �
     _ = Real.exp (∑ k ∈ Finset.range n, ‖b k‖) := by ring
     _ ≤ Real.exp (A / (1 - c)) := Real.exp_le_exp.2 hsum
 
-/-- `|P_{n+1} - P_n| ≤ C c_max^n` on `B_ε`. -/
-private theorem exists_norm_PSeq_sub_le : ∃ C, 0 ≤ C ∧ ∀ n, ∀ z ∈ nbhd ε,
-    ‖PSeq f q (n + 1) z - PSeq f q n z‖ ≤ C * (koenigsIFS hε hf).cmax ^ n := by
-  obtain ⟨A, hA0, hA⟩ := exists_norm_ratio_sub_one_le hε hf hq hfq
-  obtain ⟨B, hB0, hB⟩ := exists_norm_PSeq_le hε hf hq hfq
-  refine ⟨B * A, mul_nonneg hB0 hA0, fun n z hz => ?_⟩
-  rw [PSeq_succ hε hf hq n (subset_closure hz), ← mul_sub_one, norm_mul, mul_assoc]
-  exact mul_le_mul (hB n z hz) (hA n z hz) (norm_nonneg _) hB0
+section ODEConstruction
 
-/-- `|ĝ_{n+1} - ĝ_n| ≤ C c_max^n` on `B_ε`, by the mean value inequality. -/
-private theorem exists_norm_gSeq_sub_le : ∃ C, 0 ≤ C ∧ ∀ n, ∀ z ∈ nbhd ε,
-    ‖gSeq f q (n + 1) z - gSeq f q n z‖ ≤ C * (koenigsIFS hε hf).cmax ^ n := by
-  obtain ⟨C, hC0, hC⟩ := exists_norm_PSeq_sub_le hε hf hq hfq
-  obtain ⟨R, hR⟩ := (isBounded_nbhd ε).exists_norm_le
-  have hR0 : 0 ≤ R := (norm_nonneg q).trans (hR q hq)
-  have hc0 := cmax_nonneg' hε hf
-  set c := (koenigsIFS hε hf).cmax
-  refine ⟨C * (R + R), mul_nonneg hC0 (by linarith), fun n z hz => ?_⟩
-  have hd : ∀ w ∈ nbhd ε, HasDerivAt (fun w => gSeq f q (n + 1) w - gSeq f q n w)
-      (PSeq f q (n + 1) w - PSeq f q n w) w := fun w hw =>
-    (hasDerivAt_gSeq hε hf (n + 1) (subset_closure hw)).sub
-      (hasDerivAt_gSeq hε hf n (subset_closure hw))
-  have h := (convex_nbhd ε).norm_image_sub_le_of_norm_deriv_le
-    (fun w hw => (hd w hw).differentiableAt)
-    (fun w hw => by rw [(hd w hw).deriv]; exact hC n w hw) hq hz
-  simp only [gSeq_fixed hfq, sub_zero] at h
-  calc _ ≤ C * c ^ n * ‖z - q‖ := h
-    _ ≤ C * c ^ n * (R + R) := mul_le_mul_of_nonneg_left
-        ((norm_sub_le _ _).trans (add_le_add (hR z hz) (hR q hq))) (by positivity)
-    _ = C * (R + R) * c ^ n := by ring
+omit hfq
 
-/-! ## Convergence -/
+/-! ## Constructing the solution of the ODE by two integrations -/
 
-/-- The same geometric bound holds on the closure, by continuity of the approximants. -/
-private theorem exists_norm_gSeq_sub_le_closure :
-    ∃ C, 0 ≤ C ∧ ∀ n, ∀ z ∈ closure (nbhd ε),
-      ‖gSeq f q (n + 1) z - gSeq f q n z‖ ≤ C * (koenigsIFS hε hf).cmax ^ n := by
-  obtain ⟨C, hC0, hC⟩ := exists_norm_gSeq_sub_le hε hf hq hfq
-  refine ⟨C, hC0, fun n z hz => le_on_closure (hC n) ?_ continuousOn_const hz⟩
-  have hc : ContinuousOn (fun w => gSeq f q (n + 1) w - gSeq f q n w)
-      (closure (nbhd ε)) := fun w hw =>
-    ((hasDerivAt_gSeq hε hf (n + 1) hw).continuousAt.sub
-      (hasDerivAt_gSeq hε hf n hw).continuousAt).continuousWithinAt
-  exact hc.norm
+private theorem hasDerivAt_hatHPrimitive {z : ℂ} (hz : z ∈ nbhd ε) :
+    HasDerivAt (segmentPrimitive (hatH f) q) (hatH f z) z :=
+  hasDerivAt_segmentPrimitive (isOpen_nbhd ε) (convex_nbhd ε)
+    (differentiableOn_hatH hε hf) hq hz
 
-private theorem tendsto_gSeq {z : ℂ} (hz : z ∈ closure (nbhd ε)) :
-    Tendsto (fun n => gSeq f q n z) atTop
-      (𝓝 (z - q + ∑' k, (gSeq f q (k + 1) z - gSeq f q k z))) := by
-  obtain ⟨C, -, hC⟩ := exists_norm_gSeq_sub_le_closure hε hf hq hfq
-  have hs : Summable fun k => gSeq f q (k + 1) z - gSeq f q k z :=
-    (summable_geometric_cmax hε hf C).of_norm_bounded fun k => hC k z hz
-  exact (hs.hasSum.tendsto_sum_nat.const_add (z - q)).congr fun n => (gSeq_eq_sum f q n z).symm
+private theorem hasDerivAt_koenigs' {z : ℂ} (hz : z ∈ nbhd ε) :
+    HasDerivAt (koenigs f q) (Complex.exp (segmentPrimitive (hatH f) q z)) z := by
+  change HasDerivAt (segmentPrimitive (fun w => Complex.exp (segmentPrimitive (hatH f) q w)) q)
+    (Complex.exp (segmentPrimitive (hatH f) q z)) z
+  exact hasDerivAt_segmentPrimitive (isOpen_nbhd ε) (convex_nbhd ε)
+    (fun w hw => ((hasDerivAt_hatHPrimitive hε hf hq hw).cexp).differentiableAt.differentiableWithinAt)
+    hq hz
 
-/-- `ĝ = (z - p) + ∑_k (ĝ_{k+1} - ĝ_k)` on `cl B_ε`. -/
-private theorem koenigs_eq_tsum {z : ℂ} (hz : z ∈ closure (nbhd ε)) :
-    koenigs f q z = z - q + ∑' k, (gSeq f q (k + 1) z - gSeq f q k z) :=
-  (tendsto_gSeq hε hf hq hfq hz).limUnder_eq
+private theorem differentiableOn_koenigs' : DifferentiableOn ℂ (koenigs f q) (nbhd ε) :=
+  fun _ hz => (hasDerivAt_koenigs' hε hf hq hz).differentiableAt.differentiableWithinAt
 
-private theorem tendsto_koenigs {z : ℂ} (hz : z ∈ nbhd ε) :
-    Tendsto (fun n => gSeq f q n z) atTop (𝓝 (koenigs f q z)) := by
-  rw [koenigs_eq_tsum hε hf hq hfq (subset_closure hz)]
-  exact tendsto_gSeq hε hf hq hfq (subset_closure hz)
-
-/-- The linearising limit is continuous up to the boundary, by uniform convergence on
-`cl B_ε`. -/
 private theorem continuousOn_koenigs' : ContinuousOn (koenigs f q) (closure (nbhd ε)) := by
-  obtain ⟨C, -, hC⟩ := exists_norm_gSeq_sub_le_closure hε hf hq hfq
-  have hc : ∀ n, ContinuousOn (fun z => gSeq f q (n + 1) z - gSeq f q n z)
-      (closure (nbhd ε)) := fun n z hz =>
-    ((hasDerivAt_gSeq hε hf (n + 1) hz).continuousAt.sub
-      (hasDerivAt_gSeq hε hf n hz).continuousAt).continuousWithinAt
-  exact ((continuousOn_id.sub continuousOn_const).add
-    (continuousOn_tsum hc (summable_geometric_cmax hε hf C) hC)).congr
-    (fun z hz => koenigs_eq_tsum hε hf hq hfq hz)
-
-omit hq hfq in
-private theorem differentiableOn_gSeq_sub (k : ℕ) :
-    DifferentiableOn ℂ (fun w => gSeq f q (k + 1) w - gSeq f q k w) (nbhd ε) := fun _ hw =>
-  ((hasDerivAt_gSeq hε hf (k + 1) (subset_closure hw)).sub
-    (hasDerivAt_gSeq hε hf k (subset_closure hw))).differentiableAt.differentiableWithinAt
-
-private theorem differentiableOn_koenigs' : DifferentiableOn ℂ (koenigs f q) (nbhd ε) := by
-  obtain ⟨C, -, hC⟩ := exists_norm_gSeq_sub_le hε hf hq hfq
-  have h : DifferentiableOn ℂ
-      (fun w => w - q + ∑' k, (gSeq f q (k + 1) w - gSeq f q k w)) (nbhd ε) :=
-    (differentiableOn_id.sub_const q).add (Complex.differentiableOn_tsum_of_summable_norm
-      (summable_geometric_cmax hε hf C) (differentiableOn_gSeq_sub hε hf) (isOpen_nbhd ε)
-      fun k w hw => hC k w hw)
-  exact h.congr fun w hw => koenigs_eq_tsum hε hf hq hfq (subset_closure hw)
-
-/-- `ĝ' = 1 + ∑_k (P_{k+1} - P_k)` on `B_ε`. -/
-private theorem hasDerivAt_koenigs {z : ℂ} (hz : z ∈ nbhd ε) :
-    HasDerivAt (koenigs f q) (1 + ∑' k, (PSeq f q (k + 1) z - PSeq f q k z)) z := by
-  obtain ⟨C, -, hC⟩ := exists_norm_gSeq_sub_le hε hf hq hfq
-  have ho := isOpen_nbhd ε
-  have hSd : DifferentiableOn ℂ (fun w => ∑' k, (gSeq f q (k + 1) w - gSeq f q k w))
-      (nbhd ε) :=
-    Complex.differentiableOn_tsum_of_summable_norm (summable_geometric_cmax hε hf C)
-      (differentiableOn_gSeq_sub hε hf) ho fun k w hw => hC k w hw
-  have hsum := Complex.hasSum_deriv_of_summable_norm (summable_geometric_cmax hε hf C)
-    (differentiableOn_gSeq_sub hε hf) ho (fun k w hw => hC k w hw) hz
-  have hderiv : ∀ k, deriv (fun w => gSeq f q (k + 1) w - gSeq f q k w) z =
-      PSeq f q (k + 1) z - PSeq f q k z := fun k =>
-    ((hasDerivAt_gSeq hε hf (k + 1) (subset_closure hz)).sub
-      (hasDerivAt_gSeq hε hf k (subset_closure hz))).deriv
-  simp only [hderiv] at hsum
-  rw [hsum.tsum_eq]
-  have h1 : HasDerivAt (fun w => w - q + ∑' k, (gSeq f q (k + 1) w - gSeq f q k w))
-      (1 + deriv (fun w => ∑' k, (gSeq f q (k + 1) w - gSeq f q k w)) z) z :=
-    ((hasDerivAt_id z).sub_const q).add (hSd.differentiableAt (ho.mem_nhds hz)).hasDerivAt
-  refine h1.congr_of_eventuallyEq ?_
-  filter_upwards [ho.mem_nhds hz] with w hw using koenigs_eq_tsum hε hf hq hfq (subset_closure hw)
+  have hH : ContinuousOn (hatH f) (closure (nbhd ε)) := by
+    rw [hatH_eq_dualProj hε hf]
+    exact (koenigsIFS hε hf).continuousOn_dualProj _
+  exact continuousOn_segmentPrimitive (convex_nbhd ε).closure
+    ((continuousOn_segmentPrimitive (convex_nbhd ε).closure hH (subset_closure hq)).cexp)
+    (subset_closure hq)
 
 private theorem deriv_koenigs_eq {z : ℂ} (hz : z ∈ nbhd ε) :
-    deriv (koenigs f q) z = 1 + ∑' k, (PSeq f q (k + 1) z - PSeq f q k z) :=
-  (hasDerivAt_koenigs hε hf hq hfq hz).deriv
+    deriv (koenigs f q) z = Complex.exp (segmentPrimitive (hatH f) q z) :=
+  (hasDerivAt_koenigs' hε hf hq hz).deriv
+
+private theorem deriv_deriv_koenigs' {z : ℂ} (hz : z ∈ nbhd ε) :
+    deriv (deriv (koenigs f q)) z = hatH f z * deriv (koenigs f q) z := by
+  have heq : deriv (koenigs f q) =ᶠ[𝓝 z] fun w => Complex.exp (segmentPrimitive (hatH f) q w) :=
+    Filter.eventuallyEq_of_mem ((isOpen_nbhd ε).mem_nhds hz)
+      (fun w hw => deriv_koenigs_eq hε hf hq hw)
+  rw [heq.deriv_eq, ((hasDerivAt_hatHPrimitive hε hf hq hz).cexp).deriv,
+    deriv_koenigs_eq hε hf hq hz]
+  ring
+
+private theorem deriv_koenigs_self' : deriv (koenigs f q) q = 1 := by
+  rw [deriv_koenigs_eq hε hf hq hq, segmentPrimitive_self, Complex.exp_zero]
+
+end ODEConstruction
+
+/-! ## Integrating the logarithmic derivatives, then taking the product limit -/
+
+private noncomputable def partialH (f : ℂ → ℂ) (n : ℕ) (z : ℂ) :=
+  ∑ k ∈ Finset.range n, hatHTerm f k z
+
+omit hq hfq in
+private theorem differentiableOn_partialH (n : ℕ) :
+    DifferentiableOn ℂ (partialH f n) (nbhd ε) := by
+  apply DifferentiableOn.fun_sum
+  intro k hk
+  have h := (koenigsIFS hε hf).differentiableOn_dualTerm (.inf fun _ => 0) k
+  have heq : (koenigsIFS hε hf).dualTerm (.inf fun _ => 0) k = hatHTerm f k :=
+    funext (dualTerm_koenigsIFS hε hf k)
+  rw [← heq]
+  exact h
+
+/-- The exponential of the integrated finite logarithmic-derivative sum is the finite
+product `P_n = (f^n)'/λ^n`. This is the finite version of the displayed integral identity
+in the proof of Lemma 5.1. -/
+private theorem PSeq_eq_exp_primitive (n : ℕ) {z : ℂ} (hz : z ∈ nbhd ε) :
+    PSeq f q n z = Complex.exp (segmentPrimitive (partialH f n) q z) := by
+  let E (w : ℂ) := Complex.exp (segmentPrimitive (partialH f n) q w)
+  have hE : ∀ w ∈ nbhd ε, HasDerivAt E (E w * partialH f n w) w := fun w hw =>
+    (hasDerivAt_segmentPrimitive (isOpen_nbhd ε) (convex_nbhd ε)
+      (differentiableOn_partialH hε hf n) hq hw).cexp
+  have hP : ∀ w ∈ nbhd ε, HasDerivAt (PSeq f q n) (partialH f n w * PSeq f q n w) w := by
+    intro w hw
+    rw [partialH, ← deriv_PSeq hε hf (q := q) n (subset_closure hw)]
+    exact ((differentiableOn_PSeq hε hf n).differentiableAt ((isOpen_nbhd ε).mem_nhds hw)).hasDerivAt
+  have hQ : ∀ w ∈ nbhd ε, HasDerivAt (fun w => PSeq f q n w / E w) 0 w := by
+    intro w hw
+    convert! (hP w hw).div (hE w hw) (Complex.exp_ne_zero _) using 1
+    field_simp
+    ring
+  have hconst := (isOpen_nbhd ε).is_const_of_deriv_eq_zero (isPreconnected_nbhd ε)
+    (fun w hw => (hQ w hw).differentiableAt.differentiableWithinAt)
+    (fun w hw => (hQ w hw).deriv) hz hq
+  have hPq : PSeq f q n q = 1 := by
+    rw [PSeq_eq_prod hε hf hq n (subset_closure hq)]
+    exact Finset.prod_eq_one fun k _ => by
+      rw [Function.iterate_fixed hfq k, div_self (deriv_ne_zero_fixed hf hq)]
+  have hEq : E q = 1 := by simp [E]
+  rw [hPq, hEq, div_one, div_eq_one_iff_eq (Complex.exp_ne_zero _)] at hconst
+  exact hconst
+
+omit hq hfq in
+private theorem exists_partialH_bound : ∃ B, ∀ n, ∀ z ∈ nbhd ε, ‖partialH f n z‖ ≤ B := by
+  obtain ⟨C, hC0, hC⟩ := (koenigsIFS hε hf).exists_dualTerm_bound
+  let c := (koenigsIFS hε hf).cmax
+  refine ⟨C / (1 - c), fun n z hz => ?_⟩
+  calc ‖partialH f n z‖ ≤ ∑ k ∈ Finset.range n, ‖hatHTerm f k z‖ := norm_sum_le _ _
+    _ ≤ ∑ k ∈ Finset.range n, C * c ^ k := Finset.sum_le_sum fun k hk => by
+      rw [← dualTerm_koenigsIFS hε hf k z]
+      exact hC (.inf fun _ => 0) k z (subset_closure hz)
+    _ = C * ∑ k ∈ Finset.Ico 0 n, c ^ k := by rw [Finset.mul_sum, Finset.range_eq_Ico]
+    _ ≤ C * (c ^ 0 / (1 - c)) := mul_le_mul_of_nonneg_left
+      (geom_sum_Ico_le_of_lt_one (cmax_nonneg' hε hf) (cmax_lt_one' hε hf)) hC0
+    _ = _ := by rw [pow_zero]; ring
 
 private theorem tendsto_PSeq {z : ℂ} (hz : z ∈ nbhd ε) :
     Tendsto (fun n => PSeq f q n z) atTop (𝓝 (deriv (koenigs f q) z)) := by
-  obtain ⟨C, -, hC⟩ := exists_norm_PSeq_sub_le hε hf hq hfq
-  have hs : Summable fun k => PSeq f q (k + 1) z - PSeq f q k z :=
-    (summable_geometric_cmax hε hf C).of_norm_bounded fun k => hC k z hz
-  rw [deriv_koenigs_eq hε hf hq hfq hz]
-  exact (hs.hasSum.tendsto_sum_nat.const_add 1).congr fun n => (PSeq_eq_sum f q n z).symm
+  obtain ⟨B, hB⟩ := exists_partialH_bound hε hf
+  have hlim := tendsto_segmentPrimitive (convex_nbhd ε)
+    (fun n => (differentiableOn_partialH hε hf n).continuousOn) hB
+    (fun w hw => (summable_hatHTerm hε hf (subset_closure hw)).hasSum.tendsto_sum_nat) hq hz
+  rw [deriv_koenigs_eq hε hf hq hz]
+  exact ((Complex.continuous_exp.tendsto _).comp hlim).congr
+    (fun n => (PSeq_eq_exp_primitive hε hf hq hfq n hz).symm)
 
-/-- `ĝ'' = Ĥ_f ĝ'` on `B_ε`, as the limit of `P_n' = Ĥ_n P_n`. -/
-private theorem deriv_deriv_koenigs' {z : ℂ} (hz : z ∈ nbhd ε) :
-    deriv (deriv (koenigs f q)) z = hatH f z * deriv (koenigs f q) z := by
-  obtain ⟨C, -, hC⟩ := exists_norm_PSeq_sub_le hε hf hq hfq
-  have ho := isOpen_nbhd ε
-  have hdiff : ∀ k, DifferentiableOn ℂ (fun w => PSeq f q (k + 1) w - PSeq f q k w) (nbhd ε) :=
-    fun k => (differentiableOn_PSeq hε hf (k + 1)).sub (differentiableOn_PSeq hε hf k)
-  have hsum := Complex.hasSum_deriv_of_summable_norm (summable_geometric_cmax hε hf C) hdiff ho
-    (fun k w hw => hC k w hw) hz
-  have heq : deriv (koenigs f q) =ᶠ[𝓝 z]
-      fun w => 1 + ∑' k, (PSeq f q (k + 1) w - PSeq f q k w) := by
-    filter_upwards [ho.mem_nhds hz] with w hw using deriv_koenigs_eq hε hf hq hfq hw
-  rw [heq.deriv_eq, deriv_const_add]
-  -- the partial sums of the derivatives are the `P_n'`
-  have hda : ∀ k, DifferentiableAt ℂ (PSeq f q k) z := fun k =>
-    (differentiableOn_PSeq hε hf k).differentiableAt (ho.mem_nhds hz)
-  have hpartial : ∀ n, ∑ k ∈ Finset.range n,
-      deriv (fun w => PSeq f q (k + 1) w - PSeq f q k w) z = deriv (PSeq f q n) z := by
+/-- Equation (5.2), deduced by integrating the derivative products after constructing `ĝ`
+from the ODE. -/
+private theorem tendsto_koenigs {z : ℂ} (hz : z ∈ nbhd ε) :
+    Tendsto (fun n => gSeq f q n z) atTop (𝓝 (koenigs f q z)) := by
+  obtain ⟨B, -, hB⟩ := exists_norm_PSeq_le hε hf hq hfq
+  have hlim := tendsto_segmentPrimitive (convex_nbhd ε)
+    (fun n => (differentiableOn_PSeq hε hf n).continuousOn) hB
+    (fun w hw => tendsto_PSeq hε hf hq hfq hw) hq hz
+  have heq : ∀ n, segmentPrimitive (PSeq f q n) q z = gSeq f q n z := by
     intro n
-    rw [Finset.sum_congr rfl fun k _ => deriv_fun_sub (hda (k + 1)) (hda k),
-      Finset.sum_range_sub (fun k => deriv (PSeq f q k) z)]
-    have h0 : PSeq f q 0 = fun _ => 1 := funext (PSeq_zero f q)
-    rw [h0, deriv_const, sub_zero]
-  have h1 := hsum.tendsto_sum_nat.congr hpartial
-  have h2 : Tendsto (fun n => (∑ k ∈ Finset.range n, hatHTerm f k z) * PSeq f q n z) atTop
-      (𝓝 (hatH f z * deriv (koenigs f q) z)) :=
-    (summable_hatHTerm hε hf (subset_closure hz)).hasSum.tendsto_sum_nat.mul
-      (tendsto_PSeq hε hf hq hfq hz)
-  refine tendsto_nhds_unique h1 (h2.congr fun n => ?_)
-  rw [deriv_PSeq hε hf n (subset_closure hz)]
-
-private theorem koenigs_self' : koenigs f q q = 0 := by
-  refine tendsto_nhds_unique (tendsto_koenigs hε hf hq hfq hq) ?_
-  simp only [gSeq_fixed hfq]
-  exact tendsto_const_nhds
-
-private theorem deriv_koenigs_self' : deriv (koenigs f q) q = 1 := by
-  have hne := deriv_ne_zero_fixed hf hq
-  have h : ∀ n, PSeq f q n q = 1 := fun n => by
-    rw [PSeq_eq_prod hε hf hq n (subset_closure hq)]
-    exact Finset.prod_eq_one fun k _ => by rw [Function.iterate_fixed hfq k, div_self hne]
-  refine tendsto_nhds_unique (tendsto_PSeq hε hf hq hfq hq) ?_
-  simp only [h]
-  exact tendsto_const_nhds
+    have ht := segmentPrimitive_eq_sub (convex_nbhd ε) (g := gSeq f q n)
+      (differentiableOn_PSeq hε hf (q := q) n).continuousOn
+      (fun w hw => hasDerivAt_gSeq hε hf n (subset_closure hw)) hq hz
+    simpa only [gSeq_fixed hfq, sub_zero] using ht
+  have heq' : segmentPrimitive (deriv (koenigs f q)) q z = koenigs f q z := by
+    have ht := segmentPrimitive_eq_sub (convex_nbhd ε)
+      ((differentiableOn_koenigs' hε hf hq).deriv (isOpen_nbhd ε)).continuousOn
+      (fun w hw => ((differentiableOn_koenigs' hε hf hq).differentiableAt
+        ((isOpen_nbhd ε).mem_nhds hw)).hasDerivAt) hq hz
+    simpa only [koenigs, segmentPrimitive_self, sub_zero] using ht
+  simpa only [heq, heq'] using hlim
 
 private theorem koenigs_comp' {z : ℂ} (hz : z ∈ nbhd ε) :
     koenigs f q (f z) = deriv f q * koenigs f q z := by
@@ -472,42 +408,39 @@ private theorem koenigs_comp' {z : ℂ} (hz : z ∈ nbhd ε) :
   rw [pow_succ]
   field_simp
 
+/-- Commuting maps with a common fixed point are linearised by the same `ĝ`.
+This is the limit argument (5.2) used in the singleton case of Theorem 2.3. -/
+theorem koenigs_commuting {g : ℂ → ℂ} (hg : InClass ε g) (hgq : g q = q)
+    (hcomm : ∀ z ∈ nbhd ε, f (g z) = g (f z)) {z : ℂ} (hz : z ∈ nbhd ε) :
+    koenigs f q (g z) = deriv g q * koenigs f q z := by
+  have hit : ∀ n, f^[n] (g z) = g (f^[n] z) := by
+    intro n
+    induction n with
+    | zero => rfl
+    | succ n ih =>
+      rw [Function.iterate_succ_apply', ih, Function.iterate_succ_apply']
+      exact hcomm _ (mapsTo_iterate hε hf n hz)
+  have hlim : Tendsto (fun n => f^[n] z) atTop (𝓝 q) := by
+    rw [← tendsto_sub_nhds_zero_iff, tendsto_zero_iff_norm_tendsto_zero]
+    refine squeeze_zero (fun _ => norm_nonneg _) (fun n => ?_)
+      ((tendsto_pow_atTop_nhds_zero_of_lt_one (cmax_nonneg' hε hf)
+        (cmax_lt_one' hε hf)).mul_const ‖z - q‖ |>.trans (by simp))
+    simpa only [Function.iterate_fixed hfq] using norm_iterate_sub_le hε hf n hz hq
+  have hgd := hg.differentiableOn.differentiableAt
+    ((isOpen_nbhd _).mem_nhds (IFS.nbhd_subset_two hq))
+  have hds : Tendsto (fun n => dslope g q (f^[n] z)) atTop (𝓝 (deriv g q)) := by
+    simpa only [dslope_same, Function.comp_def] using
+      (continuousAt_dslope_same.2 hgd).tendsto.comp hlim
+  have hprod := hds.mul (tendsto_koenigs hε hf hq hfq hz)
+  apply tendsto_nhds_unique (tendsto_koenigs hε hf hq hfq (hg.mapsTo (subset_closure hz)))
+  refine hprod.congr fun n => ?_
+  have he := sub_smul_dslope g q (f^[n] z)
+  simp only [smul_eq_mul, hgq] at he
+  simp only [gSeq, hit]
+  rw [← he]
+  ring
+
 end Approximants
-
-/-! ## Realness and positivity on `I` -/
-
-omit hε in
-private theorem im_deriv_ofReal {t : ℝ} (ht : (t : ℂ) ∈ nbhd (2 * ε)) : (deriv f t).im = 0 :=
-  im_deriv_eq_zero (isOpen_nbhd _) hf.differentiableOn hf.im_eq_zero ht
-
-private theorem im_iterate_ofReal (n : ℕ) {t : ℝ} (ht : (t : ℂ) ∈ nbhd ε) :
-    (f^[n] t).im = 0 := by
-  rw [← koenigsIFS_comp hε hf]
-  exact (koenigsIFS hε hf).im_comp_ofReal _ ht
-
-private theorem re_iterate_mem_I (n : ℕ) {x : ℝ} (hx : x ∈ I) : (f^[n] x).re ∈ I := by
-  rw [← koenigsIFS_comp hε hf]
-  exact (koenigsIFS hε hf).re_comp_mem_I _ hx
-
-/-- `f'` has constant sign on `I`: it is real, continuous and nonvanishing there. -/
-private theorem re_deriv_mul_pos {x y : ℝ} (hx : x ∈ I) (hy : y ∈ I) :
-    0 < (deriv f x).re * (deriv f y).re := by
-  by_contra! hneg
-  have h2ε : 0 < 2 * ε := by linarith
-  have hc : ContinuousOn (deriv f) (nbhd (2 * ε)) :=
-    (hf.differentiableOn.deriv (isOpen_nbhd _)).continuousOn
-  have hcont : ContinuousOn (fun t : ℝ => (deriv f t).re) (uIcc x y) :=
-    Complex.continuous_re.comp_continuousOn (hc.comp Complex.continuous_ofReal.continuousOn
-      fun t ht => ofReal_mem_nbhd h2ε (uIcc_subset_Icc hx hy ht))
-  obtain ⟨t, ht, ht0⟩ : (0 : ℝ) ∈ (fun t : ℝ => (deriv f t).re) '' uIcc x y := by
-    apply intermediate_value_uIcc hcont
-    rcases mul_nonpos_iff.1 hneg with h | h
-    · exact mem_uIcc.2 (Or.inr ⟨h.2, h.1⟩)
-    · exact mem_uIcc.2 (Or.inl ⟨h.1, h.2⟩)
-  have htI : t ∈ I := uIcc_subset_Icc hx hy ht
-  refine hf.deriv_ne_zero _ (subset_closure (ofReal_mem_nbhd hε htI)) (Complex.ext ?_ ?_)
-  · simpa using ht0
-  · simpa using im_deriv_ofReal hf (ofReal_mem_nbhd h2ε htI)
 
 /-! ## The main statements -/
 
@@ -515,17 +448,20 @@ variable {p : ℝ} (hp : p ∈ I) (hfp : f p = p)
 
 include hp hfp
 
+-- Keep the common fixed-point interface for the public statements below.
+set_option linter.unusedSectionVars false
+
 theorem differentiableOn_koenigs : DifferentiableOn ℂ (koenigs f p) (nbhd ε) :=
-  differentiableOn_koenigs' hε hf (ofReal_mem_nbhd hε hp) hfp
+  differentiableOn_koenigs' hε hf (ofReal_mem_nbhd hε hp)
 
 theorem continuousOn_koenigs : ContinuousOn (koenigs f p) (closure (nbhd ε)) :=
-  continuousOn_koenigs' hε hf (ofReal_mem_nbhd hε hp) hfp
+  continuousOn_koenigs' hε hf (ofReal_mem_nbhd hε hp)
 
 theorem koenigs_self : koenigs f p p = 0 :=
-  koenigs_self' hε hf (ofReal_mem_nbhd hε hp) hfp
+  segmentPrimitive_self _ _
 
 theorem deriv_koenigs_self : deriv (koenigs f p) p = 1 :=
-  deriv_koenigs_self' hε hf (ofReal_mem_nbhd hε hp) hfp
+  deriv_koenigs_self' hε hf (ofReal_mem_nbhd hε hp)
 
 theorem koenigs_comp {z : ℂ} (hz : z ∈ nbhd ε) :
     koenigs f p (f z) = deriv f p * koenigs f p z :=
@@ -533,63 +469,27 @@ theorem koenigs_comp {z : ℂ} (hz : z ∈ nbhd ε) :
 
 theorem deriv_deriv_koenigs {z : ℂ} (hz : z ∈ nbhd ε) :
     deriv (deriv (koenigs f p)) z = hatH f z * deriv (koenigs f p) z :=
-  deriv_deriv_koenigs' hε hf (ofReal_mem_nbhd hε hp) hfp hz
+  deriv_deriv_koenigs' hε hf (ofReal_mem_nbhd hε hp) hz
 
 theorem im_koenigs_ofReal {t : ℝ} (ht : (t : ℂ) ∈ nbhd ε) : (koenigs f p t).im = 0 := by
   have hp' := ofReal_mem_nbhd hε hp
-  have hlam := im_deriv_ofReal hf (IFS.nbhd_subset_two hp')
-  have hn : ∀ n, (gSeq f p n t).im = 0 := fun n => by
-    have h : gSeq f p n t = ((((f^[n] t).re - p) / (deriv f p).re ^ n : ℝ) : ℂ) := by
-      push_cast
-      rw [← eq_ofReal_re_of_im_eq_zero (im_iterate_ofReal hε hf n ht),
-        ← eq_ofReal_re_of_im_eq_zero hlam]
-      rfl
-    rw [h, Complex.ofReal_im]
-  refine tendsto_nhds_unique
-    ((Complex.continuous_im.tendsto _).comp (tendsto_koenigs hε hf hp' hfp ht)) ?_
-  simp only [Function.comp_def, hn]
-  exact tendsto_const_nhds
+  have hd : DifferentiableOn ℂ (segmentPrimitive (hatH f) p) (nbhd ε) :=
+    fun z hz => (hasDerivAt_hatHPrimitive hε hf hp' hz).differentiableAt.differentiableWithinAt
+  apply im_segmentPrimitive_eq_zero (convex_nbhd ε) hd.continuousOn.cexp _ hp' ht
+  intro x hx
+  have him := im_segmentPrimitive_eq_zero (convex_nbhd ε)
+    (differentiableOn_hatH hε hf).continuousOn (fun x hx => im_hatH_ofReal hε hf hx) hp' hx
+  simp only [Complex.exp_im, him, Real.sin_zero, mul_zero]
 
 /-- On `I`, the derivative of `ĝ` is real and positive. -/
 theorem deriv_koenigs_ofReal {x : ℝ} (hx : x ∈ I) :
     (deriv (koenigs f p) x).im = 0 ∧ 0 < (deriv (koenigs f p) x).re := by
   have hp' := ofReal_mem_nbhd hε hp
   have hx' := ofReal_mem_nbhd hε hx
-  have hlam := im_deriv_ofReal hf (IFS.nbhd_subset_two hp')
-  have hy : ∀ k, f^[k] (x : ℂ) = ((f^[k] x).re : ℂ) := fun k =>
-    eq_ofReal_re_of_im_eq_zero (im_iterate_ofReal hε hf k hx')
-  -- the factors `f'(f^k(x))/f'(p)` of `P_n(x)` are real and positive
-  set a : ℕ → ℝ := fun k => (deriv f (f^[k] x)).re / (deriv f p).re with ha_def
-  have hreal : ∀ k, deriv f (f^[k] x) / deriv f p = (a k : ℂ) := fun k => by
-    have hd : (deriv f (f^[k] x)).im = 0 := by
-      rw [hy k]
-      exact im_deriv_ofReal hf
-        (IFS.nbhd_subset_two (ofReal_mem_nbhd hε (re_iterate_mem_I hε hf k hx)))
-    simp only [ha_def]
-    push_cast
-    rw [← eq_ofReal_re_of_im_eq_zero hd, ← eq_ofReal_re_of_im_eq_zero hlam]
-  have hpos : ∀ k, 0 < a k := fun k => by
-    have h := re_deriv_mul_pos hε hf (re_iterate_mem_I hε hf k hx) hp
-    rw [← hy k] at h
-    rcases mul_pos_iff.1 h with h | h
-    · exact div_pos h.1 h.2
-    · exact div_pos_of_neg_of_neg h.1 h.2
-  have hP : ∀ n, PSeq f p n x = ((∏ k ∈ Finset.range n, a k : ℝ) : ℂ) := fun n => by
-    rw [PSeq_eq_prod hε hf hp' n (subset_closure hx'), Complex.ofReal_prod]
-    exact Finset.prod_congr rfl fun k _ => hreal k
-  have hT := tendsto_PSeq hε hf hp' hfp hx'
-  constructor
-  · refine tendsto_nhds_unique ((Complex.continuous_im.tendsto _).comp hT) ?_
-    simp only [Function.comp_def, hP, Complex.ofReal_im]
-    exact tendsto_const_nhds
-  · obtain ⟨A, -, hA⟩ := exists_norm_ratio_sub_one_le hε hf hp' hfp
-    have hs : Summable fun k => a k - 1 := by
-      refine (summable_geometric_cmax hε hf A).of_norm_bounded fun k => ?_
-      have h := hA k x hx'
-      rwa [hreal k, ← Complex.ofReal_one, ← Complex.ofReal_sub, Complex.norm_real] at h
-    refine pos_of_tendsto_prod hpos hs ?_
-    have h := (Complex.continuous_re.tendsto _).comp hT
-    simpa only [Function.comp_def, hP, Complex.ofReal_re] using h
+  have him := im_segmentPrimitive_eq_zero (convex_nbhd ε)
+    (differentiableOn_hatH hε hf).continuousOn (fun t ht => im_hatH_ofReal hε hf ht) hp' hx'
+  rw [deriv_koenigs_eq hε hf hp' hx', Complex.exp_im, Complex.exp_re, him]
+  simpa using Real.exp_pos (segmentPrimitive (hatH f) p x).re
 
 end
 

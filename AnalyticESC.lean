@@ -4,10 +4,12 @@ public import AnalyticESC.Defs
 public import AnalyticESC.Basic
 public import AnalyticESC.Words
 public import AnalyticESC.Analysis
+public import AnalyticESC.Analysis.Primitive
 public import AnalyticESC.Separation
 public import AnalyticESC.Dual.Projection
 public import AnalyticESC.Dual.Derivatives
 public import AnalyticESC.Dual.HigherDerivatives
+public import AnalyticESC.Dual.Hutchinson
 public import AnalyticESC.Dual.Attractor
 public import AnalyticESC.Dual.Cylinders
 public import AnalyticESC.Main.Closeness
@@ -56,8 +58,9 @@ analytic self-conformal sets on the real line*.
 * `Separation`: Definition 1.2 (failure of SESC is weak super-exponential condensation),
   SESC ⇒ ESC, the natural projection and the attractor.
 * `Dual.Projection`: the dual natural projection, the cocycle identity, (2.7), Lemma 2.4 (a), (b).
-* `Dual.Derivatives`: Lemma 2.8, Corollary 2.9 and Lemma 2.10, by Cauchy estimates.
+* `Dual.Derivatives`: Lemma 2.8, Corollary 2.9 and Lemma 2.10, by Lemma 2.7 and geometric tails.
 * `Dual.HigherDerivatives`: the identity (2.10) and Lemma 2.7.
+* `Dual.Hutchinson`: the contraction theorem on compact sets of the complete analytic space.
 * `Dual.Attractor`: Lemma 2.1, Lemma 2.4 (c) and Lemma 2.5, (a) ⇔ (c).
 * `Dual.Cylinders`: the cylinder sets of Section 2.1 and Lemma 2.5.
 * `Main.Closeness`: the estimates (3.2) and (3.3).
@@ -80,11 +83,11 @@ analytic self-conformal sets on the real line*.
 * `Conjugation.Uniqueness`: uniqueness of linearisations of a single map.
 * `Conjugation.Composite`: compositions along words and periodic dual projections.
 * `Conjugation.Zeros`: conjugacies by injective analytic maps.
-* `Conjugation.Characterisation`: Theorem 1.12 without the hypothesis on the attractor.
+* `Conjugation.Characterisation`: the first assertion of Theorem 1.12 and single-map tools.
 * `Conjugation.DualConj`: Theorem 2.3.
 * `Conjugation.ExactOverlaps`: the remark on exact overlaps and sub-conjugation in
   Section 1.2.3.
-* `Conjugation.PeriodicPoints`: the paper's proof of Theorem 1.12 (a), and Theorem 1.12.
+* `Conjugation.PeriodicPoints`: Theorem 1.12, including part (b) via the two-map subsystem.
 * `Dimension.Defs`: entropy, Lyapunov exponents, self-conformal measures, equality in (1.6),
   Gibbs measures, and the statements of the cited results of Bowen and Rapaport.
 * `Dimension.Pressure`: the pressure and its unique zero, the conformality dimension `s(Φ)`.

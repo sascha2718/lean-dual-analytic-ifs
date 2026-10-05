@@ -48,7 +48,7 @@ sources:
       - "Ariel Rapaport"
     type: "preprint"
     id: "arXiv:2412.16753"
-    location: "Theorem 1.2 and Corollary 1.3"
+    location: "arXiv:2412.16753v2, 10 January 2025, Theorem 1.2 and Corollary 1.3"
     relationship: "background"
     note: "These results are explicit named hypotheses of the dimension endpoints; their proofs are not formalised."
   - title: "Equilibrium states and the ergodic theory of Anosov diffeomorphisms"
@@ -60,9 +60,15 @@ sources:
   - title: "Dimension theory of iterated function systems"
     authors: ["De-Jun Feng", "Huyi Hu"]
     type: "paper"
-    location: "Comm. Pure Appl. Math. 62 (2009)"
+    location: "Comm. Pure Appl. Math. 62 (2009), no. 11, 1435–1500, Theorem 2.8"
     relationship: "background"
     note: "Exact dimensionality is included in RapaportMeasureStatement; its proof is not formalised."
+  - title: "On Furstenberg's intersection conjecture, self-similar measures, and the L^q norms of convolutions"
+    authors: ["Pablo Shmerkin"]
+    type: "paper"
+    location: "Ann. of Math. 189 (2019), no. 2, 319–391, Lemma 1.7; DOI 10.4007/annals.2019.189.2.1"
+    relationship: "background"
+    note: "The required ball-mass estimate at 0 is proved in the library, not assumed."
 
 related_formalizations: []
 
@@ -94,7 +100,7 @@ automation:
     - method: "agent"
       models: ["GPT-6 (OpenAI)"]
       framework: "Codex (OpenAI)"
-      tool_setup: "Review of paper correspondence, challenge minimality and upload support files."
+      tool_setup: "Lean proof development and review of paper correspondence, challenge minimality and upload support files."
     - method: "manual"
       models: []
       framework: "n/a"
@@ -117,28 +123,23 @@ fidelity:
     Finite and infinite words are separated in Challenge and represented together internally.
     The space analyticSpace represents the manuscript's functions by their restrictions to
     B_epsilon, requiring holomorphy there, continuity on its closure and real values on I.
-    The dual attractor is constructed directly by coding rather than Hutchinson's theorem.
-    Cauchy estimates replace the Faà di Bruno argument for Lemmas 2.8 and 2.10; Lemma 2.7 is
-    proved separately, using a local primitive in place of log|f'|, and is not used thereafter.
-    Theorems 1.5 and 2.2 use a condensation dichotomy, splitting on bounded prefix lengths
-    and using equality of all derivatives. The manuscript splits into three cases, uses
-    finite order of vanishing for finite limit words and derives Theorem 1.5 from Theorem 2.2.
-    For equation (3.3), Lean uses norms and a positive interval-length bound.
-    Theorem 1.4 uses the union class, as in the manuscript. Its density proof uses the same
-    affine interpolation and multiplicative perturbation. Proposition 4.2 uses equal widths,
-    corrects the factors 16Q² + 12Q and 8Q to 16Q² + 12Q + 1 and 8Q + 2 for an empty Z,
-    supplies the two second-derivative estimates left to the reader and obtains C = 40/m
-    for a margin m of f. The manuscript handles an empty Z by adjoining an auxiliary point.
-    Lean preserves invariant cylinders by quantitative bounds; the manuscript uses continuity.
-    Lemma 5.1 constructs the linearising map as the uniform limit (5.2) and derives its ODE;
-    the manuscript starts with the ODE. Theorem 1.12(a) follows the periodic-point argument.
-    Part (b) and Theorem 2.3 use general equivalences without the non-singleton assumption.
+    Restriction identifies this space with a closed subspace of the continuous functions on
+    the closure of B_epsilon, where the Hutchinson construction is carried out. The complex form
+    of Lemma 2.7 uses a
+    local primitive of f''/f'; its real derivatives are proved equal to those of log|f'|.
+    Equation (3.3) uses norms, positive interval lengths and an eventual smallness condition;
+    the absolute-value denominator and its c_min bound are proved and used. Constants may
+    overestimate the manuscript's choices. Proposition 4.2 chooses equal widths,
+    supplies the two second-derivative estimates left to the reader
+    and obtains C = 40/m for a margin m of f. Near the interpolation points a product ratio
+    is controlled by continuity instead of writing out its individual factors.
     Literature inputs are explicit hypotheses, not axioms: a one-sided full-shift
     specialisation of Bowen's theorem and Rapaport's results together with Feng–Hu exact
     dimensionality. The natural measure, not defined in the manuscript, is the image of
     any probability Gibbs measure for s(Phi) log|f'| under the natural projection. Lean
-    computes its local dimension at 0 and bounds its L^q dimensions directly, rather than
-    invoking Shmerkin's Lemma 1.7. Summability and boundedness needed for the L^q definition
+    computes its local dimension at 0, expanding the details left to the reader. The required
+    ball-mass estimate of Shmerkin's Lemma 1.7 is proved here at 0 for measures supported
+    on [0,infinity). Summability and boundedness needed for the L^q definition
     are proved in the library. The pressure zero is constructed using Fekete's lemma.
     Theorem 1.6 assumes N > 0, and Corollary 1.7 is restricted to N ≥ 2. Measure dimension is
     stated as almost everywhere local dimension. Full statement-level qualifications are
@@ -185,12 +186,12 @@ alignment:
       lean: "Challenge.audit_conj_iff"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Conjugation.PeriodicPoints (IFS.theorem_1_12), along the paper's proof, which uses the hypothesis on the attractor. IFS.conjSelfSimilar_iff proves the equivalence without it."
+      note: "Proved in Solution from AnalyticESC.Conjugation.PeriodicPoints (IFS.theorem_1_12), along the paper's proof, which uses the hypothesis on the attractor. IFS.conjSelfSimilar_iff treats singleton attractors by the separate argument of Theorem 2.3."
     - source: "Theorem 1.12 (b) (sub-conjugacy to a self-similar IFS)"
       lean: "Challenge.audit_subconj_iff"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Conjugation.PeriodicPoints (IFS.theorem_1_12), whose part (b) is IFS.subConjSelfSimilar_iff from AnalyticESC.Conjugation.Characterisation; the hypothesis on the attractor is not needed."
+      note: "Proved in Solution from AnalyticESC.Conjugation.PeriodicPoints (IFS.theorem_1_12), whose part (b) applies (a) to the two-map subsystem and uses commutation for a common fixed point; the hypothesis on the original attractor is not needed."
     - source: "Theorem 1.6 (Rapaport: dimension under the ESC)"
       lean: "Challenge.audit_dim_of_esc"
       module: "Challenge"
