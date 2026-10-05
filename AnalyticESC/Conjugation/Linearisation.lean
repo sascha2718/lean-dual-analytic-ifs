@@ -89,7 +89,9 @@ theorem lemma_5_1 (hε : 0 < ε) (hf : InClass ε f) {p : ℝ} (hp : p ∈ I) (h
         fun z => b * deriv (koenigs f p) z := by
       rw [deriv_const_add', deriv_const_mul_field']
     refine ⟨fun z => (a : ℂ) + b * koenigs f p z,
-      ⟨_, (hkd.const_mul _).const_add _, fun x hx => ?_, rfl⟩, ?_, fun x hx => ?_, ?_, ?_⟩
+      ⟨_, (hkd.const_mul _).const_add _,
+        ((continuousOn_koenigs hε hf hp hfp).const_mul _).const_add _,
+        fun x hx => ?_, rfl⟩, ?_, fun x hx => ?_, ?_, ?_⟩
     · simp [im_koenigs_ofReal hε hf hp hfp (hmem hx)]
     · intro x hx y hy hxy
       have h : b * (koenigs f p x).re = b * (koenigs f p y).re := by simpa using hxy

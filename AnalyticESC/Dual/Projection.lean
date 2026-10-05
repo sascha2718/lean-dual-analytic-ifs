@@ -120,6 +120,32 @@ theorem differentiableOn_dualProj (w : Word N) : DifferentiableOn ℂ (Φ.dualPr
     (fun n => Φ.differentiableOn_dualTerm w n) (isOpen_nbhd ε)
     fun n z hz => hC w n z (subset_closure hz)
 
+/-- Every term of (1.4) is continuous on `cl B_ε`. -/
+theorem continuousOn_dualTerm (w : Word N) (n : ℕ) :
+    ContinuousOn (Φ.dualTerm w n) (closure (nbhd ε)) := by
+  cases h : w.get? n with
+  | none =>
+    have : Φ.dualTerm w n = fun _ => 0 := funext (Φ.dualTerm_of_get?_eq_none h)
+    rw [this]
+    exact continuousOn_const
+  | some i =>
+    have : Φ.dualTerm w n = fun z => Φ.nonlin i (Φ.comp (w.take n).reverse z) *
+        deriv (Φ.comp (w.take n).reverse) z := funext (Φ.dualTerm_of_get?_eq_some h)
+    rw [this]
+    obtain ⟨U, -, hU, -, hnl⟩ := Φ.exists_differentiableOn_nonlin i
+    obtain ⟨V, hVo, hV, hc⟩ := Φ.exists_differentiableOn_comp (w.take n).reverse
+    exact (hnl.continuousOn.comp (hc.continuousOn.mono hV)
+      (fun z hz => hU (Φ.mapsTo_comp_closure _ hz))).mul
+      ((hc.deriv hVo).continuousOn.mono hV)
+
+/-- The geometric bound on `cl B_ε` makes (1.4) a uniformly convergent series of continuous
+functions there. In particular, `H_w` has the boundary continuity required in Section 2.1. -/
+theorem continuousOn_dualProj (w : Word N) :
+    ContinuousOn (Φ.dualProj w) (closure (nbhd ε)) := by
+  obtain ⟨C, -, hC⟩ := Φ.exists_dualTerm_bound
+  exact continuousOn_tsum (Φ.continuousOn_dualTerm w)
+    ((summable_geometric_of_lt_one Φ.cmax_nonneg Φ.cmax_lt_one).mul_left C) (hC w)
+
 theorem im_dualTerm_ofReal (w : Word N) (n : ℕ) {t : ℝ} (ht : (t : ℂ) ∈ nbhd ε) :
     (Φ.dualTerm w n t).im = 0 := by
   cases h : w.get? n with
@@ -242,6 +268,7 @@ theorem exists_dualProj_bounds :
 theorem dualProj_mem_analyticSpace (w : ℕ → Fin N) :
     toNbhd ε (Φ.dualProj (.inf w)) ∈ analyticSpace ε :=
   ⟨Φ.dualProj (.inf w), Φ.differentiableOn_dualProj _,
+    Φ.continuousOn_dualProj _,
     fun _ hx => Φ.im_dualProj_ofReal _ (ofReal_mem_nbhd Φ.ε_pos hx), rfl⟩
 
 /-- Lemma 2.4, second claim: `‖H_i - H_j‖_∞ ≤ c_max^{|i ∧ j|} K` on `B_ε` for distinct

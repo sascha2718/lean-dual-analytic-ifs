@@ -161,10 +161,11 @@ end IFS
 uniform convergence, that is, of the supremum norm over `B_ε`. -/
 def toNbhd (ε : ℝ) (h : ℂ → ℂ) : nbhd ε →ᵤ ℂ := UniformFun.ofFun fun z => h z
 
-/-- The space `C^ω_ε([0,1])` of Section 2.1: maps complex analytic on `B_ε` and real on `I`,
-as functions on `B_ε`. -/
+/-- The space `C^ω_ε([0,1])` of Section 2.1: maps complex analytic on `B_ε`, continuous on
+`cl B_ε` and real on `I`, represented by their restrictions to `B_ε`. -/
 def analyticSpace (ε : ℝ) : Set (nbhd ε →ᵤ ℂ) :=
-  {h | ∃ g : ℂ → ℂ, DifferentiableOn ℂ g (nbhd ε) ∧ (∀ x ∈ I, (g x).im = 0) ∧ h = toNbhd ε g}
+  {h | ∃ g : ℂ → ℂ, DifferentiableOn ℂ g (nbhd ε) ∧ ContinuousOn g (closure (nbhd ε)) ∧
+    (∀ x ∈ I, (g x).im = 0) ∧ h = toNbhd ε g}
 
 /-- The pairs `ℬ_n = {(i, j) ∈ Σ_n × Σ_n : i₁ < j₁}` of Section 4.1. -/
 def pairs (N n : ℕ) : Set ((Fin n → Fin N) × (Fin n → Fin N)) :=

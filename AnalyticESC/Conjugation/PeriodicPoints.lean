@@ -376,7 +376,7 @@ theorem conjSelfSimilar_of_dualProj_eq
     rw [Φ.periodic_hatH_f_eq_dualProj_const k x hx, Φ.periodic_hatH_f_eq_dualProj_const k₀ x hx]
     exact h _ _ x hx
   -- Lemma 5.1 for `f_{k₀}`, with `g(p_{k₀}) = 0` and `g'(p_{k₀}) = 1`: `g'' = H g'`
-  obtain ⟨G, ⟨G', hG'd, -, hGG'⟩, hinj, hode, -, -⟩ :=
+  obtain ⟨G, ⟨G', hG'd, -, -, hGG'⟩, hinj, hode, -, -⟩ :=
     (lemma_5_1 hε (Φ.inClass k₀) (hp k₀) (hfp k₀)).1 0 1 one_ne_zero
   have hGd : DifferentiableOn ℂ G (nbhd ε) := hG'd.congr fun z hz => by
     have := congrFun (congrArg UniformFun.toFun hGG') ⟨z, hz⟩

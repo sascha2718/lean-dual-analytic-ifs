@@ -1,7 +1,7 @@
 # Lean working guide
 
 Durable working agreements for the Lean formalisation of *On exponential separation of analytic
-self-conformal sets on the real line*. [README.md](README.md) holds scope, limitations and build
+self-conformal sets on the real line*. [README.md](README.md) holds scope, differences and build
 instructions. Current proof differences and manuscript issues belong in
 `paper-correspondence.yaml` and `formalization.yaml`. The manuscript is `../analytic.tex`.
 Historical plans are preserved locally under `Archive/RepositoryReview-2026-10-05/`, outside

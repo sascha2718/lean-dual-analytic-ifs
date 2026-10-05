@@ -96,7 +96,7 @@ subset `f_{a_{|a|}}(cl B_ε)` of `B_ε`, on which `g` is bounded. -/
 private theorem exists_bound_of_dualCompOn_eq {a : List (Fin N)} (ha : a ≠ [])
     {u : nbhd ε →ᵤ ℂ} (hu : u ∈ analyticSpace ε) (hfix : Φ.dualCompOn a u = u) :
     ∃ B, ∀ z, ‖UniformFun.toFun u z‖ ≤ B := by
-  obtain ⟨g, hg, -, rfl⟩ := hu
+  obtain ⟨g, hg, -, -, rfl⟩ := hu
   obtain ⟨M, -, hM, -⟩ := Φ.exists_dualProj_bounds
   obtain ⟨k, b, hkb⟩ := List.exists_cons_of_ne_nil (List.reverse_ne_nil_iff.2 ha)
   have hK : IsCompact (Φ.f k '' closure (nbhd ε)) :=

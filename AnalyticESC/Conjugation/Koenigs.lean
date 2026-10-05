@@ -9,8 +9,9 @@ public import AnalyticESC.Analysis
 # The linearisation of a single map
 
 For a map `f` of the class with fixed point `p ∈ I`: the function `Ĥ_f` of (5.1), and the
-linearising map `ĝ(z) = lim_{n → ∞} (f^n(z) - p)/f'(p)^n` of (5.2), which is holomorphic on `B_ε`,
-satisfies `ĝ ∘ f = f'(p) ĝ` and `ĝ'' = Ĥ_f ĝ'`, and has positive derivative on `I`.
+linearising map `ĝ(z) = lim_{n → ∞} (f^n(z) - p)/f'(p)^n` of (5.2), which is holomorphic on `B_ε`
+and continuous on `cl B_ε`, satisfies `ĝ ∘ f = f'(p) ĝ` and `ĝ'' = Ĥ_f ĝ'`, and has positive
+derivative on `I`.
 
 The paper defines `ĝ` by integrating `Ĥ_f` and derives (5.2); here `ĝ` is the limit (5.2). With
 `λ = f'(p)`, the maps `ĝ_n(z) = (f^n(z) - p)/λ^n` have derivatives
@@ -323,23 +324,47 @@ private theorem exists_norm_gSeq_sub_le : ∃ C, 0 ≤ C ∧ ∀ n, ∀ z ∈ nb
 
 /-! ## Convergence -/
 
-private theorem tendsto_gSeq {z : ℂ} (hz : z ∈ nbhd ε) :
+/-- The same geometric bound holds on the closure, by continuity of the approximants. -/
+private theorem exists_norm_gSeq_sub_le_closure :
+    ∃ C, 0 ≤ C ∧ ∀ n, ∀ z ∈ closure (nbhd ε),
+      ‖gSeq f q (n + 1) z - gSeq f q n z‖ ≤ C * (koenigsIFS hε hf).cmax ^ n := by
+  obtain ⟨C, hC0, hC⟩ := exists_norm_gSeq_sub_le hε hf hq hfq
+  refine ⟨C, hC0, fun n z hz => le_on_closure (hC n) ?_ continuousOn_const hz⟩
+  have hc : ContinuousOn (fun w => gSeq f q (n + 1) w - gSeq f q n w)
+      (closure (nbhd ε)) := fun w hw =>
+    ((hasDerivAt_gSeq hε hf (n + 1) hw).continuousAt.sub
+      (hasDerivAt_gSeq hε hf n hw).continuousAt).continuousWithinAt
+  exact hc.norm
+
+private theorem tendsto_gSeq {z : ℂ} (hz : z ∈ closure (nbhd ε)) :
     Tendsto (fun n => gSeq f q n z) atTop
       (𝓝 (z - q + ∑' k, (gSeq f q (k + 1) z - gSeq f q k z))) := by
-  obtain ⟨C, -, hC⟩ := exists_norm_gSeq_sub_le hε hf hq hfq
+  obtain ⟨C, -, hC⟩ := exists_norm_gSeq_sub_le_closure hε hf hq hfq
   have hs : Summable fun k => gSeq f q (k + 1) z - gSeq f q k z :=
     (summable_geometric_cmax hε hf C).of_norm_bounded fun k => hC k z hz
   exact (hs.hasSum.tendsto_sum_nat.const_add (z - q)).congr fun n => (gSeq_eq_sum f q n z).symm
 
-/-- `ĝ = (z - p) + ∑_k (ĝ_{k+1} - ĝ_k)` on `B_ε`. -/
-private theorem koenigs_eq_tsum {z : ℂ} (hz : z ∈ nbhd ε) :
+/-- `ĝ = (z - p) + ∑_k (ĝ_{k+1} - ĝ_k)` on `cl B_ε`. -/
+private theorem koenigs_eq_tsum {z : ℂ} (hz : z ∈ closure (nbhd ε)) :
     koenigs f q z = z - q + ∑' k, (gSeq f q (k + 1) z - gSeq f q k z) :=
   (tendsto_gSeq hε hf hq hfq hz).limUnder_eq
 
 private theorem tendsto_koenigs {z : ℂ} (hz : z ∈ nbhd ε) :
     Tendsto (fun n => gSeq f q n z) atTop (𝓝 (koenigs f q z)) := by
-  rw [koenigs_eq_tsum hε hf hq hfq hz]
-  exact tendsto_gSeq hε hf hq hfq hz
+  rw [koenigs_eq_tsum hε hf hq hfq (subset_closure hz)]
+  exact tendsto_gSeq hε hf hq hfq (subset_closure hz)
+
+/-- The linearising limit is continuous up to the boundary, by uniform convergence on
+`cl B_ε`. -/
+private theorem continuousOn_koenigs' : ContinuousOn (koenigs f q) (closure (nbhd ε)) := by
+  obtain ⟨C, -, hC⟩ := exists_norm_gSeq_sub_le_closure hε hf hq hfq
+  have hc : ∀ n, ContinuousOn (fun z => gSeq f q (n + 1) z - gSeq f q n z)
+      (closure (nbhd ε)) := fun n z hz =>
+    ((hasDerivAt_gSeq hε hf (n + 1) hz).continuousAt.sub
+      (hasDerivAt_gSeq hε hf n hz).continuousAt).continuousWithinAt
+  exact ((continuousOn_id.sub continuousOn_const).add
+    (continuousOn_tsum hc (summable_geometric_cmax hε hf C) hC)).congr
+    (fun z hz => koenigs_eq_tsum hε hf hq hfq hz)
 
 omit hq hfq in
 private theorem differentiableOn_gSeq_sub (k : ℕ) :
@@ -354,7 +379,7 @@ private theorem differentiableOn_koenigs' : DifferentiableOn ℂ (koenigs f q) (
     (differentiableOn_id.sub_const q).add (Complex.differentiableOn_tsum_of_summable_norm
       (summable_geometric_cmax hε hf C) (differentiableOn_gSeq_sub hε hf) (isOpen_nbhd ε)
       fun k w hw => hC k w hw)
-  exact h.congr fun w hw => koenigs_eq_tsum hε hf hq hfq hw
+  exact h.congr fun w hw => koenigs_eq_tsum hε hf hq hfq (subset_closure hw)
 
 /-- `ĝ' = 1 + ∑_k (P_{k+1} - P_k)` on `B_ε`. -/
 private theorem hasDerivAt_koenigs {z : ℂ} (hz : z ∈ nbhd ε) :
@@ -377,7 +402,7 @@ private theorem hasDerivAt_koenigs {z : ℂ} (hz : z ∈ nbhd ε) :
       (1 + deriv (fun w => ∑' k, (gSeq f q (k + 1) w - gSeq f q k w)) z) z :=
     ((hasDerivAt_id z).sub_const q).add (hSd.differentiableAt (ho.mem_nhds hz)).hasDerivAt
   refine h1.congr_of_eventuallyEq ?_
-  filter_upwards [ho.mem_nhds hz] with w hw using koenigs_eq_tsum hε hf hq hfq hw
+  filter_upwards [ho.mem_nhds hz] with w hw using koenigs_eq_tsum hε hf hq hfq (subset_closure hw)
 
 private theorem deriv_koenigs_eq {z : ℂ} (hz : z ∈ nbhd ε) :
     deriv (koenigs f q) z = 1 + ∑' k, (PSeq f q (k + 1) z - PSeq f q k z) :=
@@ -492,6 +517,9 @@ include hp hfp
 
 theorem differentiableOn_koenigs : DifferentiableOn ℂ (koenigs f p) (nbhd ε) :=
   differentiableOn_koenigs' hε hf (ofReal_mem_nbhd hε hp) hfp
+
+theorem continuousOn_koenigs : ContinuousOn (koenigs f p) (closure (nbhd ε)) :=
+  continuousOn_koenigs' hε hf (ofReal_mem_nbhd hε hp) hfp
 
 theorem koenigs_self : koenigs f p p = 0 :=
   koenigs_self' hε hf (ofReal_mem_nbhd hε hp) hfp

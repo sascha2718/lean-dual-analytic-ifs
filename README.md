@@ -1,9 +1,10 @@
 # Exponential separation of analytic self-conformal sets on the real line
 
-Lean 4 formalisation of the paper by Balázs Bárány, István Kolossváry and Sascha Troscheit.
-The [preprint](https://arxiv.org/abs/2509.07888) is on arXiv; the theorem numbers and
-correspondence below refer to the revised working manuscript `analytic.tex` of 5 October 2026,
-which includes corrections made after arXiv v2.
+Lean 4 formalisation of *On exponential separation of analytic self-conformal sets on the real line*
+by Balázs Bárány, István Kolossváry and Sascha Troscheit
+([arXiv:2509.07888](https://arxiv.org/abs/2509.07888)). The theorem numbers and correspondence below
+refer to the revised working manuscript `analytic.tex` of 5 October 2026, which includes corrections
+made after arXiv v2.
 
 ## Formalised results
 
@@ -20,9 +21,23 @@ which includes corrections made after arXiv v2.
   `D_μ(q) ≤ q(s(Φ) - 1/3)/(q - 1)`, assuming Bowen's Gibbs-measure theorem.
 
 The library also proves the supporting statements of Sections 2–5. Five of the twelve headline
-statements have explicit literature hypotheses: Bowen's Theorem 1.4 (one-sided full-shift
-specialisation), Rapaport's Theorem 1.2 together with Feng–Hu exact dimensionality, and Rapaport's
-Corollary 1.3. These results are stated and cited in the challenge, not proved here.
+statements have explicit literature hypotheses. These results are stated and cited in the challenge,
+not proved here. The precise references are:
+
+- **Bowen:** Rufus Bowen,
+  [*Equilibrium states and the ergodic theory of Anosov diffeomorphisms*](https://doi.org/10.1007/BFb0081279),
+  Lecture Notes in Mathematics **470**, Springer-Verlag, 1975, **Theorem 1.4**.
+  Its one-sided full-shift specialisation is `BowenGibbsStatement`.
+- **Feng–Hu:** De-Jun Feng and Huyi Hu,
+  [*Dimension theory of iterated function systems*](https://doi.org/10.1002/cpa.20276),
+  *Communications on Pure and Applied Mathematics* **62** (2009), no. 11, 1435–1500,
+  **Theorem 2.8**. Its exact-dimensionality conclusion is used together with Rapaport's
+  Theorem 1.2 in `RapaportMeasureStatement`.
+- **Rapaport:** Ariel Rapaport,
+  [*Dimension of self-conformal measures associated to an exponentially separated analytic IFS on ℝ*](https://arxiv.org/abs/2412.16753v2),
+  arXiv:2412.16753v2, 10 January 2025, **Theorem 1.2** and **Corollary 1.3**.
+  These supply the dimension formulae in `RapaportMeasureStatement` and `RapaportSetStatement`,
+  respectively.
 
 ## Statements and correspondence
 
@@ -34,21 +49,17 @@ only `propext`, `Classical.choice` and `Quot.sound`; there are no literature axi
 
 [paper-correspondence.yaml](paper-correspondence.yaml) maps 26 theorem, lemma, proposition,
 corollary and definition environments to Lean and records the precise qualifications.
-[formalization.yaml](formalization.yaml) gives
-provenance and a summary of the differences. The main limitations are:
+[formalization.yaml](formalization.yaml) records the sources, authorship and use of AI, and
+summarises the differences.
+The main differences are:
 
 - Corollary 1.7 is formalised for `N ≥ 2`; its trivial `N = 1` case is omitted.
-- The internal analytic function space omits continuity on the closed complex neighbourhood.
-  Thus Lemmas 2.1, 2.4 and 5.1 use a different space from the manuscript.
-- Several proof routes differ: Cauchy derivative estimates, the condensation dichotomy,
+- Several proof routes differ slightly: Cauchy derivative estimates, the condensation dichotomy,
   direct construction of the dual attractor, and construction of the linearising map by a limit.
   Theorem 1.12(a) follows the manuscript's periodic-point argument.
-- Proposition 4.2 uses the manuscript's multiplicative perturbation and supplies the two omitted
+- Proposition 4.2 uses the manuscript's multiplicative perturbation but additionally proves the two omitted
   second-derivative estimates. Lean handles empty `𝒵` by enlarging the constants; the manuscript
   adjoins an auxiliary point to `𝒵`.
-
-These qualifications prevent describing the development as a literal verification of every
-proof as printed. Automated correspondence checks do not replace mathematical review.
 
 ## Build and verification
 

@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
-# Provenance metadata for the Lean formalisation accompanying
+# Sources and development details for the Lean formalisation accompanying
 # "On exponential separation of analytic self-conformal sets on the real line"
 # (Bárány, Kolossváry and Troscheit). Follows the mathlib-initiative formalization.yaml v0.4
 # self-reporting format.
@@ -115,8 +115,8 @@ fidelity:
   divergences: >-
     Maps are represented by holomorphic extensions, with complex derivatives at real points.
     Finite and infinite words are separated in Challenge and represented together internally.
-    The space analyticSpace omits the manuscript's continuity requirement on the closure of
-    B_epsilon, so Lemmas 2.1, 2.4 and 5.1 are formalised in a different ambient function space.
+    The space analyticSpace represents the manuscript's functions by their restrictions to
+    B_epsilon, requiring holomorphy there, continuity on its closure and real values on I.
     The dual attractor is constructed directly by coding rather than Hutchinson's theorem.
     Cauchy estimates replace the Faà di Bruno argument for Lemmas 2.8 and 2.10; Lemma 2.7 is
     proved separately, using a local primitive in place of log|f'|, and is not used thereafter.

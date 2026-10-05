@@ -279,7 +279,7 @@ private theorem exists_bound_of_mem_isDualAttractor {Λ : Set (nbhd ε →ᵤ �
     ∃ C, ∀ z, ‖UniformFun.toFun u z‖ ≤ C := by
   rw [hΛ.2.2.2] at hu
   obtain ⟨i, u', hu', rfl⟩ := mem_iUnion.1 hu
-  obtain ⟨g, hg, -, rfl⟩ := hΛ.1 hu'
+  obtain ⟨g, hg, -, -, rfl⟩ := hΛ.1 hu'
   obtain ⟨Mn, -, hMn⟩ := Φ.exists_nonlin_bound
   have hK : IsCompact (Φ.f i '' closure (nbhd ε)) :=
     (isCompact_closure_nbhd ε).image_of_continuousOn

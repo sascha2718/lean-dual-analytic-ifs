@@ -103,7 +103,7 @@ entries:
     lean: ["AnalyticESC.IFS.existsUnique_isDualAttractor"]
     relation: representation
     headline: false
-    note: "C^omega_eps([0,1]) is AnalyticESC.analyticSpace, the restrictions to B_eps of maps holomorphic there and real on I, with the topology of uniform convergence on B_eps. It does not require continuity on the closure of B_eps, which the paper's definition includes, so uniqueness is stated over a larger space. Existence comes from the coding map ({H_i : i in Sigma}, AnalyticESC.IFS.isDualAttractor_range) and uniqueness from a direct coding argument; the paper applies Hutchinson's theorem. The hypothesis 0 < N is the paper's implicit assumption that the IFS has a map."
+    note: "C^omega_eps([0,1]) is AnalyticESC.analyticSpace, the restrictions to B_eps of maps holomorphic there, continuous on its closure and real on I, with the topology of uniform convergence on B_eps, as in the manuscript. Existence comes from the coding map ({H_i : i in Sigma}, AnalyticESC.IFS.isDualAttractor_range) and uniqueness from a direct coding argument; the paper applies Hutchinson's theorem. The hypothesis 0 < N is the paper's implicit assumption that the IFS has a map."
 
   - source: "thm:DualSSC"
     kind: theorem
@@ -127,7 +127,7 @@ entries:
     lean: ["AnalyticESC.IFS.dualProj_mem_analyticSpace", "AnalyticESC.IFS.exists_dualProj_holder", "AnalyticESC.IFS.isDualAttractor_range"]
     relation: split
     headline: false
-    note: "The three claims: H_i lies in C^omega_eps([0,1]) (as AnalyticESC.analyticSpace, without continuity on the closure of B_eps), the Hoelder bound on B_eps, and that {H_i : i in Sigma} is a dual attractor, hence the attractor by AnalyticESC.IFS.existsUnique_isDualAttractor."
+    note: "The three claims: H_i lies in C^omega_eps([0,1]) (AnalyticESC.analyticSpace), the Hoelder bound on B_eps, and that {H_i : i in Sigma} is a dual attractor, hence the attractor by AnalyticESC.IFS.existsUnique_isDualAttractor. Boundary continuity is proved by uniform convergence of the defining series on the closure of B_eps (AnalyticESC.IFS.continuousOn_dualProj)."
 
   - source: "lem:SSCEequiv"
     kind: lemma
@@ -215,4 +215,4 @@ entries:
     lean: ["AnalyticESC.lemma_5_1", "AnalyticESC.existsUnique_fixedPoint"]
     relation: split
     headline: false
-    note: "The map g is a + b g_hat for the linearising map g_hat of (5.2), AnalyticESC.koenigs. Lean constructs g_hat as the uniform limit (5.2) on B_eps and shows g_hat'' = H_hat_f g_hat'; the paper defines g_hat by integrating H_hat_f and derives (5.2). Invertibility means injectivity of the real restriction on [0,1], and g lies in AnalyticESC.analyticSpace, without continuity on the closure of B_eps. The second part assumes g twice differentiable within [0,1], with one-sided derivatives at the end points, and follows the paper. H_hat_f of (5.1) is AnalyticESC.hatH."
+    note: "The map g is a + b g_hat for the linearising map g_hat of (5.2), AnalyticESC.koenigs. Lean constructs g_hat as the uniform limit (5.2) on the closure of B_eps and shows g_hat'' = H_hat_f g_hat'; the paper defines g_hat by integrating H_hat_f and derives (5.2). Invertibility means injectivity of the real restriction on [0,1], and g lies in AnalyticESC.analyticSpace, including continuity on the closure of B_eps (AnalyticESC.continuousOn_koenigs). The second part assumes g twice differentiable within [0,1], with one-sided derivatives at the end points, and follows the paper. H_hat_f of (5.1) is AnalyticESC.hatH."
