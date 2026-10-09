@@ -1,10 +1,12 @@
 # Exponential separation of analytic self-conformal sets on the real line
 
 Lean 4 formalisation of *On exponential separation of analytic self-conformal sets on the real line*
-by Balázs Bárány, István Kolossváry and Sascha Troscheit
-([arXiv:2509.07888](https://arxiv.org/abs/2509.07888)). The theorem numbers and correspondence below
-refer to the revised working manuscript `analytic.tex` of 5 October 2026, which includes corrections
-made after arXiv v2.
+by Balázs Bárány, István Kolossváry and Sascha Troscheit,
+[arXiv:2509.07888v2](https://arxiv.org/abs/2509.07888v2) (26 March 2026). The theorem, section and
+equation numbers below and in the Lean sources refer to this version. Where a Lean statement or
+proof differs from the printed text, the difference is listed under
+[Relation to arXiv v2](#relation-to-arxiv-v2) and recorded in the correspondence files. A revised
+version of the paper incorporating these corrections is in preparation.
 
 ## Formalised results
 
@@ -47,16 +49,62 @@ vocabulary and proves the theorems from [AnalyticESC](AnalyticESC.lean). The sol
 are free of `sorry`. [comparator.json](comparator.json) selects the twelve theorems and permits
 only `propext`, `Classical.choice` and `Quot.sound`; there are no literature axioms.
 
-[paper-correspondence.yaml](paper-correspondence.yaml) maps 26 theorem, lemma, proposition,
-corollary and definition environments to Lean and records the precise qualifications.
+[paper-correspondence.yaml](paper-correspondence.yaml) maps the 26 theorem, lemma, proposition,
+corollary and definition environments of arXiv v2 to Lean and records the precise qualifications.
 [formalization.yaml](formalization.yaml) records the sources, authorship and use of AI, and
 summarises the differences.
-The main differences are:
 
-- Corollary 1.7 is formalised for `N ≥ 2`; its trivial `N = 1` case is omitted.
-- Complex derivatives of holomorphic extensions represent derivatives of the real analytic maps.
-- Some constants are chosen differently without affecting the validity of the result.
- Proposition 4.2 chooses equal widths and proves the two omitted second-derivative estimates.
+## Relation to arXiv v2
+
+The Lean statements differ from the printed statements of arXiv v2 at the following points.
+
+- **The space `𝔖_N`.** Section 1.1 of v2 fixes `ε > 0` and takes `𝔖_N` to be the IFSs with maps
+  in `S^ω_ε(I)`. The Lean space `𝔖_N` (`InUnionClass`) consists of the IFSs whose maps lie in
+  `S^ω_ε(I)` for some `ε > 0` depending on the system, with the `𝒞²` metric `d₂`. Theorem 1.4 and
+  Corollary 1.7 are stated for this space, and their open and dense sets are relative to it.
+  Theorems 1.5, 1.6 and 1.12 and Proposition 1.8 are stated for a fixed `ε`, as printed.
+- **Proposition 1.8** assumes `N ≥ 2`. For `N = 1` the printed conclusion `β > 0` can fail.
+- **Corollary 1.7** is formalised for `N ≥ 2`; its `N = 1` case is omitted.
+- **The example of Section 1.2.2.** v2 deduces `dim_H Λ = s(Φ)` and `dim μ_p = H(p)/χ` from
+  Corollary 1.7. Lean deduces them from Theorem 1.6, after proving that the attractor is not a
+  singleton, `s(Φ) < 1` and `H(p) < χ`, which the endpoint records.
+- **Theorem 1.12, first claim.** v2 states that `Φ` is conjugated to an analytic IFS with at least
+  one similarity map. Lean states the claim precisely: for every `i` there is an analytic invertible
+  `g` with `g' ≠ 0` on `[0,1]` such that `g ∘ f_i ∘ g⁻¹` is a contracting similarity on `g([0,1])`.
+- **Theorem 2.3 (b)** is stated for distinct words `i, j` of the same length; v2 omits
+  distinctness.
+- **Lemma 2.5.** Items (a), (b) and (c) are formalised. Item (d) of v2, the uniform separation of
+  `H_i` and `H_j` over finite words `i, j ∈ Σ_*` with `i₁ ≠ j₁`, is not formalised.
+- **Lemma 2.10** is proved for all distinct words `i, j ∈ Σ ∪ Σ_*`; v2 assumes
+  `|i ∧ j| < min{|i|, |j|}`.
+- **Lemma 4.1** assumes that compositions along distinct finite words differ on `[0,1]`, which
+  follows from the absence of exact overlaps assumed in v2.
+- **Proposition 4.2** assumes `f([0,1]) ⊆ (0,1)` and produces `g ∈ S^ω_{ε'}(I)` for some `ε' > 0`;
+  v2 states `g ∈ S^ω_ε(I)` with the `ε` of `f` and does not assume `f([0,1]) ⊆ (0,1)`. Lean
+  chooses equal widths, pads an empty `𝒵` by a point of `[0,1] \ 𝒴`, and proves the two
+  second-derivative estimates that v2 leaves to the reader.
+- **Lemma 5.1** assumes `b ≠ 0`; v2 states the lemma for all `a, b ∈ ℝ`.
+- **The function space `C^ω_ε([0,1])`** of Section 2.1 is represented by the maps holomorphic on
+  `B_ε`, continuous on its closure and real on `I`; v2 does not require continuity on the closure.
+- **Complex derivatives.** Maps are given by holomorphic extensions, and derivatives at real points
+  are complex derivatives, which agree with the real ones.
+- **Constants** may be larger than the printed constants.
+
+Some Lean proofs depart from the printed proofs.
+
+- Theorem 2.2 is proved first, and Theorem 1.5 is deduced from it by compactness and Lemma 2.5 (c),
+  using only the infinite-word part of (1.5). v2 proves Theorem 1.5 directly and deduces
+  Theorem 2.2. The Lean proof of Theorem 2.2 treats the case of finite limit words, which v2 does
+  not, and uses (3.3) with the absolute value `|f'_u|^k` in the denominator.
+- In the density proof of Theorem 1.4, v2 asserts that exact overlaps can be removed by an
+  arbitrarily small perturbation. Lean proves this by an interpolation lemma, which also makes the
+  maps send `[0,1]` into `(0,1)`, and fixes the strictly invariant cylinder of Lemma 2.5 (b)
+  together with a `d₂`-neighbourhood in which its inclusions persist before choosing `δ` and the
+  word length, so that Lemma 2.5 (b) applies to the perturbed system.
+- Lemma 2.6 controls the perturbed system with the constants `c_min/2` and a constant in
+  `(c_max, 1)`; v2 uses `c_min` and `c_max`.
+- Theorem 1.12 (b) treats a common fixed point of `f_i` and `f_j` by commutation, and Theorem 2.3
+  treats a singleton attractor separately; the proofs in v2 apply Theorem 1.12 (a) in both cases.
 
 ## Build and verification
 
@@ -70,7 +118,9 @@ python3 scripts/check_module_headers.py
 
 The warnings about `sorry` in Challenge are intentional. The source check enforces the module
 headers, the Palomar file-size limits and the exclusion of Lean symlinks. Locally,
-`python3 scripts/check_paper_correspondence.py` also checks the manifest against `../analytic.tex`.
+`python3 scripts/check_paper_correspondence.py` also checks the manifest against `../analytic.tex`,
+the authors' working manuscript, whose statement environments and labels coincide with those of
+the arXiv v2 source.
 The workstation shares `.lake/packages` with another project; do not run `lake update` there.
 
 On Linux, `./comparator-audit.sh` runs the sandboxed Comparator with the bundled NanoDa and

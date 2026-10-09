@@ -34,20 +34,22 @@ sources:
       - "István Kolossváry"
       - "Sascha Troscheit"
     type: "paper"
-    id: "arXiv:2509.07888"
-    location: "Working manuscript analytic.tex, 5 October 2026: Sections 1 to 5"
+    id: "arXiv:2509.07888v2"
+    location: "arXiv:2509.07888v2, 26 March 2026: Sections 1 to 5"
     relationship: "formalizes"
     note: >-
-      The paper whose results are formalised here. paper-correspondence.yaml records the
-      statement-by-statement correspondence with the Lean declarations. The formalisation and the
-      paper are developed by the same authors. The source is the revised working manuscript,
-      including corrections after arXiv v2; the correspondence does not claim to verify v2 as printed.
+      The paper whose results are formalised here, in the version arXiv v2 of 26 March 2026.
+      paper-correspondence.yaml records the statement-by-statement correspondence with the Lean
+      declarations and the points at which the Lean statements or proofs differ from the printed
+      text; fidelity.divergences summarises them. The formalisation and the paper are developed
+      by the same authors. A revised version of the paper incorporating these corrections is in
+      preparation.
     author_endorsement: "participated"
   - title: "Dimension of self-conformal measures associated to an exponentially separated analytic IFS on R"
     authors:
       - "Ariel Rapaport"
     type: "preprint"
-    id: "arXiv:2412.16753"
+    id: "arXiv:2412.16753v2"
     location: "arXiv:2412.16753v2, 10 January 2025, Theorem 1.2 and Corollary 1.3"
     relationship: "background"
     note: "These results are explicit named hypotheses of the dimension endpoints; their proofs are not formalised."
@@ -119,38 +121,59 @@ automation:
 
 fidelity:
   divergences: >-
-    Maps are represented by holomorphic extensions, with complex derivatives at real points.
-    Finite and infinite words are separated in Challenge and represented together internally.
-    The space analyticSpace represents the manuscript's functions by their restrictions to
-    B_epsilon, requiring holomorphy there, continuity on its closure and real values on I.
-    Restriction identifies this space with a closed subspace of the continuous functions on
-    the closure of B_epsilon, where the Hutchinson construction is carried out. The complex form
-    of Lemma 2.7 uses a
-    local primitive of f''/f'; its real derivatives are proved equal to those of log|f'|.
-    Equation (3.3) uses norms, positive interval lengths and an eventual smallness condition;
-    the absolute-value denominator and its c_min bound are proved and used. Constants may
-    overestimate the manuscript's choices. Proposition 4.2 chooses equal widths,
-    supplies the two second-derivative estimates left to the reader
-    and obtains C = 40/m for a margin m of f. Near the interpolation points a product ratio
-    is controlled by continuity instead of writing out its individual factors.
-    Literature inputs are explicit hypotheses, not axioms: a one-sided full-shift
-    specialisation of Bowen's theorem and Rapaport's results together with Feng–Hu exact
-    dimensionality. The natural measure, not defined in the manuscript, is the image of
-    any probability Gibbs measure for s(Phi) log|f'| under the natural projection. Lean
-    computes its local dimension at 0, expanding the details left to the reader. The required
-    ball-mass estimate of Shmerkin's Lemma 1.7 is proved here at 0 for measures supported
-    on [0,infinity). Summability and boundedness needed for the L^q definition
-    are proved in the library. The pressure zero is constructed using Fekete's lemma.
-    Theorem 1.6 assumes N > 0, and Corollary 1.7 is restricted to N ≥ 2. Measure dimension is
-    stated as almost everywhere local dimension. Full statement-level qualifications are
-    recorded in paper-correspondence.yaml.
+    The source is arXiv:2509.07888v2; theorem, section and equation numbers refer to it. Maps
+    are represented by holomorphic extensions, with complex derivatives at real points. Finite
+    and infinite words are separated in Challenge and represented together internally. The
+    space 𝔖_N (InUnionClass) consists of the IFSs whose maps lie in S^omega_epsilon(I) for
+    some epsilon > 0 depending on the system, with the C^2 metric; v2 fixes epsilon throughout.
+    Theorem 1.4 and Corollary 1.7 are stated for this space, and their open and dense sets are
+    relative to it. Theorem 1.6 assumes N > 0, Corollary 1.7 is restricted to N >= 2, and
+    Proposition 1.8 assumes N >= 2, which v2 does not; for N = 1 its conclusion beta > 0 can
+    fail. The dimensions of the example of Section 1.2.2 are deduced from Theorem 1.6 after
+    proving that the attractor is not a singleton, s(Phi) < 1 and H(p) < chi, where v2 cites
+    Corollary 1.7. The first claim of Theorem 1.12 is stated precisely: for every i there is an
+    analytic invertible g with g' nonzero on [0,1] such that g f_i g^{-1} is a contracting
+    similarity. Theorem 2.3 (b) is stated for distinct words. Lemma 2.5 (d) of v2 is not
+    formalised. Lemma 2.10 is proved for all distinct words, Lemma 4.1 under the weaker
+    hypothesis that compositions along distinct finite words differ on [0,1], and Lemma 5.1 for
+    b != 0. Proposition 4.2 assumes f([0,1]) in (0,1) and yields g in S^omega_{epsilon'}(I) for
+    some epsilon' > 0, where v2 states g in S^omega_epsilon(I); the proof chooses equal widths,
+    pads an empty Z by a point of I outside Y, supplies the two second-derivative estimates
+    left to the reader and obtains C = 40/m for a margin m of f. Near the interpolation points
+    a product ratio is controlled by continuity instead of writing out its individual factors.
+    The space analyticSpace represents the functions C^omega_epsilon([0,1]) of v2 by their
+    restrictions to B_epsilon, requiring holomorphy there, continuity on its closure, which v2
+    does not require, and real values on I. Restriction identifies this space with a closed
+    subspace of the continuous functions on the closure of B_epsilon, where the Hutchinson
+    construction is carried out. The complex form of Lemma 2.7 uses a local primitive of
+    f''/f'; its real derivatives are proved equal to those of log|f'|. Theorem 2.2 is proved
+    first, including the case of finite limit words, and Theorem 1.5 is deduced from it by
+    compactness and Lemma 2.5 (c), using only the infinite-word part of (1.5); v2 proves
+    Theorem 1.5 directly. Equation (3.3) uses norms, positive interval lengths and an eventual
+    smallness condition; the absolute-value denominator |f_u'|^k and its c_min bound are
+    proved and used. In the density proof of Theorem 1.4, the removal of exact overlaps by a
+    small perturbation, asserted in v2, is proved by an interpolation lemma, and the invariant
+    cylinder is fixed together with a d_2-neighbourhood in which its inclusions persist before
+    delta and the word length are chosen. Lemma 2.6 controls the perturbed system with
+    c_min/2 and a constant in (c_max, 1). Theorem 1.12 (b) treats a common fixed point by
+    commutation and Theorem 2.3 treats a singleton attractor separately. Constants may
+    overestimate the printed choices. Literature inputs are explicit hypotheses, not axioms: a
+    one-sided full-shift specialisation of Bowen's theorem and Rapaport's results together
+    with Feng–Hu exact dimensionality. The natural measure, not defined in the paper, is the
+    image of any probability Gibbs measure for s(Phi) log|f'| under the natural projection.
+    Lean computes its local dimension at 0, expanding the details left to the reader. The
+    required ball-mass estimate of Shmerkin's Lemma 1.7 is proved here at 0 for measures
+    supported on [0,infinity). Summability and boundedness needed for the L^q definition are
+    proved in the library. The pressure zero is constructed using Fekete's lemma. Measure
+    dimension is stated as almost everywhere local dimension. Full statement-level
+    qualifications are recorded in paper-correspondence.yaml.
 
 review:
   status: "unchecked"
   reviewers: []
   notes: >-
-    Automated review compares the challenge statements and the main proof routes with the
-    revised working manuscript. This is not independent human review or author approval.
+    Automated review compares the challenge statements and the main proof routes with
+    arXiv:2509.07888v2. This is not independent human review or author approval.
     Mechanical verification of a submitted snapshot is recorded by CI and Palomar, not inferred
     from the correspondence manifest.
 
@@ -161,7 +184,7 @@ alignment:
       lean: "Challenge.audit_sesc_open_dense"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Generic.OpenDense, for the union class 𝔖_N."
+      note: "Proved in Solution from AnalyticESC.Generic.OpenDense, for the union class 𝔖_N of systems whose maps lie in S^ω_ε(I) for some ε > 0 depending on the system; v2 fixes ε throughout."
     - source: "Theorem 1.5 (sufficient condition for the SESC)"
       lean: "Challenge.audit_sesc_of_dualProj"
       module: "Challenge"
@@ -171,7 +194,7 @@ alignment:
       lean: "Challenge.audit_example_criterion"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Main.Criterion."
+      note: "Proved in Solution from AnalyticESC.Main.Criterion, with the hypothesis N ≥ 2 added to the printed statement."
     - source: "The example of Section 1.2.2"
       lean: "Challenge.audit_example_sesc"
       module: "Challenge"
@@ -181,7 +204,7 @@ alignment:
       lean: "Challenge.audit_conj_similarity"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Conjugation.Characterisation."
+      note: "Proved in Solution from AnalyticESC.Conjugation.Characterisation, in the precise form of the first claim stated in Challenge."
     - source: "Theorem 1.12 (a) (conjugacy to a self-similar IFS)"
       lean: "Challenge.audit_conj_iff"
       module: "Challenge"
@@ -191,7 +214,7 @@ alignment:
       lean: "Challenge.audit_subconj_iff"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Conjugation.PeriodicPoints (IFS.theorem_1_12), whose part (b) applies (a) to the two-map subsystem and uses commutation for a common fixed point; the hypothesis on the original attractor is not needed."
+      note: "Proved in Solution from AnalyticESC.Conjugation.PeriodicPoints (IFS.theorem_1_12), whose part (b) applies (a) to the two-map subsystem and uses commutation for a common fixed point, a case the proof in v2 does not treat; the hypothesis on the original attractor is not needed."
     - source: "Theorem 1.6 (Rapaport: dimension under the ESC)"
       lean: "Challenge.audit_dim_of_esc"
       module: "Challenge"
@@ -201,12 +224,12 @@ alignment:
       lean: "Challenge.audit_dim_open_dense"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Dimension.OpenDense assuming Rapaport's results, for N ≥ 2."
+      note: "Proved in Solution from AnalyticESC.Dimension.OpenDense assuming Rapaport's results, for N ≥ 2; the printed corollary is for every N and its N = 1 case is omitted."
     - source: "The example of Section 1.2.2 (dimensions of the attractor and of self-conformal measures)"
       lean: "Challenge.audit_example_dim"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Dimension.Example, assuming Rapaport's results."
+      note: "Proved in Solution from AnalyticESC.Dimension.Example, assuming Rapaport's results, from Theorem 1.6 after proving s(Φ) < 1 and H(p) < χ; v2 cites Corollary 1.7."
     - source: "The remark at the end of Section 1.2.2 (local dimension of the natural measure at 0)"
       lean: "Challenge.audit_example_localDim"
       module: "Challenge"

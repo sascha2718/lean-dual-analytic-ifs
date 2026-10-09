@@ -19,7 +19,7 @@ Lemma 4.1 and their orbits are split, for each letter `ℓ`, into the set `𝒴_
 `x_{i,j}` of the bad pairs with `i₁ = ℓ` and the set `𝒵_ℓ` of the remaining orbit points, and
 Proposition 4.2 perturbs each map accordingly. A strictly invariant cylinder is fixed first;
 uniform continuity estimates in the `d₂` metric give a neighbourhood where its strict
-inclusions persist. Only then are `δ` and the word length chosen, as in the manuscript.
+inclusions persist. Only then are `δ` and the word length chosen.
 -/
 
 namespace AnalyticESC

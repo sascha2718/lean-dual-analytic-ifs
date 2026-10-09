@@ -8,8 +8,9 @@ public import Mathlib
 # Exponential separation of analytic self-conformal sets on the real line
 
 Headline statements from B. Bárány, I. Kolossváry and S. Troscheit, *On exponential separation
-of analytic self-conformal sets on the real line*. Theorem and equation numbers refer to the
-manuscript.
+of analytic self-conformal sets on the real line*, arXiv:2509.07888v2 (26 March 2026). Theorem,
+section and equation numbers refer to this version; differences from the printed statements are
+noted in the docstrings and in `README.md`.
 
 A map of the IFS is given by its holomorphic extension `f : ℂ → ℂ`; on `[0,1]` it is real, and its
 complex derivatives at real points are the derivatives of its real restriction. Finite words are
@@ -116,7 +117,8 @@ noncomputable def d2Map (f g : ℂ → ℂ) : ℝ :=
 /-- The `𝒞²` distance `d₂(Φ, Ψ) = max_i d₂(f_i, g_i)` between two IFSs (Section 1.1). -/
 noncomputable def d2 (f g : Fin N → ℂ → ℂ) : ℝ := ⨆ i, d2Map (f i) (g i)
 
-/-- The space `𝔖_N` of Section 1.1: IFSs whose maps lie in `S^ω_ε(I)` for some `ε > 0`. -/
+/-- The space `𝔖_N` of Section 1.1: IFSs whose maps lie in `S^ω_ε(I)` for some `ε > 0`, which may
+depend on the system. Section 1.1 of arXiv v2 fixes `ε` throughout. -/
 def InUnionClass (f : Fin N → ℂ → ℂ) : Prop := ∃ ε > 0, ∀ i, InClass ε (f i)
 
 section Dimension
@@ -231,7 +233,7 @@ def BowenGibbsStatement : Prop :=
     ∃ ν : Measure (ℕ → Fin N), IsProbabilityMeasure ν ∧ IsGibbsMeasure φ ν
 
 /-- **Cited result.** A. Rapaport, *Dimension of self-conformal measures associated to an
-exponentially separated analytic IFS on ℝ*, arXiv:2412.16753, Theorem 1.2, together with the exact
+exponentially separated analytic IFS on ℝ*, arXiv:2412.16753v2, Theorem 1.2, together with the exact
 dimensionality of self-conformal measures, D.-J. Feng and H. Hu, *Dimension theory of iterated
 function systems*, Comm. Pure Appl. Math. 62 (2009): under `RapaportHyp`, for a positive
 probability vector `p`, the self-conformal measure `μ = ∑_i p_i φ_i μ` on `I` satisfies
@@ -247,7 +249,7 @@ def RapaportMeasureStatement : Prop :=
           (-∑ i, p i * ∫ y, Real.log |deriv (φ i) y| ∂μ))))
 
 /-- **Cited result.** A. Rapaport, *Dimension of self-conformal measures associated to an
-exponentially separated analytic IFS on ℝ*, arXiv:2412.16753, Corollary 1.3: under `RapaportHyp`,
+exponentially separated analytic IFS on ℝ*, arXiv:2412.16753v2, Corollary 1.3: under `RapaportHyp`,
 the attractor `K`, the nonempty compact set `K ⊆ I` with `K = ⋃_i φ_i(K)`, has Hausdorff dimension
 `min{1, s(Φ)}`, where `s(Φ)` is the zero of the pressure
 `P(t) = lim_n (1/n) log ∑_{u ∈ Σ_n} (sup_{x ∈ I} |φ_u'(x)|)^t`. -/
@@ -286,7 +288,8 @@ theorem audit_sesc_of_dualProj {ε : ℝ} (hε : 0 < ε) (f : Fin N → ℂ → 
 Suppose that there is `α > 0` such that for all `i ≠ j` there is `x ∈ [0,1]` with
 `|f_i''/f_i'(x) - f_j''/f_j'(x)| ≥ α`. Then `β > 0`, and if `α > 2β c_max/(1 - c_max)`, then
 `sup_{x ∈ [0,1]} |H_i(x) - H_j(x)| > 0` for all distinct `i, j ∈ Σ ∪ Σ_*` with `|i| = |j|`, and `Φ`
-satisfies the strong exponential separation condition. -/
+satisfies the strong exponential separation condition. The hypothesis `N ≥ 2` is not in the
+printed statement, whose conclusion `β > 0` can fail for `N = 1`. -/
 theorem audit_example_criterion {ε : ℝ} (hε : 0 < ε) (f : Fin N → ℂ → ℂ)
     (hf : ∀ i, InClass ε (f i)) (hN : 2 ≤ N) {α : ℝ} (hα : 0 < α)
     (hsep : ∀ i j : Fin N, i ≠ j → ∃ x ∈ I, α ≤ ‖nonlin (f i) x - nonlin (f j) x‖) :
@@ -305,7 +308,9 @@ theorem audit_example_sesc : ∃ ε > 0, (∀ i, InClass ε (exampleMaps i)) ∧
   sorry
 
 /-- Theorem 1.12, first claim: an analytic IFS is conjugated, by an analytic map with nonvanishing
-derivative, to an analytic IFS in which the map corresponding to `f_i` is a similarity. -/
+derivative, to an analytic IFS in which the map corresponding to `f_i` is a similarity. This is the
+precise form of the printed claim that `Φ` is conjugated to an analytic IFS with at least one
+similarity map. -/
 theorem audit_conj_similarity {ε : ℝ} (hε : 0 < ε) (f : Fin N → ℂ → ℂ)
     (hf : ∀ i, InClass ε (f i)) (i : Fin N) :
     ∃ g, IsAnalyticCoord g ∧ (∀ x ∈ I, deriv g x ≠ 0) ∧
@@ -338,15 +343,15 @@ section DimensionEndpoints
 open MeasureTheory Filter Topology
 
 /-- Theorem 1.6 (Rapaport), from Rapaport's Theorem 1.2 and Corollary 1.3. Let
-`Φ = (f_i)_{i ∈ Fin N}` be an analytic IFS in `𝔖_N` whose attractor is not a singleton. If `Φ`
-satisfies the ESC, then there is equality in (1.6). -/
+`Φ = (f_i)_{i ∈ Fin N}`, `N ≥ 1`, be an analytic IFS in `𝔖_N` whose attractor is not a singleton.
+If `Φ` satisfies the ESC, then there is equality in (1.6). -/
 theorem audit_dim_of_esc (hM : RapaportMeasureStatement) (hS : RapaportSetStatement) {ε : ℝ}
     (hε : 0 < ε) (f : Fin N → ℂ → ℂ) (hf : ∀ i, InClass ε (f i)) (hN : 0 < N) (hnd : ¬ ∃ x, attractor f = {x}) (hesc : ESC f) : DimEquality f := by
   sorry
 
 /-- Corollary 1.7, from Rapaport's Theorem 1.2 and Corollary 1.3. For `N ≥ 2`, the IFSs in `𝔖_N`
 with equality in (1.6) contain a subset `U` of `𝔖_N` that is open and dense in `𝔖_N` for the `𝒞²`
-metric `d₂`. -/
+metric `d₂`. The printed corollary is for every `N`; its `N = 1` case is omitted. -/
 theorem audit_dim_open_dense (hM : RapaportMeasureStatement) (hS : RapaportSetStatement)
     (hN : 2 ≤ N) :
     ∃ U : Set (Fin N → ℂ → ℂ), (∀ f ∈ U, InUnionClass f ∧ DimEquality f) ∧
@@ -356,7 +361,8 @@ theorem audit_dim_open_dense (hM : RapaportMeasureStatement) (hS : RapaportSetSt
 
 /-- The example of Section 1.2.2, from Rapaport's Theorem 1.2 and Corollary 1.3:
 `dim_H Λ = s(Φ) < 1`, where `s(Φ)` is the unique zero of the pressure, and `dim μ_p = H(p)/χ < 1` at
-`μ_p`-almost every point, for every positive probability vector `p`. -/
+`μ_p`-almost every point, for every positive probability vector `p`, by Theorem 1.6; the printed
+text cites Corollary 1.7. -/
 theorem audit_example_dim (hM : RapaportMeasureStatement) (hS : RapaportSetStatement) :
     ∃ s : ℝ,
       (∀ t, Tendsto (fun n : ℕ => Real.log (pressureSum exampleMaps t n) / n) atTop (𝓝 0) ↔

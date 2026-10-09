@@ -45,8 +45,8 @@ summand by `F_max δ |f'(y)|/|f(y)|`. The paper's "Hence `g ∈ S^ω([0,1])`" is
 * All widths are equal, `η_y = ρ³`, and `(C1)`-`(C4)`, (4.5), (4.6) and the comparison near `𝒴`
   are conditions on `ρ`, which is taken small last. The conditions from (4.3) are imposed with
   `c = a_y` and a common right-hand side `ν`, which absorbs the fixed factors.
-* An empty `𝒵` is padded by a point outside `𝒴`, as in the manuscript. Thus `Q ≥ 1`, and the
-  factors `16Q² + 12Q` and `8Q` in `(C1)` and `(C2)` apply without changing them.
+* An empty `𝒵` is padded by a point outside `𝒴`, a case the paper does not treat. Thus `Q ≥ 1`,
+  and the factors `16Q² + 12Q` and `8Q` in `(C1)` and `(C2)` apply without changing them.
 * The paper writes out the near/far split for `‖φ'' ψ A‖` and leaves `‖φ ψ A''‖` and
   `‖φ' ψ A'‖` to the reader. These two norms are not small: near `y` they are of order
   `a_y ψ(y) ∏_{y' ≠ y} (y - y')² = δ |f'(y)|/(2 |f(y)|)`, so they contribute to `C δ`. Their
@@ -1403,8 +1403,8 @@ private theorem proposition_4_2_nonempty {ε : ℝ} (hε : 0 < ε) {f : ℂ → 
     have e : 2 * (20 * (δ / m)) = 40 / m * δ := by ring
     linarith
 
-/-- Proposition 4.2. As in the manuscript, pad an empty `Z` by a point of `I \ Y`
-before making the multiplicative perturbation. -/
+/-- Proposition 4.2, for `f` with `f([0,1]) ⊆ (0,1)` and `g` in the class for some `ε' > 0`. An
+empty `Z` is padded by a point of `I \ Y` before making the multiplicative perturbation. -/
 theorem proposition_4_2 {ε : ℝ} (hε : 0 < ε) {f : ℂ → ℂ} (hf : InClass ε f)
     (hI : ∀ x ∈ I, (f x).re ∈ Ioo 0 1) :
     ∃ C > 0, ∀ Y Z : Finset ℝ, (∀ y ∈ Y, y ∈ I) → (∀ z ∈ Z, z ∈ I) → Disjoint Y Z →

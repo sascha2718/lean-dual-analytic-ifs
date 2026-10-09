@@ -19,7 +19,7 @@ audited theorems that use them.
   diffeomorphisms*, Lecture Notes in Mathematics 470, Springer, 1975, Theorem 1.4, for the
   one-sided full shift.
 * `RapaportMeasureStatement`: A. Rapaport, *Dimension of self-conformal measures associated to an
-  exponentially separated analytic IFS on ℝ*, arXiv:2412.16753, Theorem 1.2, with the exact
+  exponentially separated analytic IFS on ℝ*, arXiv:2412.16753v2, Theorem 1.2, with the exact
   dimensionality of self-conformal measures of D.-J. Feng and H. Hu, *Dimension theory of iterated
   function systems*, Comm. Pure Appl. Math. 62 (2009).
 * `RapaportSetStatement`: the same paper of Rapaport, Corollary 1.3.

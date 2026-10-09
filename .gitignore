@@ -8,3 +8,4 @@ Archive/
 Archive.lean
 texput.log
 .DS_Store
+*.swp
