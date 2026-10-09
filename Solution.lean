@@ -358,10 +358,9 @@ theorem audit_example_sesc : ∃ ε > 0, (∀ i, InClass ε (exampleMaps i)) ∧
   subst hΦ
   exact ⟨ε, hε, fun i => ⟨(hg i).1, (hg i).2, (hg i).3, (hg i).4, (hg i).5, (hg i).6⟩, hS⟩
 
-/-- Theorem 1.12, first claim: an analytic IFS is conjugated, by an analytic map with nonvanishing
-derivative, to an analytic IFS in which the map corresponding to `f_i` is a similarity. This is the
-precise form of the printed claim that `Φ` is conjugated to an analytic IFS with at least one
-similarity map. -/
+/-- Individual-map linearisation for Theorem 1.12: an analytic coordinate with nonvanishing
+derivative conjugates the chosen map `f_i` to a contracting similarity. This is narrower than
+the first claim in arXiv v2: contraction of the other conjugated maps is not asserted. -/
 theorem audit_conj_similarity {ε : ℝ} (hε : 0 < ε) (f : Fin N → ℂ → ℂ)
     (hf : ∀ i, InClass ε (f i)) (i : Fin N) :
     ∃ g, IsAnalyticCoord g ∧ (∀ x ∈ I, deriv g x ≠ 0) ∧

@@ -8,7 +8,7 @@ public import AnalyticESC.Conjugation.Composite
 /-!
 # Single-map conjugation
 
-The first assertion of Theorem 1.12 and the single-map ODE tools used in its proof.
+Individual-map linearisation for Theorem 1.12 and the single-map ODE tools used in its proof.
 The equivalences, including the two-map subsystem argument for part (b), are proved in
 `Conjugation.PeriodicPoints`.
 -/
@@ -94,8 +94,9 @@ namespace IFS
 
 variable {N : ℕ} {ε : ℝ} (Φ : IFS N ε)
 
-/-- Theorem 1.12, first claim: `Φ` is conjugated, by a map with nonvanishing derivative, to an
-analytic IFS in which `g ∘ f_i ∘ g⁻¹` is a similarity. -/
+/-- Individual-map linearisation for Theorem 1.12: an analytic coordinate with nonvanishing
+derivative conjugates `f_i` to a contracting similarity. Contraction of the other conjugated
+maps is not asserted. -/
 theorem theorem_1_12_similarity (i : Fin N) :
     ∃ g, IsAnalyticCoord g ∧ (∀ x ∈ I, deriv g x ≠ 0) ∧
       ∃ lam t : ℝ, lam ≠ 0 ∧ |lam| < 1 ∧ ∀ x ∈ I, g (Φ.f i x).re = lam * g x + t := by

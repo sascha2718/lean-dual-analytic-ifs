@@ -74,9 +74,10 @@ related_formalizations: []
 
 status:
   scope: >-
-    Twelve comparator endpoints cover Theorems 1.4, 1.5, 1.6 and 1.12, Corollary 1.7 for
-    N ≥ 2, Proposition 1.8, and the separation and dimension properties of the example in
-    Section 1.2.2. Seven endpoints are unconditional and five use the explicit named
+    Twelve comparator endpoints cover Theorems 1.4, 1.5 and 1.6, individual-map linearisation
+    and parts (a) and (b) of Theorem 1.12, Corollary 1.7 for N ≥ 2, Proposition 1.8, and the
+    separation and dimension properties of the example in Section 1.2.2. Seven endpoints are
+    unconditional and five use the explicit named
     literature hypotheses BowenGibbsStatement, RapaportMeasureStatement or RapaportSetStatement,
     defined in Challenge, Solution and Dimension/Defs.lean. The library also proves the
     supporting statements of Sections 2 to 5, with the qualifications in
@@ -128,10 +129,11 @@ fidelity:
     relative to it. Theorem 1.6 assumes N > 0, Corollary 1.7 is restricted to N >= 2, and
     Proposition 1.8 assumes N >= 2, which v2 does not. The dimensions of the example of
     Section 1.2.2 are deduced from Theorem 1.6 after proving that the attractor is not a singleton,
-    s(Phi) < 1 and H(p) < chi, where v2 cites Corollary 1.7. The first claim of Theorem 1.12 is
-    formalised as follows: for every i there is an
-    analytic invertible g with g' nonzero on [0,1] such that g f_i g^{-1} is a contracting
-    similarity. Theorem 2.3 (b) is stated for distinct words. Lemma 2.5 (d) of v2 is not
+    s(Phi) < 1 and H(p) < chi, where v2 cites Corollary 1.7. For the first claim of Theorem 1.12,
+    Lean proves only individual-map linearisation: for every i there is an analytic invertible
+    g with g' nonzero on [0,1] such that g f_i g^{-1} is a contracting similarity. Contraction
+    of the other conjugated maps, required by the full-system claim in v2, is not asserted.
+    Theorem 2.3 (b) is stated for distinct words. Lemma 2.5 (d) of v2 is not
     formalised. Lemma 2.10 is proved for all distinct words, Lemma 4.1 under the weaker
     hypothesis that compositions along distinct finite words differ on [0,1], and Lemma 5.1 for
     b != 0. Proposition 4.2 assumes f([0,1]) in (0,1) and yields g in S^omega_{epsilon'}(I) for
@@ -200,11 +202,11 @@ alignment:
       module: "Challenge"
       status: "proved"
       note: "Proved in Solution from AnalyticESC.Main.Example, with ε = 1/100."
-    - source: "Theorem 1.12, first claim (conjugacy to an IFS with a similarity map)"
+    - source: "Theorem 1.12, first claim (individual-map linearisation only)"
       lean: "Challenge.audit_conj_similarity"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Conjugation.Characterisation, in the precise form of the first claim stated in Challenge."
+      note: "Proved in Solution from AnalyticESC.Conjugation.Characterisation. The endpoint linearises the chosen map only; it does not assert contraction of the other conjugated maps."
     - source: "Theorem 1.12 (a) (conjugacy to a self-similar IFS)"
       lean: "Challenge.audit_conj_iff"
       module: "Challenge"

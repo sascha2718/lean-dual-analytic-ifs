@@ -68,8 +68,10 @@ The Lean statements differ from the printed statements of arXiv v2 at the follow
   Corollary 1.7. Lean deduces them from Theorem 1.6, after proving that the attractor is not a
   singleton, `s(Φ) < 1` and `H(p) < χ`, which the endpoint records.
 - **Theorem 1.12, first claim.** v2 states that `Φ` is conjugated to an analytic IFS with at least
-  one similarity map. Lean states this as follows: for every `i` there is an analytic invertible
-  `g` with `g' ≠ 0` on `[0,1]` such that `g ∘ f_i ∘ g⁻¹` is a contracting similarity on `g([0,1])`.
+  one similarity map. The Lean endpoint proves only individual-map linearisation: for every `i`
+  there is an analytic invertible `g` with `g' ≠ 0` on `[0,1]` such that `g ∘ f_i ∘ g⁻¹` is a
+  contracting similarity on `g([0,1])`.
+  It does not assert that the other conjugated maps are contractions.
 - **Theorem 2.3 (b)** is stated for distinct words `i, j` of the same length; v2 omits
   distinctness.
 - **Lemma 2.5.** Items (a), (b) and (c) are formalised. Item (d) of v2, the uniform separation of
