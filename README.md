@@ -3,10 +3,9 @@
 Lean 4 formalisation of *On exponential separation of analytic self-conformal sets on the real line*
 by Balázs Bárány, István Kolossváry and Sascha Troscheit,
 [arXiv:2509.07888v2](https://arxiv.org/abs/2509.07888v2) (26 March 2026). The theorem, section and
-equation numbers below and in the Lean sources refer to this version. Where a Lean statement or
+equation numbers below and in the Lean sources refer to arXiv v2. Where a Lean statement or
 proof differs from the printed text, the difference is listed under
-[Relation to arXiv v2](#relation-to-arxiv-v2) and recorded in the correspondence files. A revised
-version of the paper incorporating these corrections is in preparation.
+[Relation to arXiv v2](#relation-to-arxiv-v2) and recorded in the correspondence files.
 
 ## Formalised results
 
@@ -63,13 +62,13 @@ The Lean statements differ from the printed statements of arXiv v2 at the follow
   `S^ω_ε(I)` for some `ε > 0` depending on the system, with the `𝒞²` metric `d₂`. Theorem 1.4 and
   Corollary 1.7 are stated for this space, and their open and dense sets are relative to it.
   Theorems 1.5, 1.6 and 1.12 and Proposition 1.8 are stated for a fixed `ε`, as printed.
-- **Proposition 1.8** assumes `N ≥ 2`. For `N = 1` the printed conclusion `β > 0` can fail.
+- **Proposition 1.8** assumes `N ≥ 2`; v2 does not impose this restriction.
 - **Corollary 1.7** is formalised for `N ≥ 2`; its `N = 1` case is omitted.
 - **The example of Section 1.2.2.** v2 deduces `dim_H Λ = s(Φ)` and `dim μ_p = H(p)/χ` from
   Corollary 1.7. Lean deduces them from Theorem 1.6, after proving that the attractor is not a
   singleton, `s(Φ) < 1` and `H(p) < χ`, which the endpoint records.
 - **Theorem 1.12, first claim.** v2 states that `Φ` is conjugated to an analytic IFS with at least
-  one similarity map. Lean states the claim precisely: for every `i` there is an analytic invertible
+  one similarity map. Lean states this as follows: for every `i` there is an analytic invertible
   `g` with `g' ≠ 0` on `[0,1]` such that `g ∘ f_i ∘ g⁻¹` is a contracting similarity on `g([0,1])`.
 - **Theorem 2.3 (b)** is stated for distinct words `i, j` of the same length; v2 omits
   distinctness.
@@ -118,9 +117,8 @@ python3 scripts/check_module_headers.py
 
 The warnings about `sorry` in Challenge are intentional. The source check enforces the module
 headers, the Palomar file-size limits and the exclusion of Lean symlinks. Locally,
-`python3 scripts/check_paper_correspondence.py` also checks the manifest against `../analytic.tex`,
-the authors' working manuscript, whose statement environments and labels coincide with those of
-the arXiv v2 source.
+`python3 scripts/check_paper_correspondence.py` also checks the manifest against the statement
+environments and labels in the local file `../analytic.tex`.
 The workstation shares `.lake/packages` with another project; do not run `lake update` there.
 
 On Linux, `./comparator-audit.sh` runs the sandboxed Comparator with the bundled NanoDa and

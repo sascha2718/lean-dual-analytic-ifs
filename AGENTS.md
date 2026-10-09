@@ -2,10 +2,9 @@
 
 Durable working agreements for the Lean formalisation of *On exponential separation of analytic
 self-conformal sets on the real line*. [README.md](README.md) holds scope, differences and build
-instructions. Current proof differences and manuscript issues belong in
-`paper-correspondence.yaml` and `formalization.yaml`. The cited source is arXiv:2509.07888v2;
-the working manuscript `../analytic.tex` is ahead of it, and differences are recorded relative
-to v2.
+instructions. Differences between the Lean statements or proofs and arXiv:2509.07888v2 belong in
+`paper-correspondence.yaml` and `formalization.yaml`. Use arXiv v2 as the sole reference for these
+comparisons. Describe the differences without discussing manuscript revisions or planned fixes.
 Historical plans are preserved locally under `Archive/RepositoryReview-2026-10-05/`, outside
 the upload. Keep development history in git and verification evidence in CI logs.
 
