@@ -10,11 +10,11 @@ public import AnalyticESC.Generic.Points
 /-!
 # The density step of Theorem 1.4
 
-The proof of Theorem 1.4 in Section 4.2, after the interpolation `IFS.lemma_4_2`: an IFS whose maps
+The proof of Theorem 1.4 in Section 4.2, after the interpolation `IFS.exists_noCoincidence_near`: an IFS whose maps
 send `[0,1]` into `(0,1)` and whose compositions along distinct finite words differ on `[0,1]` has
 arbitrarily `d₂`-close perturbations whose dual IFS satisfies the SSC.
 
-The proof follows the paper with words of length `n + 1`, to match Lemma 2.5. The points of
+The proof follows the paper with words of length `n + 1`, to match Lemma 2.6. The points of
 Lemma 4.1 and their orbits are split, for each letter `ℓ`, into the set `𝒴_ℓ` of the points
 `x_{i,j}` of the bad pairs with `i₁ = ℓ` and the set `𝒵_ℓ` of the remaining orbit points, and
 Proposition 4.2 perturbs each map accordingly. A strictly invariant cylinder is fixed first;
@@ -417,7 +417,7 @@ theorem exists_dualSSC_near (hN : 0 < N) (Φ : IFS N ε)
     exact (mul_le_mul_of_nonneg_right (pow_le_pow_of_le_one hc0 hc1.le (Nat.le_succ n))
       (by linarith)).trans_lt hn
   -- the points of Lemma 4.1
-  obtain ⟨x, hxI, hxd, hxo, hxs⟩ := Φ.lemma_4_3 (n + 1) (-K) K hnc
+  obtain ⟨x, hxI, hxd, hxo, hxs⟩ := Φ.lemma_4_1 (n + 1) (-K) K hnc
   have hx : IsPointChoice Φ (-K) K n x :=
     ⟨hxI, hxd, fun p hp => (hxo p hp).1, fun p hp => (hxo p hp).2.1, hxs⟩
   -- the perturbation of Proposition 4.2
@@ -440,7 +440,7 @@ theorem exists_dualSSC_near (hN : 0 < N) (Φ : IFS N ε)
   have hZ : ∀ ℓ, ∀ z ∈ Φ.goodPoints (-K) K n x ℓ, AgreeAt (Φ.f ℓ) (Ψ.f ℓ) z :=
     fun ℓ z hz => ⟨((hg ℓ).2.1 z (Finset.mem_union_right _ hz)).1,
       ((hg ℓ).2.1 z (Finset.mem_union_right _ hz)).2, (hg ℓ).2.2.1 z hz⟩
-  refine (Ψ.lemma_2_5 hN).1.2 ⟨-K, K, by linarith, n,
+  refine (Ψ.lemma_2_6 hN).1.2 ⟨-K, K, by linarith, n,
     hstable Ψ (hd.trans_le (min_le_right _ _)), fun i j hij => ?_⟩
   rcases lt_or_gt_of_ne hij with h | h
   · exact hx.dualCylDisjoint Ψ hkK hn hY hZ (p := (i, j)) ⟨Nat.succ_pos n, h⟩

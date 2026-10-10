@@ -2,11 +2,10 @@
 
 Durable working agreements for the Lean formalisation of *On exponential separation of analytic
 self-conformal sets on the real line*. [README.md](README.md) holds scope, differences and build
-instructions. Differences between the Lean statements or proofs and arXiv:2509.07888v2 belong in
-`paper-correspondence.yaml` and `formalization.yaml`. Use arXiv v2 as the sole reference for these
-comparisons. Describe the differences without discussing manuscript revisions or planned fixes.
-Historical plans are preserved locally under `Archive/RepositoryReview-2026-10-05/`, outside
-the upload. Keep development history in git and verification evidence in CI logs.
+instructions. The reference manuscript is `../analytic.tex`, identified by the source fingerprints
+in `paper-correspondence.yaml`. Keep numbered Lean declarations and documentation aligned with its
+numbering. Record correspondence and exclusions in `paper-correspondence.yaml` and
+`formalization.yaml`. Keep development history in git and verification evidence in CI logs.
 
 ## Repositories
 
@@ -65,8 +64,10 @@ the upload. Keep development history in git and verification evidence in CI logs
 
 ## Correspondence
 
-- `paper-correspondence.yaml` has one entry per statement environment of the paper. Keep it in
-  step with the Lean sources and run `python3 scripts/check_paper_correspondence.py` from this
+- `paper-correspondence.yaml` has one entry per statement environment, including remarks, and
+  entries for selected mathematical prose. Reviewed source fingerprints detect changes; update them
+  only after checking the changed mathematics and its Lean coverage. Keep the manifest in step with
+  the Lean sources and run `python3 scripts/check_paper_correspondence.py` from this
   directory before committing.
 - An endpoint becomes audited by adding it to `comparator.json`, to the `alignment` list in
   `formalization.yaml`, and to its manifest entry with status `formalized`.

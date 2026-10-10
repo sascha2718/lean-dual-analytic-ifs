@@ -16,8 +16,8 @@ public import AnalyticESC.Dimension.Lq
 
 Proofs of the theorems stated in `Challenge.lean`, for B. Bárány, I. Kolossváry and
 S. Troscheit, *On exponential separation of analytic self-conformal sets on the real line*,
-arXiv:2509.07888v2 (26 March 2026). This module repeats the challenge vocabulary with the same
-names, types and values, without importing `Challenge.lean`, and proves each audited theorem from
+as stated in `../analytic.tex`. This module repeats the challenge vocabulary with
+the same names, types and values, without importing `Challenge.lean`, and proves each audited theorem from
 the `AnalyticESC` library. The challenge definitions unfold to the library definitions, so the
 transport is definitional.
 -/
@@ -117,7 +117,7 @@ noncomputable def d2Map (f g : ℂ → ℂ) : ℝ :=
 noncomputable def d2 (f g : Fin N → ℂ → ℂ) : ℝ := ⨆ i, d2Map (f i) (g i)
 
 /-- The space `𝔖_N` of Section 1.1: IFSs whose maps lie in `S^ω_ε(I)` for some `ε > 0`, which may
-depend on the system. Section 1.1 of arXiv v2 fixes `ε` throughout. -/
+depend on the system. -/
 def InUnionClass (f : Fin N → ℂ → ℂ) : Prop := ∃ ε > 0, ∀ i, InClass ε (f i)
 
 section Dimension
@@ -330,8 +330,8 @@ theorem audit_sesc_of_dualProj {ε : ℝ} (hε : 0 < ε) (f : Fin N → ℂ → 
 Suppose that there is `α > 0` such that for all `i ≠ j` there is `x ∈ [0,1]` with
 `|f_i''/f_i'(x) - f_j''/f_j'(x)| ≥ α`. Then `β > 0`, and if `α > 2β c_max/(1 - c_max)`, then
 `sup_{x ∈ [0,1]} |H_i(x) - H_j(x)| > 0` for all distinct `i, j ∈ Σ ∪ Σ_*` with `|i| = |j|`, and `Φ`
-satisfies the strong exponential separation condition. The hypothesis `N ≥ 2` is not in the
-printed statement, whose conclusion `β > 0` can fail for `N = 1`. -/
+satisfies the strong exponential separation condition. The hypothesis `N ≥ 2` ensures `β > 0`,
+which can fail for a singleton IFS. -/
 theorem audit_example_criterion {ε : ℝ} (hε : 0 < ε) (f : Fin N → ℂ → ℂ)
     (hf : ∀ i, InClass ε (f i)) (hN : 2 ≤ N) {α : ℝ} (hα : 0 < α)
     (hsep : ∀ i j : Fin N, i ≠ j → ∃ x ∈ I, α ≤ ‖nonlin (f i) x - nonlin (f j) x‖) :
@@ -349,7 +349,7 @@ theorem audit_example_criterion {ε : ℝ} (hε : 0 < ε) (f : Fin N → ℂ →
   exact hne (.fin (List.ofFn i)) (.fin (List.ofFn j))
     (fun h => hij (List.ofFn_injective (AnalyticESC.Word.fin.inj h))) (by simp)
 
-/-- The example of Section 1.2.2: the system `x/8`, `x/8 + x²/32`, `x/16 + x²/32 + 29/32` lies in
+/-- The polynomial example of Section 1.2.2: the system `x/8`, `x/8 + x²/32`, `x/16 + x²/32 + 29/32` lies in
 `𝔖_3` for some `ε > 0` and satisfies the strong exponential separation condition. -/
 theorem audit_example_sesc : ∃ ε > 0, (∀ i, InClass ε (exampleMaps i)) ∧ SESC exampleMaps := by
   obtain ⟨ε, hε, Φ, hΦ, hS⟩ := AnalyticESC.example_sesc
@@ -359,8 +359,7 @@ theorem audit_example_sesc : ∃ ε > 0, (∀ i, InClass ε (exampleMaps i)) ∧
   exact ⟨ε, hε, fun i => ⟨(hg i).1, (hg i).2, (hg i).3, (hg i).4, (hg i).5, (hg i).6⟩, hS⟩
 
 /-- Individual-map linearisation for Theorem 1.12: an analytic coordinate with nonvanishing
-derivative conjugates the chosen map `f_i` to a contracting similarity. This is narrower than
-the first claim in arXiv v2: contraction of the other conjugated maps is not asserted. -/
+derivative conjugates the chosen map `f_i` to a contracting similarity. -/
 theorem audit_conj_similarity {ε : ℝ} (hε : 0 < ε) (f : Fin N → ℂ → ℂ)
     (hf : ∀ i, InClass ε (f i)) (i : Fin N) :
     ∃ g, IsAnalyticCoord g ∧ (∀ x ∈ I, deriv g x ≠ 0) ∧
@@ -417,7 +416,7 @@ theorem audit_dim_of_esc (hM : RapaportMeasureStatement) (hS : RapaportSetStatem
 
 /-- Corollary 1.7, from Rapaport's Theorem 1.2 and Corollary 1.3. For `N ≥ 2`, the IFSs in `𝔖_N`
 with equality in (1.6) contain a subset `U` of `𝔖_N` that is open and dense in `𝔖_N` for the `𝒞²`
-metric `d₂`. The printed corollary is for every `N`; its `N = 1` case is omitted. -/
+metric `d₂`. Corollary 1.7 is stated for every `N`; its `N = 1` case is omitted here. -/
 theorem audit_dim_open_dense (hM : RapaportMeasureStatement) (hS : RapaportSetStatement)
     (hN : 2 ≤ N) :
     ∃ U : Set (Fin N → ℂ → ℂ), (∀ f ∈ U, InUnionClass f ∧ DimEquality f) ∧
@@ -434,10 +433,9 @@ theorem audit_dim_open_dense (hM : RapaportMeasureStatement) (hS : RapaportSetSt
   · obtain ⟨r, hr, h⟩ := hO f hf
     exact ⟨r, hr, fun g hg hd => h g (hlib g hg) hd⟩
 
-/-- The example of Section 1.2.2, from Rapaport's Theorem 1.2 and Corollary 1.3:
+/-- The polynomial example of Section 1.2.2, from Rapaport's Theorem 1.2 and Corollary 1.3:
 `dim_H Λ = s(Φ) < 1`, where `s(Φ)` is the unique zero of the pressure, and `dim μ_p = H(p)/χ < 1` at
-`μ_p`-almost every point, for every positive probability vector `p`, by Theorem 1.6; the printed
-text cites Corollary 1.7. -/
+`μ_p`-almost every point, for every positive probability vector `p`, by Theorem 1.6. -/
 theorem audit_example_dim (hM : RapaportMeasureStatement) (hS : RapaportSetStatement) :
     ∃ s : ℝ,
       (∀ t, Tendsto (fun n : ℕ => Real.log (pressureSum exampleMaps t n) / n) atTop (𝓝 0) ↔
@@ -449,9 +447,9 @@ theorem audit_example_dim (hM : RapaportMeasureStatement) (hS : RapaportSetState
           (𝓝 (entropy p / lyapunov exampleMaps p μ)) := by
   exact AnalyticESC.example_dim (rapaportMeasure_lib hM) (rapaportSet_lib hS)
 
-/-- The remark at the end of Section 1.2.2, from Bowen's theorem: the pressure of the example has a
-unique zero `s = s(Φ)`, the potential `s log|f'_{ω₀}(π(σω))|` has a Gibbs measure, and for every
-such Gibbs measure `ν` the natural measure `μ = ν ∘ π⁻¹` has local dimension `s(Φ) - 1/3 < s(Φ)`
+/-- The natural measure of the polynomial example in Section 1.2.2, from Bowen's theorem:
+the pressure has a unique zero `s = s(Φ)`, the potential `s log|f'_{ω₀}(π(σω))|` has a Gibbs measure,
+and for every such Gibbs measure `ν` the natural measure `μ = ν ∘ π⁻¹` has local dimension `s(Φ) - 1/3 < s(Φ)`
 at `0`. -/
 theorem audit_example_localDim (hB : BowenGibbsStatement) :
     ∃ s : ℝ,
@@ -465,9 +463,9 @@ theorem audit_example_localDim (hB : BowenGibbsStatement) :
           Real.log r) (𝓝[>] 0) (𝓝 (s - 1 / 3)) := by
   exact AnalyticESC.example_localDim_of_bowen (bowenGibbs_lib hB)
 
-/-- The end of Section 1.2.2, from Bowen's theorem: for every Gibbs measure `ν` of the potential
-`s(Φ) log|f'_{ω₀}(π(σω))|` and every `q > 1`, the natural measure `μ = ν ∘ π⁻¹` has
-`D_μ(q) ≤ q (s(Φ) - 1/3) / (q - 1)`, which is smaller than `s(Φ)` for `q > 3 s(Φ)`. -/
+/-- `L^q` dimensions of the polynomial example in Section 1.2.2, from Bowen's theorem:
+for every Gibbs measure `ν` of the potential `s(Φ) log|f'_{ω₀}(π(σω))|` and every `q > 1`,
+the natural measure `μ = ν ∘ π⁻¹` has `D_μ(q) ≤ q (s(Φ) - 1/3) / (q - 1)`, which is smaller than `s(Φ)` for `q > 3 s(Φ)`. -/
 theorem audit_example_lq (hB : BowenGibbsStatement) :
     ∃ s : ℝ,
       (∀ t, Tendsto (fun n : ℕ => Real.log (pressureSum exampleMaps t n) / n) atTop (𝓝 0) ↔

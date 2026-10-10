@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Static consistency checks for the paper--Lean correspondence manifest.
 
-This script deliberately does not invoke Lean or LaTeX.  It catches stale labels, misspelled
+This script deliberately does not invoke Lean or LaTeX. It checks reviewed source fingerprints,
+including remarks and selected prose, and catches stale labels, misspelled
 Lean declaration names, and drift between the manifest, the challenge, the solution, the
 comparator configuration and formalization.yaml.  A successful run is not a substitute for
 elaboration by Lean.
@@ -13,6 +14,7 @@ locally rather than in CI.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -27,8 +29,9 @@ STATEMENT_ENVIRONMENTS = {
     "lemma",
     "corollary",
     "definition",
+    "remark",
 }
-LABEL_PREFIXES = ("thm", "lem", "prop", "cor", "def")
+LABEL_PREFIXES = ("thm", "lem", "prop", "cor", "def", "rem")
 LABEL_RE = re.compile(r"\\label\{((?:" + "|".join(LABEL_PREFIXES) + r"):[^}]+)\}")
 SOURCE_LABEL_RE = re.compile(r"^(?:" + "|".join(LABEL_PREFIXES) + r"):")
 UNLABELLED_PREFIX = "unlabelled:"
@@ -56,6 +59,7 @@ class PaperDeclaration:
     kind: str
     file: Path
     line: int
+    text: str
 
 
 @dataclass(frozen=True)
@@ -196,6 +200,12 @@ def validate_manifest(data: dict[str, Any], path: Path) -> tuple[list[str], list
         raise ManifestError(f"{path}: manuscript_files must be a nonempty list of paths")
     if not isinstance(entries, list) or not entries:
         raise ManifestError(f"{path}: entries must be a nonempty list")
+    snapshots = data.get("manuscript_sha256")
+    if not isinstance(snapshots, dict) or set(snapshots) != set(manuscript_files):
+        raise ManifestError(f"{path}: manuscript_sha256 must cover every manuscript file")
+    for digest in snapshots.values():
+        if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
+            raise ManifestError(f"{path}: invalid manuscript SHA-256 fingerprint")
 
     seen_sources: set[str] = set()
     for index, entry in enumerate(entries, 1):
@@ -211,8 +221,18 @@ def validate_manifest(data: dict[str, Any], path: Path) -> tuple[list[str], list
         if source in seen_sources:
             raise ManifestError(f"{where}: duplicate source {source!r}")
         seen_sources.add(source)
-        if kind not in STATEMENT_ENVIRONMENTS:
-            raise ManifestError(f"{where}: kind must be one of {sorted(STATEMENT_ENVIRONMENTS)}")
+        if kind not in STATEMENT_ENVIRONMENTS | {"prose"}:
+            raise ManifestError(f"{where}: unknown kind {kind!r}")
+        digest = entry.get("sha256")
+        if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
+            raise ManifestError(f"{where}: a reviewed sha256 fingerprint is required")
+        if kind == "prose":
+            if not source.startswith("prose:") or entry.get("file") not in manuscript_files:
+                raise ManifestError(f"{where}: prose needs a prose: source and a manuscript file")
+            if not all(isinstance(entry.get(k), str) and entry[k] for k in ("start", "end")):
+                raise ManifestError(f"{where}: prose needs nonempty start and end anchors")
+        elif source.startswith(UNLABELLED_PREFIX) and not entry.get("match"):
+            raise ManifestError(f"{where}: an unlabelled entry needs a unique text match")
         if status not in ALLOWED_STATUSES:
             raise ManifestError(f"{where}: status must be one of {sorted(ALLOWED_STATUSES)}")
         if isinstance(lean, str):
@@ -228,7 +248,8 @@ def validate_manifest(data: dict[str, Any], path: Path) -> tuple[list[str], list
             raise ManifestError(f"{where}: an intentionally unformalized entry needs a reason")
         if "headline" in entry and not isinstance(entry["headline"], bool):
             raise ManifestError(f"{where}: headline must be true or false")
-        if not (SOURCE_LABEL_RE.match(source) or source.startswith(UNLABELLED_PREFIX)):
+        if not (SOURCE_LABEL_RE.match(source) or source.startswith(UNLABELLED_PREFIX)
+                or (kind == "prose" and source.startswith("prose:"))):
             raise ManifestError(
                 f"{where}: source must be a paper label ({', '.join(LABEL_PREFIXES)}) "
                 f"or begin with {UNLABELLED_PREFIX!r}"
@@ -262,8 +283,86 @@ def scan_paper_file(path: Path) -> list[PaperDeclaration]:
         labels = LABEL_RE.findall(text[begin.end() : begin.end() + end.start()])
         if len(labels) > 1:
             raise ManifestError(f"{path}:{line}: {kind} environment has multiple primary labels: {labels}")
-        declarations.append(PaperDeclaration(labels[0] if labels else None, kind, path, line))
+        body = text[begin.start() : begin.end() + end.end()]
+        declarations.append(PaperDeclaration(labels[0] if labels else None, kind, path, line, body))
     return declarations
+
+
+def source_fingerprint(text: str) -> str:
+    """Hash TeX tokens, ignoring comments and layout whitespace, but retaining word boundaries."""
+    tokens = re.findall(r"\\[A-Za-z@]+|\\.|[A-Za-z0-9]+|[^\s]", strip_tex_comments(text))
+    return hashlib.sha256("\x1f".join(tokens).encode("utf-8")).hexdigest()
+
+
+def normalized_text(text: str) -> str:
+    return " ".join(strip_tex_comments(text).split())
+
+
+def prose_span(text: str, start: str, end: str) -> str:
+    text, start, end = map(normalized_text, (text, start, end))
+    if text.count(start) != 1 or text.count(end) != 1:
+        raise ManifestError("prose anchors must each occur exactly once")
+    first = text.index(start)
+    last = text.index(end)
+    if last < first:
+        raise ManifestError("prose end anchor precedes start anchor")
+    return text[first : last + len(end)]
+
+
+def check_paper_coverage(repo_root: Path, manuscript_files: list[str],
+                         entries: list[dict[str, Any]], snapshots: dict[str, str]
+                         ) -> tuple[list[str], list[PaperDeclaration]]:
+    errors: list[str] = []
+    declarations: list[PaperDeclaration] = []
+    texts: dict[str, str] = {}
+    for relative in manuscript_files:
+        path = repo_root / relative
+        try:
+            texts[relative] = path.read_text(encoding="utf-8")
+            declarations.extend(scan_paper_file(path))
+        except (OSError, ManifestError) as exc:
+            errors.append(str(exc))
+            continue
+        if source_fingerprint(texts[relative]) != snapshots[relative]:
+            errors.append(f"{relative}: manuscript content changed; review correspondence, including "
+                          "unmapped prose and proofs, before updating manuscript_sha256")
+
+    covered: set[tuple[Path, int]] = set()
+    for entry in entries:
+        source = entry["source"]
+        if entry["kind"] == "prose":
+            if entry["file"] not in texts:
+                continue
+            try:
+                body = prose_span(texts[entry["file"]], entry["start"], entry["end"])
+            except ManifestError as exc:
+                errors.append(f"{source}: {exc}")
+                continue
+        else:
+            if source.startswith(UNLABELLED_PREFIX):
+                candidates = [d for d in declarations if d.label is None
+                              and d.kind == entry["kind"]
+                              and normalized_text(entry["match"]) in normalized_text(d.text)]
+            else:
+                candidates = [d for d in declarations if d.label == source]
+            if len(candidates) != 1:
+                errors.append(f"{source}: expected exactly one matching statement, found {len(candidates)}")
+                continue
+            declaration = candidates[0]
+            key = (declaration.file, declaration.line)
+            if key in covered:
+                errors.append(f"{source}: statement already covered by another entry")
+            covered.add(key)
+            if declaration.kind != entry["kind"]:
+                errors.append(f"{source}: environment kind changed to {declaration.kind}")
+            body = declaration.text
+        if source_fingerprint(body) != entry["sha256"]:
+            errors.append(f"{source}: content changed; review its Lean correspondence before updating sha256")
+
+    for d in declarations:
+        if (d.file, d.line) not in covered:
+            errors.append(f"{d.file.name}:{d.line}: {d.label or 'unlabelled ' + d.kind} missing from manifest")
+    return errors, declarations
 
 
 def appendix_lean_section(path: Path) -> str:
@@ -402,63 +501,11 @@ def main() -> int:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
 
-    # Paper statements: every labelled statement has exactly one manifest entry, and the
-    # unlabelled statements are matched by count per environment kind.
-    labelled: dict[str, PaperDeclaration] = {}
-    unlabelled: list[PaperDeclaration] = []
-    for relative in manuscript_files:
-        path = repo_root / relative
-        if not path.is_file():
-            errors.append(f"manifest manuscript file does not exist: {relative}")
-            continue
-        try:
-            found = scan_paper_file(path)
-        except ManifestError as exc:
-            errors.append(str(exc))
-            continue
-        for declaration in found:
-            if declaration.label is None:
-                unlabelled.append(declaration)
-                continue
-            previous = labelled.get(declaration.label)
-            if previous:
-                errors.append(
-                    f"duplicate paper label {declaration.label!r}: "
-                    f"{previous.file}:{previous.line} and {declaration.file}:{declaration.line}"
-                )
-            else:
-                labelled[declaration.label] = declaration
-
-    manifest_labels = {entry["source"]: entry for entry in entries if SOURCE_LABEL_RE.match(entry["source"])}
-    missing = sorted(set(labelled) - set(manifest_labels))
-    extra = sorted(set(manifest_labels) - set(labelled))
-    if missing:
-        errors.append("paper declarations missing from manifest: " + ", ".join(missing))
-    if extra:
-        errors.append("manifest labels not found in statement environments: " + ", ".join(extra))
-    for label in sorted(set(labelled) & set(manifest_labels)):
-        paper_kind = labelled[label].kind
-        manifest_kind = manifest_labels[label]["kind"]
-        if paper_kind != manifest_kind:
-            errors.append(
-                f"{label}: manifest kind {manifest_kind!r} does not match paper environment {paper_kind!r}"
-            )
-    for kind in sorted(STATEMENT_ENVIRONMENTS):
-        in_paper = [d for d in unlabelled if d.kind == kind]
-        in_manifest = [
-            e for e in entries if e["source"].startswith(UNLABELLED_PREFIX) and e["kind"] == kind
-        ]
-        if len(in_paper) != len(in_manifest):
-            where = ", ".join(f"{d.file.name}:{d.line}" for d in in_paper) or "none"
-            errors.append(
-                f"{len(in_paper)} unlabelled {kind} environment(s) in the paper ({where}) but "
-                f"{len(in_manifest)} '{UNLABELLED_PREFIX}' manifest entr(y/ies) of that kind"
-            )
-    if unlabelled:
-        warnings.append(
-            "unlabelled statement environments are matched by count only: "
-            + ", ".join(f"{d.kind} at {d.file.name}:{d.line}" for d in unlabelled)
-        )
+    coverage_errors, paper_declarations = check_paper_coverage(
+        repo_root, manuscript_files, entries, data["manuscript_sha256"])
+    errors.extend(coverage_errors)
+    labelled = [d for d in paper_declarations if d.label is not None]
+    unlabelled = [d for d in paper_declarations if d.label is None]
 
     # Optional appendix check, once the paper has a Lean correspondence appendix.
     appendix = data.get("appendix_file")

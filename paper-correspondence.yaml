@@ -1,223 +1,324 @@
-version: 1
+version: 2
 
-# The cited source is arXiv:2509.07888v2 (26 March 2026); theorem, section and equation numbers in
-# the notes refer to it. Local consistency checks use the statement environments and labels in
-# analytic.tex in the parent directory.
-source_version: "arXiv:2509.07888v2"
+# Correspondence with analytic.tex. Numbered Lean declarations follow its theorem numbering.
+# SHA-256 values hash TeX tokens, ignoring comments and layout whitespace. Update them only
+# after reviewing changed mathematics and its Lean coverage, including prose and proofs.
+source_version: "analytic.tex"
+manuscript_files: ["analytic.tex"]
+manuscript_sha256: {"analytic.tex": "f88cf0c413d5d429b490e65d8be3fedb2fcd11d48cd3b04803f18882f0aac53f"}
 
-manuscript_files:
-  - analytic.tex
-
-# One entry per statement environment of the manuscript. Labelled statements use their label as
-# source; unlabelled ones use an `unlabelled:` identifier and are matched by count per kind.
-# Status is `planned` until the Lean declarations exist, then `formalized` with the declaration
-# names in `lean`. Headline entries become the Challenge endpoints listed in comparator.json.
-# Source-file locations and proof-helper inventories are deliberately omitted.
+# Every theorem-like environment, including remarks, has an entry. Unlabelled environments
+# use unique text matches; selected prose uses unique start/end anchors. The full manuscript
+# fingerprint requires review of additions elsewhere, without claiming they are formalised.
 entries:
+
   - source: "unlabelled:def-esc"
-    kind: definition
-    status: formalized
+    kind: "definition"
+    match: "\\emph{exponential separation condition (ESC)}"
+    sha256: "4c48680e5a0a41686041d66a32d05799923615d4debd5f543a92196ab78a7c15"
+    status: "formalized"
     lean: ["AnalyticESC.IFS.ESC"]
-    relation: exact
+    relation: "exact"
     headline: false
-    note: "Suprema over [0,1] are real iSups of bounded families."
+    note: "Suprema on I are real iSups of bounded families."
 
   - source: "def:SESC"
-    kind: definition
-    status: formalized
+    kind: "definition"
+    sha256: "7490faf062a64e7ec011329dbec3400221d4f51120656fd093d69eee965418dc"
+    status: "formalized"
     lean: ["AnalyticESC.IFS.SESC", "AnalyticESC.IFS.WeakSuperExpCondensation", "AnalyticESC.IFS.not_sesc_iff"]
-    relation: split
+    relation: "split"
     headline: false
-    note: "The 'i.e.' of the definition, that the SESC fails exactly under weak super-exponential condensation, is AnalyticESC.IFS.not_sesc_iff; the positive sequence eta and the strictly increasing subsequence are explicit."
+    note: "Failure of SESC is equivalent to weak super-exponential condensation; the positive sequence and strictly increasing subsequence are explicit."
 
   - source: "unlabelled:def-exact-overlaps"
-    kind: definition
-    status: formalized
+    kind: "definition"
+    match: "\\emph{exact overlaps}"
+    sha256: "cf723df33c71a832eb4eab4e15961886e52f1771e2d003f0bfedb46b8e4a915b"
+    status: "formalized"
     lean: ["AnalyticESC.IFS.HasExactOverlaps"]
-    relation: representation
+    relation: "representation"
     headline: false
-    note: "The attractor is AnalyticESC.IFS.attractor, defined as the range of the natural projection, which the paper identifies with the Hutchinson attractor."
+    note: "The attractor is represented as the range of the natural projection."
 
   - source: "thm:ESCOpenDense"
-    kind: theorem
-    status: formalized
+    kind: "theorem"
+    sha256: "e6041f1c1472062ececf99c610171cdf12a0c77814e7d5dc075916e16b938d67"
+    status: "formalized"
     lean: ["Challenge.audit_sesc_open_dense"]
-    relation: exact
+    relation: "exact"
     headline: true
-    note: "Library form AnalyticESC.theorem_1_4. The space of IFSs is the union class AnalyticESC.InUnionClass, the systems whose maps lie in S^omega_epsilon(I) for some epsilon > 0 depending on the system, with the d2 metric between families (AnalyticESC.d2Sys); open and dense are relative to this space, whereas Section 1.1 of v2 fixes epsilon throughout. The open set consists of the systems whose dual IFS satisfies the SSC, as in the paper, and of all systems when N = 0, where the dual attractor would be empty. The density proof of v2 asserts that exact overlaps can be removed by an arbitrarily small perturbation; Lean proves this in the internal lemma AnalyticESC.IFS.lemma_4_2, which uses complex analyticity in the parameter, preserves the fixed-epsilon class and makes the maps send [0,1] into (0,1). Density then uses AnalyticESC.IFS.lemma_4_3 (Lemma 4.1), Proposition 4.2 and AnalyticESC.IFS.exists_dualSSC_near; openness uses AnalyticESC.IFS.lemma_2_6_union. The density proof fixes a strictly invariant cylinder together with a d2 neighbourhood in which its inclusions persist (AnalyticESC.IFS.exists_invariant_cylinder_near) before choosing delta and the word length, so that Lemma 2.5 (b) applies to the perturbed system; v2 chooses the cylinder for Phi only."
+    note: "Library form AnalyticESC.theorem_1_4, for the union over admissible radii with the relative C2 topology. The proof constructs the interpolation removing coincidences and keeps an invariant cylinder valid in a neighbourhood before choosing the perturbation."
 
   - source: "thm:main"
-    kind: theorem
-    status: formalized
+    kind: "theorem"
+    sha256: "4a788d6c11797f7cd9071f818f90d4ceeabd05fdbd77e0ed7e111b94c5d079ef"
+    status: "formalized"
     lean: ["Challenge.audit_sesc_of_dualProj"]
-    relation: exact
+    relation: "exact"
     headline: true
-    note: "Library form AnalyticESC.IFS.theorem_1_5, over finite and infinite words (AnalyticESC.Word). The challenge splits the hypothesis into finite words of equal length and infinite words, which are the pairs of equal length. Maps are holomorphic extensions; H_w is evaluated at real points with complex derivatives, which equal the real ones there. v2 proves the theorem directly by contradiction and deduces Theorem 2.2 from it with Lemma 2.5. Lean proves Theorem 2.2 first and deduces Theorem 1.5 from it: AnalyticESC.IFS.dualProj_ne_iff_exists_delta supplies the compactness step, followed by Lemma 2.5 (c) and Theorem 2.2; only the infinite-word part of (1.5) is used."
+    note: "Library form AnalyticESC.IFS.theorem_1_5. Challenge separates finite equal-length words from infinite words. Lean proves Theorem 2.2 first, then deduces this result by compactness and Lemma 2.6, using only the infinite-word hypothesis."
 
   - source: "thm:RapaportMain"
-    kind: theorem
-    status: formalized
+    kind: "theorem"
+    sha256: "2bc1d42874701125c8b0dec669931dd5f81d91239f52cdb7a96ce83baf8671fc"
+    status: "formalized"
     lean: ["Challenge.audit_dim_of_esc"]
-    relation: representation
+    relation: "representation"
     headline: true
-    note: "Derived in AnalyticESC.IFS.theorem_1_6 from Rapaport's Theorem 1.2 and Corollary 1.3 (arXiv:2412.16753v2), which the audited statement takes as the hypotheses RapaportMeasureStatement and RapaportSetStatement, stated for real analytic maps of [0,1] as in his paper. Equality in (1.6) is AnalyticESC.IFS.DimEquality: the pressure has a unique zero s(Phi) and dim_H of the attractor is min{1, s(Phi)}; for each positive probability vector p, the self-conformal measure has local dimension min{1, H(p)/chi} almost everywhere (exact dimensionality, Feng and Hu, is part of RapaportMeasureStatement). The statement assumes N > 0; the remark after the theorem, that the attractor is a singleton exactly when the maps have a common fixed point, is AnalyticESC.IFS.exists_attractor_eq_singleton_iff."
+    note: "Library form AnalyticESC.IFS.theorem_1_6, assuming N > 0 and the cited RapaportMeasureStatement and RapaportSetStatement. Measure dimension is expressed as almost-everywhere local dimension, including Feng–Hu exact dimensionality in the literature hypothesis."
 
   - source: "cor:dim"
-    kind: corollary
-    status: formalized
+    kind: "corollary"
+    sha256: "1394327302e99d201b1966351e5bd287594297d709c0584d31389342b80cd1bc"
+    status: "formalized"
     lean: ["Challenge.audit_dim_open_dense"]
-    relation: representation
+    relation: "representation"
     headline: true
-    note: "AnalyticESC.corollary_1_7, for N >= 2, assuming Rapaport's results, and Theorem 1.4. The paper states the corollary for every N; the case N = 1, where the assertion is trivial, is not formalised. The open set is the open set of Theorem 1.4 intersected with the systems having two maps with distinct fixed points, which is open and dense in the union class for N >= 2. Equality in (1.6) is AnalyticESC.IFS.DimEquality, as for thm:RapaportMain."
+    note: "Library form AnalyticESC.corollary_1_7, assuming Rapaport's results, for N >= 2. The manuscript's trivial N = 1 case remains outside the formalisation."
 
   - source: "prop:example"
-    kind: proposition
-    status: formalized
-    lean: ["Challenge.audit_example_criterion", "Challenge.audit_example_sesc", "Challenge.audit_example_dim", "Challenge.audit_example_localDim", "Challenge.audit_example_lq"]
-    relation: split
+    kind: "proposition"
+    sha256: "600711493cd24248ee984d1e16b132de00ef882973243e3d9bdf8ebf3819d8b0"
+    status: "formalized"
+    lean: ["Challenge.audit_example_criterion"]
+    relation: "split"
     headline: true
-    note: "The proposition is AnalyticESC.IFS.proposition_1_8, with beta as AnalyticESC.IFS.beta; the hypothesis N >= 2 is added to the printed statement. The example after the proof is AnalyticESC.example_sesc, with epsilon = 1/100: AnalyticESC.exampleIFS has c_max < 1/5 (exampleIFS_cmax_lt), beta <= 1 (exampleIFS_beta_le) and distortions 1/2 apart at 0 (exampleIFS_nonlin_sep). The challenge splits the conclusion over finite and infinite words, as for Theorem 1.5. The dimensions of the example, dim_H of the attractor = s(Phi) < 1 and dim mu_p = H(p)/chi < 1, are AnalyticESC.example_dim, from Theorem 1.6, after proving that the attractor is not a singleton and that s(Phi) < 1 and H(p) < chi, which follow from 3 c_max < 1; v2 cites Corollary 1.7 for these equalities. The remark at the end of Section 1.2.2 says that the local dimension at 0 of the natural measure is smaller than s(Phi) and deduces the drop of its L^q dimensions by contradiction from Shmerkin's Lemma 1.7, leaving the details to the reader. Lean computes the local dimension s(Phi) - 1/3 at 0 (AnalyticESC.example_localDim_of_bowen) and proves D_mu(q) <= q (s(Phi) - 1/3)/(q - 1) < s(Phi) for q > 3 s(Phi) (AnalyticESC.example_lq_of_bowen) by contradiction using the ball-mass estimate of Shmerkin's Lemma 1.7. The required estimate at 0 for a measure supported on [0,infinity) is proved as AnalyticESC.shmerkin_ball_bound_zero, and AnalyticESC.lqDim_le_of_localDim applies it to the local dimension. These two lemmas need no literature hypotheses; the example endpoints assume Bowen's theorem (BowenGibbsStatement). The paper does not define the natural measure; Lean takes the image under pi of a Gibbs measure in Bowen's sense of s(Phi) log|f'_{omega_0}(pi(sigma omega))|. AnalyticESC.example_lq_of_bowen also proves summability and boundedness for the L^q definition; these internal checks are omitted from the Challenge endpoint."
+    note: "Library form AnalyticESC.IFS.proposition_1_8. Lean explicitly assumes N >= 2 for beta > 0; the manuscript does not explicitly impose this restriction. Finite and infinite equal-length words are separated in Challenge. The examples below have their own prose entries."
+
+  - source: "prose:polynomial-example"
+    kind: "prose"
+    file: "analytic.tex"
+    start: "We demonstrate \\cref{prop:example} on an example."
+    end: "for every $\\mathbf{p}$, defined in the previous section."
+    sha256: "16225f382871f61c1846de1798a7b5d95928a591b7174aefb610bd1a8d5870cb"
+    status: "formalized"
+    lean: ["Challenge.audit_example_sesc", "Challenge.audit_example_dim"]
+    relation: "split"
+    headline: true
+    note: "The polynomial example uses epsilon = 1/100, c_max < 1/5, beta <= 1 and separation 1/2 at zero. Assuming Rapaport's results, the dimension proof uses Theorem 1.6 and the coarser bound 3 c_max < 1 instead of the displayed sum 7/16."
+
+  - source: "prose:natural-measure-example"
+    kind: "prose"
+    file: "analytic.tex"
+    start: "We also remark that the $L^q$ dimension of the natural measure"
+    end: "The full calculations are included in the accompanying Lean development."
+    sha256: "45b576dae5fffa7ee29a4cc0bb76d7658f977853d31101af749e25ffeb2f0109"
+    status: "formalized"
+    lean: ["Challenge.audit_example_localDim", "Challenge.audit_example_lq"]
+    relation: "split"
+    headline: true
+    note: "The natural measure is the projection of a probability Gibbs measure for s(Phi) log|f'|, assuming BowenGibbsStatement. Lean computes local dimension s(Phi)-1/3 at zero and the Lq upper bound q(s(Phi)-1/3)/(q-1), strictly below s(Phi) for q > 3s(Phi). The needed special case of Shmerkin's ball-mass estimate and the Lq summability bounds are proved internally."
+
+  - source: "prose:non-polynomial-example"
+    kind: "prose"
+    file: "analytic.tex"
+    start: "We chose polynomials with algebraic coefficients"
+    end: "The calculations for this example are also included in the accompanying Lean development."
+    sha256: "98c366a7a9052682e62ee92a9ab24fb2c3daf7afeefff9d785631bf76564072a"
+    status: "formalized"
+    lean: ["AnalyticESC.nonPolynomialMaps", "AnalyticESC.nonPolynomial_sesc", "AnalyticESC.nonPolynomialMaps_inClass", "AnalyticESC.nonPolynomialMaps_exists_cmax_lt", "AnalyticESC.nonPolynomialMaps_nonlin", "AnalyticESC.nonPolynomialMaps_beta_eq", "AnalyticESC.nonPolynomialMaps_nonlin_sep", "AnalyticESC.nonPolynomialMaps_fixedPoints", "AnalyticESC.nonPolynomialMaps_deriv_zero", "AnalyticESC.nonPolynomialMaps_nonlin_zero", "AnalyticESC.nonPolynomialMaps_max_deriv"]
+    relation: "split"
+    headline: false
+    note: "The principal complex square root is holomorphic on Re z > -1. Compactness supplies a common admissible radius with c_max < 1/5. Lean proves the fixed points, matching first and pre-Schwarzian derivatives at zero, real derivative maximum 1/6, beta = 1/2, separation alpha = 1/4 at one, and SESC by Proposition 1.8. This is a library result, outside the twelve Challenge endpoints."
 
   - source: "def:conjugation"
-    kind: definition
-    status: formalized
+    kind: "definition"
+    sha256: "9859d1cfb8f131d7531827e04b4e31745f2e93aeacfa2d454a85e418fb172ba8"
+    status: "formalized"
     lean: ["AnalyticESC.IsAnalyticCoord", "AnalyticESC.ConjSelfSimilar"]
-    relation: representation
+    relation: "representation"
     headline: false
-    note: "Analytic means analytic on a neighbourhood of each point of [0,1]; invertible means injective on [0,1], as in the paper. Conjugacy to a self-similar IFS is stated as g(f_j(x)) = lambda_j g(x) + t_j on [0,1], which is equivalent for injective g."
+    note: "Analytic coordinates are analytic near each point of I and injective on I. Conjugacy is expressed as g(f_j(x)) = lambda_j g(x) + t_j on I."
 
   - source: "unlabelled:def-subconjugated"
-    kind: definition
-    status: formalized
+    kind: "definition"
+    match: "\\emph{sub-conjugated}"
+    sha256: "a2f9f7b02a0cb0fa96baeeb588ba4a6f84ea832b1db3a4f90ec61175c14b9878"
+    status: "formalized"
     lean: ["AnalyticESC.IFS.SubConjSelfSimilar"]
-    relation: representation
+    relation: "representation"
     headline: false
-    note: "Words of the same length are maps Fin m -> Fin N; distinctness excludes m = 0."
+    note: "Words of equal length are maps Fin m -> Fin N; distinctness excludes the empty word."
+
+  - source: "unlabelled:remark-smooth-background"
+    kind: "remark"
+    match: "Note that we assume the conjugating function"
+    sha256: "4160ed6a0b2a05a4a76eb39bb90144b9eee8c2cf7df9a1cd179b74f5d3924b05"
+    status: "intentionally_unformalized"
+    headline: false
+    reason: "Background comparison with smooth systems and the cited external example; outside the formalisation scope."
 
   - source: "thm:SubConjugation"
-    kind: theorem
-    status: formalized
+    kind: "theorem"
+    sha256: "262c3ad08bd89bed220b97519bcbfc0bad2efadf9155b4f166f254ea9ef500a3"
+    status: "formalized"
     lean: ["Challenge.audit_conj_similarity", "Challenge.audit_conj_iff", "Challenge.audit_subconj_iff"]
-    relation: split
+    relation: "split"
     headline: true
-    note: "Library forms AnalyticESC.IFS.theorem_1_12_similarity and AnalyticESC.IFS.theorem_1_12 (module Conjugation.PeriodicPoints). For the first claim of v2, audit_conj_similarity proves only individual-map linearisation: for every i there is an analytic invertible g with g' nonzero on [0,1] such that g f_i g^{-1} is a contracting similarity on g([0,1]). This is narrower than conjugacy to an analytic IFS with a similarity map: contraction of the other conjugated maps is not asserted. Part (a) follows the paper's proof, with the observation that g' has no zero: the zero set of g' is invariant under the maps and contains the infinite attractor, so g' != 0 (AnalyticESC.IFS.deriv_ne_zero_of_conj_of_nonsingleton); at the fixed point of f_w, g''/g' = H_{reversed w}/(1 - f_w') (AnalyticESC.IFS.deriv_deriv_div_deriv_eq_of_fixedPoint); the limit along the fixed points of i_1...i_n j_n...j_1 gives g''/g' = H_j on the attractor (AnalyticESC.IFS.dualProj_eq_of_conjSelfSimilar); the converse applies Lemma 5.1 to each map (AnalyticESC.IFS.conjSelfSimilar_of_dualProj_eq). Part (b) is AnalyticESC.IFS.subConjSelfSimilar_iff. It applies part (a) to the two-map subsystem when the fixed points differ and treats a common fixed point by commutation (AnalyticESC.comp_comm_of_conj); the proof in v2 applies part (a) to the subsystem without this case distinction. Its converse uses the common ODE solution. AnalyticESC.IFS.conjSelfSimilar_iff extends part (a) by the separate singleton argument of Theorem 2.3. Periodic words are AnalyticESC.periodic."
+    note: "Library forms AnalyticESC.IFS.theorem_1_12_similarity and AnalyticESC.IFS.theorem_1_12. The first claim linearises each chosen map. Part (a) uses the non-singleton attractor; part (b) also handles a common fixed point by commutation and does not need that hypothesis."
+
+  - source: "unlabelled:remark-constant-periodic"
+    kind: "remark"
+    match: "Let us note that in \\cref{it:conj1}"
+    sha256: "a7a1faa2e129303dca24050f127ef87db6cc3818da640201dbcba637a7867e61"
+    status: "formalized"
+    lean: ["AnalyticESC.IFS.dualProj_eq_of_forall_const"]
+    relation: "exact"
+    headline: false
 
   - source: "lem:ExistanceAttractor"
-    kind: lemma
-    status: formalized
+    kind: "lemma"
+    sha256: "e2868b6f14e99912c84896d1c06d0899c0c8363ef7e9f87d17e5637b6987efe1"
+    status: "formalized"
     lean: ["AnalyticESC.IFS.existsUnique_isDualAttractor"]
-    relation: representation
+    relation: "representation"
     headline: false
-    note: "C^omega_eps([0,1]) is AnalyticESC.analyticSpace, the restrictions to B_eps of maps holomorphic there, continuous on its closure and real on I, with the topology of uniform convergence on B_eps; v2 does not require continuity on the closure. Existence and uniqueness follow from Hutchinson's theorem, proved here by the contraction principle on nonempty compact sets (AnalyticESC.existsUnique_compact_invariant). AnalyticESC.ClosedAnalyticSpace.Space is the closed, complete space of continuous functions on the closure of B_eps that are holomorphic inside and real on I; restriction identifies it with analyticSpace. The coding description is then proved for this attractor. The hypothesis 0 < N is the paper's implicit assumption that the IFS has a map."
+    note: "The analytic space consists of restrictions to B_eps of holomorphic maps continuous on its closure and real on I. Hutchinson existence and uniqueness are proved on a complete closed subspace of continuous functions on the closure. N > 0 makes the attractor nonempty."
+
+  - source: "prose:radius-independence"
+    kind: "prose"
+    file: "analytic.tex"
+    start: "For $0<\\rho\\leq\\eps$, restriction"
+    end: "We suppress this radius in the notation $\\Phi^*$ and $\\Lambda^*$."
+    sha256: "89414a80fdffe2809b84be0b53bbe9ff1e7878c4fa316c6ce366a984b9830059"
+    status: "formalized"
+    lean: ["AnalyticESC.restrictNbhd", "AnalyticESC.continuous_restrictNbhd", "AnalyticESC.restrictNbhd_mem", "AnalyticESC.restrictNbhd_injOn", "AnalyticESC.IFS.restrictNbhd_dualOpU", "AnalyticESC.IFS.restrictNbhd_dualCompOn", "AnalyticESC.IFS.restrict_dualProj", "AnalyticESC.IFS.isDualAttractor_restrict_image", "AnalyticESC.IFS.restrict_dualSSC_iff", "AnalyticESC.IFS.restrict_singleton_iff", "AnalyticESC.IFS.restrict_common_fixedPoint_iff"]
+    relation: "split"
+    headline: false
+    note: "Restriction is continuous and injective on the analytic space, intertwines all dual compositions and maps the attractor onto the smaller-radius attractor. SSC, the singleton property and common fixed points of any specified pair of nonempty words are radius-independent."
 
   - source: "thm:DualSSC"
-    kind: theorem
-    status: formalized
+    kind: "theorem"
+    sha256: "1ffaa2b92ed18c5123f9b4ad2b310eff4f1338fbb3bede74cde16ce996f75c75"
+    status: "formalized"
     lean: ["AnalyticESC.IFS.theorem_2_2"]
-    relation: exact
+    relation: "exact"
     headline: false
-    note: "The proof uses the internal lemma AnalyticESC.IFS.condensation_dichotomy, whose hypothesis is the failure of the SESC, equivalent to weak super-exponential condensation by AnalyticESC.IFS.not_sesc_iff. In v2 this argument is the proof of Theorem 1.5, from which Theorem 2.2 is deduced; Lean proves Theorem 2.2 directly. The proof has three cases: bounded common suffixes give a fixed nondegenerate image interval; finite limit words use finite order of vanishing, a case that v2 does not treat; infinite limit words use (3.2), (3.3), the common-prefix bounds and analyticity. Composition derivative bounds come from (2.10) and Lemma 2.8. Equation (3.3), with the absolute value |f_u'|^k in the denominator where v2 prints (f_u')^k, is AnalyticESC.IFS.norm_iteratedDeriv_sub_le_on_image and is used in the infinite branch. The smallness condition required to iterate Lemma 3.1 holds eventually, which suffices after discarding finitely many indices. Constants are allowed to be larger than the printed constants."
+    note: "Library form AnalyticESC.IFS.theorem_2_2. The proof treats bounded common suffixes, finite limit words via finite order of vanishing, and infinite limit words via derivative estimates and analyticity. The iteration smallness condition holds eventually; constants may be enlarged."
 
   - source: "thm:DualConj"
-    kind: theorem
-    status: formalized
+    kind: "theorem"
+    sha256: "3b5cbc0f157cd03645cf39781f46276d7b722c920a6b1e7fadb905fa2ec56731"
+    status: "formalized"
     lean: ["AnalyticESC.IFS.theorem_2_3_conj", "AnalyticESC.IFS.theorem_2_3_subconj"]
-    relation: split
+    relation: "split"
     headline: false
-    note: "The dual attractor is the unique AnalyticESC.IFS.IsDualAttractor; F_i on C^omega_eps([0,1]) is AnalyticESC.IFS.dualCompOn, and the common fixed point h lies in AnalyticESC.analyticSpace (see lem:ExistanceAttractor). Part (b) is stated for distinct words i, j of the same length; v2 omits distinctness. The proof in v2 refers to Theorem 1.12 and Lemma 2.4, which need a non-singleton attractor; Lean uses Theorem 1.12 (a) in the non-singleton case and proves the singleton case separately in AnalyticESC.IFS.dualProj_eq_of_conjSelfSimilar_singleton: commutativity and the limit (5.2) give a common linearising map (AnalyticESC.koenigs_commuting), then differentiating twice identifies its logarithmic derivative with the common dual fixed point. Part (b) uses Theorem 1.12 (b), whose proof does not require a non-singleton attractor. The hypothesis 0 < N is the paper's implicit assumption that the IFS has a map; AnalyticESC.IFS.theorem_2_3_subconj does not use it."
+    note: "Both equivalences use the analytic function space and distinct equal-length words. The singleton-attractor case is proved separately by commutation and a common linearising map. The nonempty-IFS hypothesis N > 0 is explicit."
+
+  - source: "unlabelled:remark-schwarzian-mobius"
+    kind: "remark"
+    match: "The same construction applies to conjugation"
+    sha256: "637487d97fe3524dce71452ef8470947204f7c4032c759ffa9c527852ab3d46e"
+    status: "intentionally_unformalized"
+    headline: false
+    reason: "Remark 2.4 on the Schwarzian dual IFS and conjugacy to Möbius maps is explicitly excluded from formalisation by the authors."
 
   - source: "thm:H_iAnalytic"
-    kind: lemma
-    status: formalized
+    kind: "lemma"
+    sha256: "c5967b2c4d9c8b1ec178bbafea7d91a891951c9aa7d8e11c79add75cfb20ff91"
+    status: "formalized"
     lean: ["AnalyticESC.IFS.dualProj_mem_analyticSpace", "AnalyticESC.IFS.exists_dualProj_holder", "AnalyticESC.IFS.isDualAttractor_range"]
-    relation: split
+    relation: "split"
     headline: false
-    note: "The three claims: H_i lies in C^omega_eps([0,1]) (AnalyticESC.analyticSpace), the Hoelder bound on B_eps, and that {H_i : i in Sigma} is a dual attractor, hence the attractor by AnalyticESC.IFS.existsUnique_isDualAttractor. Boundary continuity is proved by uniform convergence of the defining series on the closure of B_eps (AnalyticESC.IFS.continuousOn_dualProj)."
+    note: "Lemma 2.5: analytic-space membership, Holder continuity and the coding description of the dual attractor. Boundary continuity follows from uniform convergence on the closure."
 
   - source: "lem:SSCEequiv"
-    kind: lemma
-    status: formalized
-    lean: ["AnalyticESC.IFS.lemma_2_5", "AnalyticESC.IFS.dualSSC_iff_exists_delta", "AnalyticESC.IFS.dualSSC_iff_ne"]
-    relation: split
+    kind: "lemma"
+    sha256: "7d9d4d1f1f55958b5a4d0148d27fd1df38537253b418be3c1813d0387489521a"
+    status: "formalized"
+    lean: ["AnalyticESC.IFS.lemma_2_6", "AnalyticESC.IFS.dualSSC_iff_exists_delta", "AnalyticESC.IFS.dualSSC_iff_ne"]
+    relation: "split"
     headline: false
-    note: "Items (a), (b) and (c) are formalised; item (d) of v2, the uniform separation of H_i and H_j over finite words i, j in Sigma_* with i_1 != j_1, is not formalised. The cylinder set (k,K) is AnalyticESC.dualCyl and its closure is represented by AnalyticESC.dualCylClosed, the maps with values in [k,K] on [0,1]. Disjointness of cylinders is the pointwise condition (2.2). The proof of (a) => (b) follows the compactness contradiction in the paper: extend intersecting finite-word cylinders to infinite words, extract a convergent subsequence of pairs, and use shrinking cylinder widths to identify the limiting dual projections. The cylinder definitions include continuity on the closure of B_eps."
+    note: "Lemma 2.6, items (a), (b) and (c). Cylinders are represented by pointwise bounds, with continuity on the closure."
 
   - source: "lem:cont"
-    kind: lemma
-    status: formalized
-    lean: ["AnalyticESC.IFS.lemma_2_6", "AnalyticESC.IFS.lemma_2_6_union", "AnalyticESC.IFS.exists_dualProj_sub_le_d2"]
-    relation: split
+    kind: "lemma"
+    sha256: "205caee2680ae60d1fc6b6b5a38ae029c6b02d516aeaeee1d2d9438a258e6b8c"
+    status: "formalized"
+    lean: ["AnalyticESC.IFS.lemma_2_7", "AnalyticESC.IFS.lemma_2_7_union", "AnalyticESC.IFS.exists_dualProj_sub_le_d2"]
+    relation: "split"
     headline: false
-    note: "The estimate (2.6) holds for all finite and infinite words. The perturbed system is controlled with the constants c_min/2 and a constant in (c_max, 1), since d2-closeness does not give the bounds c_min and c_max of Phi that v2 uses for the perturbed system. The radius depends only on Phi, and the perturbed system may lie in S^omega_eps' for any eps' (lemma_2_6_union)."
+    note: "Lemma 2.7. The estimate holds for finite and infinite words and perturbations with any admissible radius. Nearby systems use c_min/2 and a constant strictly between c_max and 1."
 
   - source: "thm:ugly"
-    kind: lemma
-    status: formalized
-    lean: ["AnalyticESC.IFS.lemma_2_7", "AnalyticESC.IFS.iteratedDeriv_comp_div_deriv", "AnalyticESC.gPoly", "AnalyticESC.IFS.dualDerivTerm"]
-    relation: representation
+    kind: "lemma"
+    sha256: "53a4c713d4db29bf663c6b00d8a0c0ef6aca2b2f4c6416ebbb4bf8959727a2dd"
+    status: "formalized"
+    lean: ["AnalyticESC.IFS.lemma_2_8", "AnalyticESC.IFS.iteratedDeriv_comp_div_deriv", "AnalyticESC.gPoly", "AnalyticESC.IFS.dualDerivTerm"]
+    relation: "representation"
     headline: false
-    note: "The polynomials g_k are AnalyticESC.gPoly with integer coefficients, the variable X l standing for H^(l); the partitions of {1, ..., k+1} are Mathlib's OrderedFinpartition (k + 1), with blocks ordered by their greatest element; phi_i^(m) is written as the (m-1)-th derivative of f_i''/f_i'. The identity (2.10) is AnalyticESC.IFS.iteratedDeriv_comp_div_deriv. The Lean statement also asserts convergence of the series for infinite words. The complex Faà di Bruno formula uses a local primitive of f_i''/f_i'; AnalyticESC.IFS.iteratedDeriv_logAbsDeriv proves that its positive-order real derivatives are precisely those of log|f_i'|. Termwise differentiation is justified by locally uniform convergence on B_eps. Lemmas 2.8 and 2.10 now depend on this formula."
+    note: "Lemma 2.8. The polynomials g_k have integer coefficients; OrderedFinpartition represents partitions with blocks ordered by their largest element. A local complex primitive of f''/f' supplies the Faà di Bruno formula, and positive-order real derivatives agree with those of log|f'|. Locally uniform convergence justifies termwise differentiation."
 
   - source: "thm:kbound"
-    kind: lemma
-    status: formalized
-    lean: ["AnalyticESC.IFS.lemma_2_8"]
-    relation: exact
+    kind: "lemma"
+    sha256: "a94f15fc841ffb4bfb919c9b7b75dcfd26a3e34aa2680ab0888b718ae2d41b4a"
+    status: "formalized"
+    lean: ["AnalyticESC.IFS.lemma_2_9"]
+    relation: "exact"
     headline: false
-    note: "Proved by induction on the derivative order from the Faà di Bruno formula of Lemma 2.7, polynomial bounds and a geometric series (AnalyticESC.IFS.exists_dualDerivTerm_bound and AnalyticESC.IFS.exists_iteratedDeriv_bounds). The constants may overestimate the printed choices."
+    note: "Lemma 2.9, proved by induction using Lemma 2.8, polynomial bounds and geometric series. Constants may overestimate the manuscript's choices."
 
   - source: "thm:difcor"
-    kind: corollary
-    status: formalized
-    lean: ["AnalyticESC.IFS.corollary_2_9"]
-    relation: exact
+    kind: "corollary"
+    sha256: "e5fcf1a2aa743fe330f49e1e2316bf7265d85698610d00ed989321d9eb54241a"
+    status: "formalized"
+    lean: ["AnalyticESC.IFS.corollary_2_10"]
+    relation: "exact"
     headline: false
-    note: "Holds for any constants C_k as in Lemma 2.8; the hypothesis k >= 1 is not needed."
+    note: "Corollary 2.10, for any constants as in Lemma 2.9. Lean also covers k = 0."
 
   - source: "thm:difbound"
-    kind: lemma
-    status: formalized
-    lean: ["AnalyticESC.IFS.lemma_2_10"]
-    relation: exact
+    kind: "lemma"
+    sha256: "ccbda827b5a0ba1b79ea9241db7e7beeac9a2e5b1ba4d91e4d23053d44e9c243"
+    status: "formalized"
+    lean: ["AnalyticESC.IFS.lemma_2_11"]
+    relation: "exact"
     headline: false
-    note: "Stated for all distinct finite or infinite words, which include the words with |i ∧ j| < min{|i|, |j|} of v2, with one family of constants C_k that also satisfies Lemma 2.8. AnalyticESC.IFS.exists_iteratedDeriv_bounds cancels the common prefix in the series of Lemma 2.7 and bounds the remaining geometric tails, for every common prefix length m <= |i ∧ j|."
+    note: "Lemma 2.11, for all distinct finite or infinite words with one family of constants also satisfying Lemma 2.9. The proof cancels the common prefix and bounds geometric tails."
 
   - source: "thm:analyticity"
-    kind: lemma
-    status: formalized
+    kind: "lemma"
+    sha256: "b30a5951ea4f93f4bfdc08806e67c7929c0a169416052f9c892b5e04ee4731f5"
+    status: "formalized"
     lean: ["AnalyticESC.lemma_3_1"]
-    relation: exact
+    relation: "exact"
     headline: false
-    note: "AnalyticESC.abs_deriv_sub_le_of_abs_sub_le is the C^2 form with any common bound Q, and AnalyticESC.abs_iteratedDeriv_sub_le its iterate."
+    note: "The C2 form allows any common second-derivative bound Q; the library also proves its iterate."
 
   - source: "lem:Pointsx_ij"
-    kind: lemma
-    status: formalized
-    lean: ["AnalyticESC.IFS.lemma_4_3", "AnalyticESC.IFS.noCoincidence_of_not_hasExactOverlaps"]
-    relation: exact
+    kind: "lemma"
+    sha256: "902a4aa55339bff54294186ffe6db5a9bace9dab0ec1452be5315f2543a710a9"
+    status: "formalized"
+    lean: ["AnalyticESC.IFS.lemma_4_1", "AnalyticESC.IFS.noCoincidence_of_not_hasExactOverlaps"]
+    relation: "exact"
     headline: false
-    note: "The hypothesis is AnalyticESC.IFS.NoCoincidence, that compositions along distinct finite words differ on [0,1]; it follows from the absence of exact overlaps assumed in v2 (AnalyticESC.IFS.noCoincidence_of_not_hasExactOverlaps). Orbits are lists of real points; item (c) is stated for distinct pairs of B_n."
+    note: "Lemma 4.1, under the stated NoCoincidence hypothesis on I, implied by absence of exact overlaps. Orbits are lists of real points; item (c) concerns distinct pairs of B_n."
 
   - source: "prop:AnalyticBumpFunc"
-    kind: proposition
-    status: formalized
+    kind: "proposition"
+    sha256: "ee3dd78512003f023552e4b820b031bc34306155aee0909d9c581ff1f882a389"
+    status: "formalized"
     lean: ["AnalyticESC.proposition_4_2"]
-    relation: exact
+    relation: "exact"
     headline: false
-    note: "AnalyticESC.proposition_4_2 (module Generic.MultiplicativeBump) assumes f([0,1]) in (0,1) and yields g in S^omega_{eps'}(I) for some eps' > 0 (AnalyticESC.exists_inClass); v2 states g in S^omega_eps(I) with the eps of f and does not assume f([0,1]) in (0,1). The proof follows v2: g = f exp(phi psi A), the amplitudes (4.4), widths subject to (C1) to (C4), (4.5) and (4.6), and the bound (4.3) (AnalyticESC.gaussian_bound). All widths are equal, eta_i = rho^3. An empty Z is padded by a point of I outside Y, a case v2 does not treat; the factors 16Q^2 + 12Q and 8Q then apply. Lean supplies the bounds for phi psi A'' and phi' psi A', which the paper leaves to the reader: they are of order delta near Y, and need (4.3) with c = 4M a_y for the off-diagonal part of phi' psi A' and an analogue of (4.6) with exp(-eta^(-1/3)/2). Near y_i the ratio of psi times the product over Y to its value at y_i is bounded by continuity. The constant is C = 40/m for a margin m of f on [0,1]. The paper's epsilon is eta."
+    note: "The multiplicative construction g = f exp(phi psi A) assumes f(I) lies in (0,1) and produces an admissible radius for g. Lean chooses equal widths, pads an empty Z outside Y and proves the second-derivative estimates left to the reader. The interpolation-product ratio is controlled by continuity. Constants may be enlarged."
 
   - source: "unlabelled:lem-gaussian-bound"
-    kind: lemma
-    status: formalized
+    kind: "lemma"
+    match: "Let us fix constants $c, p, \\delta>0$"
+    sha256: "02f3e1f6fbe2ce098e6ad9f59cf6feb76dda7cfdb699fc489d5f0eabd03edf33"
+    status: "formalized"
     lean: ["AnalyticESC.gaussian_bound"]
-    relation: exact
+    relation: "exact"
     headline: false
-    note: "Used in the proof of Proposition 4.2 (AnalyticESC.proposition_4_2)."
+    note: "The Gaussian bound used in Proposition 4.2."
 
   - source: "lem:conj0"
-    kind: lemma
-    status: formalized
+    kind: "lemma"
+    sha256: "f75156ad1dd8afabdf0031e8b24b8a345ccb8aed9d50b320569b7559e222830b"
+    status: "formalized"
     lean: ["AnalyticESC.lemma_5_1", "AnalyticESC.existsUnique_fixedPoint"]
-    relation: split
+    relation: "split"
     headline: false
-    note: "The lemma is stated for b != 0, where v2 allows all a, b; for b = 0 the map below is constant. The map g is a + b g_hat for the linearising map g_hat of (5.2), AnalyticESC.koenigs. Lean defines g_hat by the double integral of H_hat_f, proves its ODE and boundary continuity, integrates the finite logarithmic derivatives to get the derivative-product identity, and derives (5.2) by passing the limit through the outer integral, with log|f'| where v2 prints log f'. Shifting the limit gives the conjugacy equation, as in the paper. Invertibility means injectivity of the real restriction on [0,1], and g lies in AnalyticESC.analyticSpace, including continuity on the closure of B_eps (AnalyticESC.continuousOn_koenigs). The second part assumes g twice differentiable within [0,1], with one-sided derivatives at the end points, and follows the paper. H_hat_f of (5.1) is AnalyticESC.hatH."
+    note: "The map a + b g_hat has b != 0 and is injective on I. Lean constructs g_hat from the ODE, proves the derivative-product limit and boundary continuity, and uses log|f'|. The second assertion uses derivatives within I, including one-sided endpoint derivatives."

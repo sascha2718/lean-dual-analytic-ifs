@@ -5,7 +5,7 @@ public import AnalyticESC.Dimension.Rapaport
 @[expose] public section
 
 /-!
-# Dimensions in the example of Section 1.2.2
+# Dimensions in the polynomial example of Section 1.2.2
 
 The example satisfies the SESC, hence the ESC, and its attractor is not a singleton, since `f₁`
 fixes `0` and `f₃` fixes `1`. By Theorem 1.6, `dim_H Λ = s(Φ)` and `dim μ_p = H(p)/χ` for every
@@ -144,7 +144,7 @@ private theorem exdim_no_common_fixed_point :
   obtain rfl : x = 0 := by linarith
   norm_num at h2
 
-/-- The example of Section 1.2.2: `dim_H Λ = s(Φ) < 1`, and `dim μ_p = H(p)/χ < 1` for every
+/-- The polynomial example of Section 1.2.2: `dim_H Λ = s(Φ) < 1`, and `dim μ_p = H(p)/χ < 1` for every
 positive probability vector `p`. -/
 theorem example_dim (hM : RapaportMeasureStatement) (hS : RapaportSetStatement) :
     ∃ s : ℝ,

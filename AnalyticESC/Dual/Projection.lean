@@ -10,7 +10,7 @@ public import AnalyticESC.Words
 
 Convergence and holomorphy of the series (1.4) defining `H_w`, its uniform bounds, the cocycle
 identity for prepended words, the formula (2.7) `H_{v^←} = f_v''/f_v'` for finite words, and
-Lemma 2.4 (a), (b): `H_w ∈ C^ω_ε([0,1])` and Hölder dependence on the word.
+Lemma 2.5, analyticity and Hölder continuity: `H_w ∈ C^ω_ε([0,1])` and Hölder dependence on the word.
 -/
 
 namespace AnalyticESC
@@ -238,7 +238,7 @@ theorem dualProj_fin_reverse (v : List (Fin N)) {z : ℂ} (hz : z ∈ closure (n
     field_simp
     ring
 
-/-! ## Lemma 2.4 -/
+/-! ## Lemma 2.5 -/
 
 /-- Uniform bound for `H_w` on `cl B_ε` and the bound `2M c_max^m` for words sharing a prefix of
 length `m`. -/
@@ -264,14 +264,14 @@ theorem exists_dualProj_bounds :
         mul_le_mul h1 h2 (norm_nonneg _) (pow_nonneg Φ.cmax_nonneg _)
     _ = 2 * M * Φ.cmax ^ m := by ring
 
-/-- Lemma 2.4, first claim: `H_i ∈ C^ω_ε([0,1])` for `i ∈ Σ`. -/
+/-- Lemma 2.5, first claim: `H_i ∈ C^ω_ε([0,1])` for `i ∈ Σ`. -/
 theorem dualProj_mem_analyticSpace (w : ℕ → Fin N) :
     toNbhd ε (Φ.dualProj (.inf w)) ∈ analyticSpace ε :=
   ⟨Φ.dualProj (.inf w), Φ.differentiableOn_dualProj _,
     Φ.continuousOn_dualProj _,
     fun _ hx => Φ.im_dualProj_ofReal _ (ofReal_mem_nbhd Φ.ε_pos hx), rfl⟩
 
-/-- Lemma 2.4, second claim: `‖H_i - H_j‖_∞ ≤ c_max^{|i ∧ j|} K` on `B_ε` for distinct
+/-- Lemma 2.5, second claim: `‖H_i - H_j‖_∞ ≤ c_max^{|i ∧ j|} K` on `B_ε` for distinct
 `i, j ∈ Σ`. -/
 theorem exists_dualProj_holder :
     ∃ K > 0, ∀ i j : ℕ → Fin N, i ≠ j → ∀ z ∈ nbhd ε,

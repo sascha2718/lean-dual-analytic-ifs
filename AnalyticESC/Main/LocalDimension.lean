@@ -6,9 +6,9 @@ public import AnalyticESC.Separation
 @[expose] public section
 
 /-!
-# The local dimension of the natural measure of the example
+# The local dimension of the natural measure of the polynomial example
 
-The remark at the end of Section 1.2.2: the natural measure `μ = ν ∘ π⁻¹` of the example, where
+The natural measure `μ = ν ∘ π⁻¹` of the polynomial example in Section 1.2.2, where
 `ν` is the Gibbs measure of the potential `s(Φ) log|f'_{ω₁}(π(σω))|`, has local dimension
 `s(Φ) - 1/3 < s(Φ)` at `0`.
 
@@ -604,9 +604,9 @@ private theorem ld_le_natProj {k : ℕ} {ω : ℕ → Fin 3} (hk : ω k = 2) (h 
   have hpow : (0 : ℝ) ≤ (1 / 8) ^ k := by positivity
   nlinarith
 
-/-- The remark at the end of Section 1.2.2: for the example, a measure `ν` with the Gibbs property
-for the potential `s log|f'|` fixes `s = s(Φ)` as the unique zero of the pressure, and the natural
-measure `μ = ν ∘ π⁻¹` has local dimension `s(Φ) - 1/3` at `0`. -/
+/-- The natural measure of the polynomial example in Section 1.2.2: a measure `ν` with the Gibbs
+property for the potential `s log|f'|` fixes `s = s(Φ)` as the unique zero of the pressure,
+and the natural measure `μ = ν ∘ π⁻¹` has local dimension `s(Φ) - 1/3` at `0`. -/
 theorem example_localDim {s : ℝ} {ν : Measure (ℕ → Fin 3)} [IsProbabilityMeasure ν]
     (hν : exampleIFS.IsGibbs s ν) :
     (∀ t, Tendsto (fun n : ℕ => Real.log (exampleIFS.pressureSum t n) / n) atTop (𝓝 0) ↔

@@ -254,7 +254,7 @@ private theorem exists_points_finset (h : Φ.NoCoincidence) (k K : ℝ) (n : ℕ
         exact hsep p hp q hq hpp hqp hpq
 
 /-- Lemma 4.1. A pair `(i, j)` is not bad when `F_i(k, K) ∩ F_j(k, K) = ∅` in the sense of (2.2). -/
-theorem lemma_4_3 (n : ℕ) (k K : ℝ) (h : Φ.NoCoincidence) :
+theorem lemma_4_1 (n : ℕ) (k K : ℝ) (h : Φ.NoCoincidence) :
     ∃ x : (Fin n → Fin N) × (Fin n → Fin N) → ℝ,
       (∀ p ∈ pairs N n, x p ∈ I) ∧
       (∀ p ∈ pairs N n, Φ.DualCylDisjoint k K (List.ofFn p.1) (List.ofFn p.2) →

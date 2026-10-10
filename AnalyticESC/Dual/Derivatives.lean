@@ -7,8 +7,8 @@ public import AnalyticESC.Dual.HigherDerivatives
 /-!
 # Derivatives of the dual natural projection
 
-Lemma 2.8 (uniform bounds for `H_w^{(k)}` on `I`), Corollary 2.9 (Lipschitz bounds) and
-Lemma 2.10 (dependence on the common prefix), using the Faà di Bruno formula of Lemma 2.7,
+Lemma 2.9 (uniform bounds for `H_w^{(k)}` on `I`), Corollary 2.10 (Lipschitz bounds) and
+Lemma 2.11 (dependence on the common prefix), using the Faà di Bruno formula of Lemma 2.8,
 induction on the derivative order, polynomial bounds and geometric-series tails.
 -/
 
@@ -42,8 +42,8 @@ theorem exists_nonlin_iteratedDeriv_bound (k : ℕ) :
   exact (hD i x hx).trans ((le_abs_self _).trans
     (Finset.single_le_sum (fun j _ => abs_nonneg (D j)) (Finset.mem_univ i)))
 
-/-- The induction step in Lemma 2.8. Bounds for the lower derivatives bound each polynomial
-in Lemma 2.7; the remaining factor is at most `c_max^n`, since every partition is nonempty. -/
+/-- The induction step in Lemma 2.9. Bounds for the lower derivatives bound each polynomial
+in Lemma 2.8; the remaining factor is at most `c_max^n`, since every partition is nonempty. -/
 theorem exists_dualDerivTerm_bound_of_lower (k : ℕ) (C : ℕ → ℝ) (hC0 : ∀ ℓ, 0 ≤ C ℓ)
     (hC : ∀ ℓ < k, ∀ x ∈ I, ∀ w : Word N, ‖iteratedDeriv ℓ (Φ.dualProj w) x‖ ≤ C ℓ) :
     ∃ A ≥ 0, ∀ (w : Word N) (n : ℕ), ∀ x ∈ I,
@@ -106,8 +106,8 @@ theorem exists_dualDerivTerm_bound_of_lower (k : ℕ) (C : ℕ → ℝ) (hC0 : �
           _ = B c * Φ.cmax ^ n := by dsimp [B]; ring
       _ = (∑ c, B c) * Φ.cmax ^ n := (Finset.sum_mul ..).symm
 
-/-- Lemma 2.8 by strong induction using Lemma 2.7. The bounds also control the geometric tails
-needed for Lemma 2.10. -/
+/-- Lemma 2.9 by strong induction using Lemma 2.8. The bounds also control the geometric tails
+needed for Lemma 2.11. -/
 theorem exists_dualDerivTerm_bound (k : ℕ) :
     ∃ A ≥ 0, ∀ (w : Word N) (n : ℕ), ∀ x ∈ I,
       ‖Φ.dualDerivTerm w k n x‖ ≤ A * Φ.cmax ^ n := by
@@ -120,7 +120,7 @@ theorem exists_dualDerivTerm_bound (k : ℕ) :
       obtain ⟨A, hA0, hA⟩ := ih ℓ hℓ
       have hc1 : 0 < 1 - Φ.cmax := sub_pos.2 Φ.cmax_lt_one
       refine ⟨A * (1 - Φ.cmax)⁻¹, by positivity, fun x hx w => ?_⟩
-      rw [(Φ.lemma_2_7 w ℓ hx).2]
+      rw [(Φ.lemma_2_8 w ℓ hx).2]
       exact tsum_of_norm_bounded
         ((hasSum_geometric_of_lt_one Φ.cmax_nonneg Φ.cmax_lt_one).mul_left A)
         (fun n => hA w n x hx)
@@ -134,7 +134,7 @@ theorem exists_dualDerivTerm_bound (k : ℕ) :
     exact Φ.exists_dualDerivTerm_bound_of_lower k C hC0 fun ℓ hℓ => by
       simpa only [C, dite_eq_left hℓ] using (hb ℓ hℓ).choose_spec.2
 
-/-- One family `C_k` serving Lemmas 2.8 and 2.10, the latter for every common prefix length
+/-- One family `C_k` serving Lemmas 2.9 and 2.11, the latter for every common prefix length
 `m ≤ |i ∧ j|`. -/
 theorem exists_iteratedDeriv_bounds :
     ∃ C : ℕ → ℝ, (∀ k, 0 < C k) ∧
@@ -158,7 +158,7 @@ theorem exists_iteratedDeriv_bounds :
     simpa only [mul_right_comm (A k)] using tsum_of_norm_bounded hs hb
   refine ⟨C, fun k => by have := hA0 k; dsimp [C]; positivity, ?_, ?_⟩
   · intro k x hx w
-    rw [(Φ.lemma_2_7 w k hx).2]
+    rw [(Φ.lemma_2_8 w k hx).2]
     have ht := htail k w 0 x hx
     simp only [Nat.add_zero, pow_zero, mul_one] at ht
     exact ht.trans (le_add_of_nonneg_right zero_le_one)
@@ -172,22 +172,22 @@ theorem exists_iteratedDeriv_bounds :
     have heq : (∑ n ∈ Finset.range m, Φ.dualDerivTerm i k n x) =
         ∑ n ∈ Finset.range m, Φ.dualDerivTerm j k n x :=
       Finset.sum_congr rfl fun n hn => hprefix n (Finset.mem_range.1 hn)
-    rw [(Φ.lemma_2_7 i k hx).2, (Φ.lemma_2_7 j k hx).2,
-      ← (Φ.lemma_2_7 i k hx).1.sum_add_tsum_nat_add m,
-      ← (Φ.lemma_2_7 j k hx).1.sum_add_tsum_nat_add m, heq, add_sub_add_left_eq_sub]
+    rw [(Φ.lemma_2_8 i k hx).2, (Φ.lemma_2_8 j k hx).2,
+      ← (Φ.lemma_2_8 i k hx).1.sum_add_tsum_nat_add m,
+      ← (Φ.lemma_2_8 j k hx).1.sum_add_tsum_nat_add m, heq, add_sub_add_left_eq_sub]
     calc _ ≤ ‖∑' n, Φ.dualDerivTerm i k (n + m) x‖ +
           ‖∑' n, Φ.dualDerivTerm j k (n + m) x‖ := norm_sub_le _ _
       _ ≤ A k * (1 - Φ.cmax)⁻¹ * Φ.cmax ^ m +
           A k * (1 - Φ.cmax)⁻¹ * Φ.cmax ^ m := add_le_add (htail k i m x hx) (htail k j m x hx)
       _ ≤ 2 * C k * Φ.cmax ^ m := by dsimp [C]; nlinarith [pow_nonneg hc0 m]
 
-/-- Lemma 2.8. -/
-theorem lemma_2_8 (k : ℕ) :
+/-- Lemma 2.9. -/
+theorem lemma_2_9 (k : ℕ) :
     ∃ C, ∀ x ∈ I, ∀ w : Word N, ‖iteratedDeriv k (Φ.dualProj w) x‖ ≤ C := by
   obtain ⟨C, -, hC, -⟩ := Φ.exists_iteratedDeriv_bounds
   exact ⟨C k, hC k⟩
 
-/-- The Lipschitz bound of Corollary 2.9, for every `k`. -/
+/-- The Lipschitz bound of Corollary 2.10, for every `k`. -/
 theorem norm_iteratedDeriv_sub_le_of_bounds (C : ℕ → ℝ)
     (hC : ∀ k, ∀ x ∈ I, ∀ w : Word N, ‖iteratedDeriv k (Φ.dualProj w) x‖ ≤ C k) (k : ℕ)
     {x y : ℝ} (hx : x ∈ I) (hy : y ∈ I) (w : Word N) :
@@ -208,15 +208,15 @@ theorem norm_iteratedDeriv_sub_le_of_bounds (C : ℕ → ℝ)
   simpa [Real.norm_eq_abs] using this
 
 set_option linter.unusedVariables false in
-/-- Corollary 2.9, for any constants `C_k` as in Lemma 2.8. -/
-theorem corollary_2_9 (C : ℕ → ℝ)
+/-- Corollary 2.10, for any constants `C_k` as in Lemma 2.9. -/
+theorem corollary_2_10 (C : ℕ → ℝ)
     (hC : ∀ k, ∀ x ∈ I, ∀ w : Word N, ‖iteratedDeriv k (Φ.dualProj w) x‖ ≤ C k) {k : ℕ}
     (hk : 1 ≤ k) {x y : ℝ} (hx : x ∈ I) (hy : y ∈ I) (w : Word N) :
     ‖iteratedDeriv k (Φ.dualProj w) x - iteratedDeriv k (Φ.dualProj w) y‖ ≤ C (k + 1) * |x - y| :=
   Φ.norm_iteratedDeriv_sub_le_of_bounds C hC k hx hy w
 
-/-- Lemma 2.10, for distinct words, with constants `C_k` as in Lemma 2.8. -/
-theorem lemma_2_10 :
+/-- Lemma 2.11, for distinct words, with constants `C_k` as in Lemma 2.9. -/
+theorem lemma_2_11 :
     ∃ C : ℕ → ℝ, (∀ k, 0 < C k) ∧
       (∀ k, ∀ x ∈ I, ∀ w : Word N, ‖iteratedDeriv k (Φ.dualProj w) x‖ ≤ C k) ∧
       ∀ k, ∀ x ∈ I, ∀ i j : Word N, i ≠ j →

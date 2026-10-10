@@ -5,7 +5,7 @@ public import AnalyticESC.Dual.Attractor
 @[expose] public section
 
 /-!
-# Lemma 2.5
+# Lemma 2.6
 
 The strong separation of the dual IFS in terms of cylinder sets, (a) ⇔ (b), and in terms of the
 dual natural projection, (a) ⇔ (c).
@@ -206,11 +206,11 @@ private theorem mapsTo_dualOp_dualCylClosed {M K : ℝ}
         Φ.cmax_nonneg
     exact abs_lt.1 ((Complex.abs_re_le_norm _).trans_lt (hnorm.trans_lt hK))
 
-/-- Lemma 2.5: (a) the dual IFS satisfies the SSC if and only if (b) there are `k < K` and
+/-- Lemma 2.6: (a) the dual IFS satisfies the SSC if and only if (b) there are `k < K` and
 `n ≥ 1` with `F_i cl (k,K) ⊆ (k,K)` for every `i` and `F_i(k,K) ∩ F_j(k,K) = ∅`, in the sense of
 (2.2), for all `i, j ∈ Σ_n` with `i₁ ≠ j₁`; and if and only if (c) there is `δ > 0` with
 `sup_{x ∈ [0,1]} |H_i(x) - H_j(x)| > δ` for all `i, j ∈ Σ` with `i₁ ≠ j₁`. -/
-theorem lemma_2_5 (hN : 0 < N) :
+theorem lemma_2_6 (hN : 0 < N) :
     (Φ.DualSSC ↔ ∃ k K : ℝ, k < K ∧ ∃ n : ℕ,
       (∀ i, MapsTo (Φ.dualOp i) (dualCylClosed ε k K) (dualCyl ε k K)) ∧
       ∀ i j : Fin (n + 1) → Fin N, i 0 ≠ j 0 →

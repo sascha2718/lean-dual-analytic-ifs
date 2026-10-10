@@ -397,7 +397,7 @@ variable {N : ℕ} {ε : ℝ}
 /-- The interpolation at the start of the density proof of Theorem 1.4. Every `Φ ∈ 𝔖_N(ε)` has, for
 every `r > 0`, a perturbation `Ψ ∈ 𝔖_N(ε)` with `d₂(Φ, Ψ) < r` whose maps send `[0,1]` into `(0,1)`
 and whose compositions along distinct finite words differ on `[0,1]`. -/
-theorem lemma_4_2 (Φ : IFS N ε) {r : ℝ} (hr : 0 < r) :
+theorem exists_noCoincidence_near (Φ : IFS N ε) {r : ℝ} (hr : 0 < r) :
     ∃ Ψ : IFS N ε, d2 Φ Ψ < r ∧ (∀ i, ∀ x ∈ I, (Ψ.f i x).re ∈ Ioo 0 1) ∧ Ψ.NoCoincidence := by
   rcases Nat.eq_zero_or_pos N with hN | hN
   · -- without maps, `Ψ = Φ` works: every word is empty

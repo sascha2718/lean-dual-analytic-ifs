@@ -5,7 +5,7 @@ public import AnalyticESC.Main.Criterion
 @[expose] public section
 
 /-!
-# The example of Section 1.2.2
+# The polynomial example of Section 1.2.2
 
 The system `f₁(x) = x/8`, `f₂(x) = x/8 + x²/32`, `f₃(x) = x/16 + x²/32 + 29/32` lies in `𝔖_3` for
 `ε = 1/100`, has `c_max < 1/5`, `β ≤ 1` and distortions `1/2`-apart at `0`, so Proposition 1.8
@@ -16,7 +16,7 @@ namespace AnalyticESC
 
 open Set Metric Filter Topology
 
-/-- The maps of the example in Section 1.2.2. -/
+/-- The maps of the polynomial example in Section 1.2.2. -/
 noncomputable def exampleMaps : Fin 3 → ℂ → ℂ :=
   ![fun z => z / 8, fun z => z / 8 + z ^ 2 / 32, fun z => z / 16 + z ^ 2 / 32 + 29 / 32]
 

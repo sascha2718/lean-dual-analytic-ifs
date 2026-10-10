@@ -86,7 +86,7 @@ namespace IFS
 
 variable {N : ℕ} {ε : ℝ} (Φ : IFS N ε)
 
-/-- Equation (2.9) and the polynomial bounds from Lemma 2.8 give
+/-- Equation (2.9) and the polynomial bounds from Lemma 2.9 give
 `|f_w^{(k+1)}| ≤ E_k c_max^{|w|}`. For `k = 1, 2` these are the second- and
 third-derivative bounds used at the start of Section 3. -/
 theorem exists_iteratedDeriv_comp_decay (k : ℕ) :
@@ -106,7 +106,7 @@ theorem exists_iteratedDeriv_comp_decay (k : ℕ) :
     _ = _ := mul_comm _ _
 
 /-- A common bound on `I` for the derivatives of order at most `k` of all compositions,
-obtained from the polynomial identity and Lemma 2.8. -/
+obtained from the polynomial identity and Lemma 2.9. -/
 theorem exists_iteratedDeriv_comp_bound (k : ℕ) :
     ∃ Q, 0 ≤ Q ∧ ∀ j ≤ k, ∀ w : List (Fin N), ∀ x ∈ I, ‖iteratedDeriv j (Φ.comp w) x‖ ≤ Q := by
   choose E hE0 hE using Φ.exists_iteratedDeriv_comp_decay

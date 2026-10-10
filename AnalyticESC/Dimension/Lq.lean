@@ -5,9 +5,9 @@ public import AnalyticESC.Dimension.NaturalMeasure
 @[expose] public section
 
 /-!
-# The `L^q` dimension of the natural measure of the example
+# The `L^q` dimension of the natural measure of the polynomial example
 
-The end of Section 1.2.2: for `q > 1`, the `L^q` spectrum
+`L^q` dimensions of the polynomial example in Section 1.2.2: for `q > 1`, the `L^q` spectrum
 `τ_μ(q) = liminf_{r → 0} log(∑_{k ∈ ℤ} μ([kr, (k+1)r))^q) / log r` and the `L^q` dimension
 `D_μ(q) = τ_μ(q)/(q - 1)` of the natural measure `μ` of the example satisfy
 `D_μ(q) ≤ q (s(Φ) - 1/3) / (q - 1)`, which is smaller than `s(Φ)` for `q > 3 s(Φ)`. The sum
@@ -259,9 +259,9 @@ private theorem lq_measureReal_closedBall_pos {φ : (ℕ → Fin 3) → ℝ} {ν
   rw [mem_preimage, mem_closedBall, Real.dist_eq, sub_zero, abs_of_nonneg h0.1]
   exact (lq_natProj_le fun i hi => hy i hi).trans hm.le
 
-/-- The end of Section 1.2.2, from Bowen's theorem: for every Gibbs measure `ν` of the potential
-`s(Φ) log|f'_{ω₀}(π(σω))|` and every `q > 1`, the natural measure `μ = ν ∘ π⁻¹` has
-`D_μ(q) ≤ q (s(Φ) - 1/3) / (q - 1)`, which is smaller than `s(Φ)` for `q > 3 s(Φ)`. The `L^q` sums
+/-- `L^q` dimensions of the polynomial example in Section 1.2.2, from Bowen's theorem:
+for every Gibbs measure `ν` of the potential `s(Φ) log|f'_{ω₀}(π(σω))|` and every `q > 1`,
+the natural measure `μ = ν ∘ π⁻¹` has `D_μ(q) ≤ q (s(Φ) - 1/3) / (q - 1)`, which is smaller than `s(Φ)` for `q > 3 s(Φ)`. The `L^q` sums
 converge, and the quotient whose limit inferior is `τ_μ(q)` is bounded below and does not tend to
 `∞`, so the limit inferior is not a junk value. -/
 theorem example_lq_of_bowen (hB : BowenGibbsStatement) :

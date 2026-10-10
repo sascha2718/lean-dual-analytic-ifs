@@ -9,9 +9,9 @@ public import AnalyticESC.Analysis
 /-!
 # The dual IFS and its attractor
 
-Iterates of the dual operators, Lemma 2.1 (the attractor of the dual IFS), Lemma 2.4 (c)
+Iterates of the dual operators, Lemma 2.1 (the attractor of the dual IFS), the coding description of Lemma 2.5
 (`Λ* = {H_i : i ∈ Σ}`), the strong separation of the dual in terms of the dual natural
-projection (Lemma 2.5, (a) ⇔ (c)), and the incompatibility of dual strong separation with an
+projection (Lemma 2.6, (a) ⇔ (c)), and the incompatibility of dual strong separation with an
 exact coincidence `f_a = f_b`.
 -/
 
@@ -356,7 +356,7 @@ private theorem eq_range_of_isDualAttractor {Λ : Set (nbhd ε →ᵤ ℂ)} (hΛ
 theorem existsUnique_isDualAttractor (hN : 0 < N) : ∃! Λ, Φ.IsDualAttractor Λ :=
   Φ.existsUnique_isDualAttractor_hutchinson hN
 
-/-- Lemma 2.4, last claim: the Hutchinson attractor is `{H_i : i ∈ Σ}`. -/
+/-- Lemma 2.5, last claim: the Hutchinson attractor is `{H_i : i ∈ Σ}`. -/
 theorem isDualAttractor_range (hN : 0 < N) :
     Φ.IsDualAttractor (range fun w : ℕ → Fin N => toNbhd ε (Φ.dualProj (.inf w))) := by
   obtain ⟨Λ, hΛ, -⟩ := Φ.existsUnique_isDualAttractor hN
@@ -491,7 +491,7 @@ theorem dualProj_ne_iff_exists_delta :
     simp only [h0, ciSup_const] at this
     linarith
 
-/-- Lemma 2.5, (a) ⇔ (c). -/
+/-- Lemma 2.6, (a) ⇔ (c). -/
 theorem dualSSC_iff_exists_delta (hN : 0 < N) :
     Φ.DualSSC ↔ ∃ δ > 0, ∀ i j : ℕ → Fin N, i 0 ≠ j 0 →
       δ < ⨆ x : I, ‖Φ.dualProj (.inf i) ((x : ℝ) : ℂ) - Φ.dualProj (.inf j) ((x : ℝ) : ℂ)‖ :=

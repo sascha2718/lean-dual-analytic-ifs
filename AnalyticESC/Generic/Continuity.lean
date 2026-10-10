@@ -5,7 +5,7 @@ public import AnalyticESC.Dual.Attractor
 @[expose] public section
 
 /-!
-# Lemma 2.6
+# Lemma 2.7
 
 The dual natural projection depends Lipschitz-continuously on the system in the `𝒞²` metric,
 uniformly in the word (2.6), so the strong separation of the dual is an open condition.
@@ -404,10 +404,10 @@ theorem exists_dualProj_sub_le_d2 (Φ : IFS N ε) :
   rw [dualProj, dualProj, ← (Φ.summable_dualTerm w hxc).tsum_sub (Ψ.summable_dualTerm w hxc')]
   exact tsum_of_norm_bounded (hsum.hasSum.mul_right _) hterm
 
-/-- Lemma 2.6 for `𝔖_N`: if the dual of `Φ` satisfies the SSC, so does the dual of every
+/-- Lemma 2.7 for `𝔖_N`: if the dual of `Φ` satisfies the SSC, so does the dual of every
 `Ψ ∈ 𝔖_N` close to `Φ` in the `𝒞²` metric. The radius depends only on `Φ`, and `Ψ` may lie in
 `𝔖_N(ε')` for any `ε'`. -/
-theorem lemma_2_6_union (Φ : IFS N ε) (h : Φ.DualSSC) :
+theorem lemma_2_7_union (Φ : IFS N ε) (h : Φ.DualSSC) :
     ∃ δ > 0, ∀ {ε' : ℝ} (Ψ : IFS N ε'), d2 Φ Ψ < δ → Ψ.DualSSC := by
   rcases Nat.eq_zero_or_pos N with rfl | hN
   · -- Without letters, an attractor would be a nonempty empty union.
@@ -448,11 +448,11 @@ theorem lemma_2_6_union (Φ : IFS N ε) (h : Φ.DualSSC) :
   simp only at hxδ ⊢
   linarith
 
-/-- Lemma 2.6: if the dual of `Φ` satisfies the SSC, so does the dual of every `Ψ ∈ 𝔖_N(ε)` close
+/-- Lemma 2.7: if the dual of `Φ` satisfies the SSC, so does the dual of every `Ψ ∈ 𝔖_N(ε)` close
 to `Φ` in the `𝒞²` metric. -/
-theorem lemma_2_6 (Φ : IFS N ε) (h : Φ.DualSSC) :
+theorem lemma_2_7 (Φ : IFS N ε) (h : Φ.DualSSC) :
     ∃ δ > 0, ∀ Ψ : IFS N ε, d2 Φ Ψ < δ → Ψ.DualSSC :=
-  let ⟨δ, hδ, hΨ⟩ := Φ.lemma_2_6_union h
+  let ⟨δ, hδ, hΨ⟩ := Φ.lemma_2_7_union h
   ⟨δ, hδ, fun Ψ => hΨ Ψ⟩
 
 end IFS

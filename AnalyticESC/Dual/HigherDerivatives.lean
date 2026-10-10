@@ -5,10 +5,10 @@ public import AnalyticESC.Dual.Projection
 @[expose] public section
 
 /-!
-# Lemma 2.7
+# Lemma 2.8
 
 The higher derivatives of the dual natural projection: the identity (2.10),
-`f_v^{(k+1)}/f_v' = g_k(H_{v^←}^{(k-1)}, …, H_{v^←})`, and the formula of Lemma 2.7 for
+`f_v^{(k+1)}/f_v' = g_k(H_{v^←}^{(k-1)}, …, H_{v^←})`, and the formula of Lemma 2.8 for
 `H_w^{(k)}`, obtained from (2.8) and Faà di Bruno's formula. The set partitions `Π_{k+1}` of the
 paper are Mathlib's `OrderedFinpartition (k + 1)`, the partitions of `Fin (k + 1)` with blocks
 ordered by their greatest element.
@@ -215,7 +215,7 @@ theorem iteratedDeriv_logAbsDeriv (i : Fin N) (k : ℕ) {x : ℝ} (hx : x ∈ I)
   rw [iteratedDeriv_succ', heq.iteratedDeriv_eq]
   exact iteratedDeriv_re_ofReal hUo hnl k (hU (subset_closure hx'))
 
-/-- The term with index `n` (from `0`) of the formula of Lemma 2.7 for `H_w^{(k)}`: with `v` the
+/-- The term with index `n` (from `0`) of the formula of Lemma 2.8 for `H_w^{(k)}`: with `v` the
 first `n` letters of `w` and `i` the next one, the sum over partitions `π` of `{1, …, k+1}` of
 `φ_i^{(|π|)}(f_{v^←}(z)) · (f_{v^←}'(z))^{|π|} · ∏_{B ∈ π} g_{|B|-1}(H_v^{(|B|-2)}(z), …, H_v(z))`,
 where `φ_i^{(m)} = (f_i''/f_i')^{(m-1)}` for `m ≥ 1`. Zero if `|w| ≤ n`. -/
@@ -275,9 +275,9 @@ theorem iteratedDeriv_comp_div_deriv (w : List (Fin N)) (k : ℕ) {x : ℝ} (hx 
   rw [Φ.iteratedDeriv_succ_comp_reverse w k hx',
     mul_div_cancel_left₀ _ (Φ.deriv_comp_ne_zero _ (subset_closure hx'))]
 
-/-! ## Lemma 2.7 -/
+/-! ## Lemma 2.8 -/
 
-/-- Lemma 2.7 termwise, on `B_ε`: the `k`-th derivative of the term with index `n` of (1.4) is
+/-- Lemma 2.8 termwise, on `B_ε`: the `k`-th derivative of the term with index `n` of (1.4) is
 `dualDerivTerm w k n`, by Faà di Bruno's formula and (2.10). A local primitive of `f_i''/f_i'`
 takes the place of `φ_i = log|f_i'|` in (2.8). -/
 theorem iteratedDeriv_dualTerm (w : Word N) (k n : ℕ) {z : ℂ} (hz : z ∈ nbhd ε) :
@@ -308,9 +308,9 @@ theorem iteratedDeriv_dualTerm (w : Word N) (k n : ℕ) {z : ℂ} (hz : z ∈ nb
     rw [Finset.prod_congr rfl fun j _ => hpart _ (c.partSize_pos j), Finset.prod_mul_distrib,
       Fin.prod_const, mul_assoc]
 
-/-- Lemma 2.7: for every finite or infinite word `w` and `k ≥ 0`, the series of
+/-- Lemma 2.8: for every finite or infinite word `w` and `k ≥ 0`, the series of
 `dualDerivTerm` converges and sums to `H_w^{(k)}` on `[0,1]`. -/
-theorem lemma_2_7 (w : Word N) (k : ℕ) {x : ℝ} (hx : x ∈ I) :
+theorem lemma_2_8 (w : Word N) (k : ℕ) {x : ℝ} (hx : x ∈ I) :
     Summable (fun n => Φ.dualDerivTerm w k n x) ∧
       iteratedDeriv k (Φ.dualProj w) x = ∑' n, Φ.dualDerivTerm w k n x := by
   obtain ⟨C, -, hC⟩ := Φ.exists_dualTerm_bound

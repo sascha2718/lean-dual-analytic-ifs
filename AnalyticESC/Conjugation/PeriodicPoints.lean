@@ -21,7 +21,7 @@ finite word `w`.
    `g''(p)/g'(p) = H_{w^←}(p)/(1 - f_w'(p))`.
 3. For `i, j ∈ Σ` let `kₙ = i₁ ⋯ iₙ jₙ ⋯ j₁`. The fixed point `p_{kₙ}` lies in
    `f_{i₁ ⋯ iₙ}([0,1])`, so `p_{kₙ} → π(i)`; `f_{kₙ}'(p_{kₙ}) → 0`; and
-   `H_{j₁ ⋯ jₙ iₙ ⋯ i₁}(p_{kₙ}) → H_j(π(i))` by the bound of Lemma 2.4, which is uniform on
+   `H_{j₁ ⋯ jₙ iₙ ⋯ i₁}(p_{kₙ}) → H_j(π(i))` by `exists_dualProj_bounds`, used to prove Lemma 2.5, uniformly on
    `cl B_ε` and holds for a finite and an infinite word with a common prefix, and the continuity
    of `H_j`. As `g''/g'` is continuous at `π(i)`, `g''/g' = H_j` on the attractor for every `j`,
    and the identity theorem gives `H_j = H_k` on `[0,1]`.
@@ -306,8 +306,8 @@ theorem dualProj_eq_of_conjSelfSimilar (hnd : ¬ ∃ x, Φ.attractor = {x})
         (pow_le_pow_of_le_one Φ.cmax_nonneg Φ.cmax_lt_one.le ?_)) hc
       simp only [hk, hu, hv, List.length_append, List.length_reverse, List.length_ofFn]
       omega
-    -- `H_{j₁ ⋯ j_{n+1} i_{n+1} ⋯ i₁}(pₙ) - H_j(pₙ) → 0`, by Lemma 2.4 for words with a common
-    -- prefix of length `n + 1`
+    -- `H_{j₁ ⋯ j_{n+1} i_{n+1} ⋯ i₁}(pₙ) - H_j(pₙ) → 0`, by `exists_dualProj_bounds` for words
+    -- with a common prefix of length `n + 1`
     have hH₁ : Tendsto (fun n => Φ.dualProj (.fin (k n).reverse) (p n) -
         Φ.dualProj (.inf j) (p n)) atTop (𝓝 0) := by
       refine squeeze_zero_norm (fun n => hM _ _ (n + 1) ?_ _ (hpcl n))

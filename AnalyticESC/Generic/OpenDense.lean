@@ -12,8 +12,8 @@ public import AnalyticESC.Main.Dichotomy
 
 The IFSs of `𝔖_N` that satisfy the SESC contain a `d₂`-open and `d₂`-dense subset of `𝔖_N`, the
 union class of decision D1. The open set consists of the systems whose dual IFS satisfies the SSC:
-it is open by Lemma 2.6, its systems satisfy the SESC by Theorem 2.2, and it is dense by the
-interpolation `IFS.lemma_4_2` and the density step. The density step combines two perturbations, so
+it is open by Lemma 2.7, its systems satisfy the SESC by Theorem 2.2, and it is dense by the
+interpolation `IFS.exists_noCoincidence_near` and the density step. The density step combines two perturbations, so
 it uses the triangle inequality for `d₂` between systems of `𝔖_N(ε)` for different `ε`. For `N = 0`
 the dual IFS has no attractor, and the open set consists of all systems.
 -/
@@ -100,12 +100,12 @@ theorem theorem_1_4 (N : ℕ) :
     rcases Nat.eq_zero_or_pos N with rfl | hN
     · exact OpenDense.sesc_of_eq_zero Φ
     · exact Φ.theorem_2_2 (hΦ hN)
-  · -- Openness, by Lemma 2.6.
+  · -- Openness, by Lemma 2.7.
     rintro _ ⟨ε, Φ, rfl, hΦ⟩
     rcases Nat.eq_zero_or_pos N with rfl | hN
     · refine ⟨1, one_pos, fun g ⟨ε', hε', hg⟩ _ => ⟨ε', ⟨g, hε', hg⟩, rfl, fun h => ?_⟩⟩
       exact absurd h (lt_irrefl 0)
-    obtain ⟨δ, hδ, hΨ⟩ := Φ.lemma_2_6_union (hΦ hN)
+    obtain ⟨δ, hδ, hΨ⟩ := Φ.lemma_2_7_union (hΦ hN)
     exact ⟨δ, hδ, fun g ⟨ε', hε', hg⟩ hfg =>
       ⟨ε', ⟨g, hε', hg⟩, rfl, fun _ => hΨ (⟨g, hε', hg⟩ : IFS N ε') hfg⟩⟩
   · -- Density, by the interpolation and the density step.
@@ -115,7 +115,7 @@ theorem theorem_1_4 (N : ℕ) :
     · refine ⟨f, ⟨ε, Φ, rfl, fun h => absurd h (lt_irrefl 0)⟩, ?_⟩
       rw [d2Sys, Real.iSup_of_isEmpty]
       exact hr
-    obtain ⟨Φ₁, hΦ₁, hI, hnc⟩ := Φ.lemma_4_2 (half_pos hr)
+    obtain ⟨Φ₁, hΦ₁, hI, hnc⟩ := Φ.exists_noCoincidence_near (half_pos hr)
     obtain ⟨ε', Ψ, hΨ, hssc⟩ := IFS.exists_dualSSC_near hN Φ₁ hI hnc (half_pos hr)
     refine ⟨Ψ.f, ⟨ε', Ψ, rfl, fun _ => hssc⟩, ?_⟩
     have h := OpenDense.d2_le_add Φ Φ₁ Ψ

@@ -60,7 +60,7 @@ private theorem dualCompOn_toNbhd_dualProj' (a : List (Fin N)) (w : Word N) :
   rw [Φ.dualComp_apply a _ hz, Φ.dualProj_prepend a w (subset_closure hz), add_comm]
 
 /-- `F_i H_{i i i ⋯} = H_{i i i ⋯}`. -/
-private theorem dualCompOn_periodic {m : ℕ} (hm : 0 < m) (i : Fin m → Fin N) :
+theorem dualCompOn_periodic {m : ℕ} (hm : 0 < m) (i : Fin m → Fin N) :
     Φ.dualCompOn (List.ofFn i) (toNbhd ε (Φ.dualProj (.inf (periodic hm i)))) =
       toNbhd ε (Φ.dualProj (.inf (periodic hm i))) := by
   rw [dualCompOn_toNbhd_dualProj', prepend_ofFn_periodic]
@@ -146,6 +146,19 @@ private theorem eq_toNbhd_dualProj_of_dualCompOn_eq {a : List (Fin N)} (ha : a �
   have hlim : Tendsto (fun n : ℕ => (Φ.cmax ^ a.length) ^ n * (B + M)) atTop (𝓝 0) := by
     simpa using (tendsto_pow_atTop_nhds_zero_of_lt_one hc0 hc1).mul_const (B + M)
   exact ge_of_tendsto' hlim fun n => key n z
+
+/-- A nonempty dual composition has precisely its periodic projection as fixed point. -/
+theorem dualCompOn_fixed_iff {m : ℕ} (hm : 0 < m) (i : Fin m → Fin N)
+    {u : nbhd ε →ᵤ ℂ} (hu : u ∈ analyticSpace ε) :
+    Φ.dualCompOn (List.ofFn i) u = u ↔
+      u = toNbhd ε (Φ.dualProj (.inf (periodic hm i))) := by
+  constructor
+  · intro hfix
+    exact Φ.eq_toNbhd_dualProj_of_dualCompOn_eq
+      (by simpa only [Ne, List.ofFn_eq_nil_iff] using hm.ne') hu hfix
+      (Φ.dualCompOn_periodic hm i)
+  · rintro rfl
+    exact Φ.dualCompOn_periodic hm i
 
 /-- Theorem 2.3, first part. -/
 theorem theorem_2_3_conj (hN : 0 < N) :

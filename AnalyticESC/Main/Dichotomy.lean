@@ -16,10 +16,10 @@ whose compositions are super-exponentially close:
    `f_u(I)`, and apply the identity theorem.
 2. Unbounded suffixes and finite limit words: finite order of vanishing at the limiting point
    contradicts the interval-length lower bound unless the two fixed compositions coincide.
-3. Infinite limit words: (3.2), Lemma 3.1 and Lemma 2.8 give (3.3), including the denominator
-   `|f_u'|^k`; Lemma 2.10 and analyticity then identify the limiting dual projections.
+3. Infinite limit words: (3.2), Lemma 3.1 and Lemma 2.9 give (3.3), including the denominator
+   `|f_u'|^k`; Lemma 2.11 and analyticity then identify the limiting dual projections.
 
-Theorem 1.5 follows from compactness, Lemma 2.5(c) and Theorem 2.2.
+Theorem 1.5 follows from compactness, Lemma 2.6(c) and Theorem 2.2.
 -/
 
 namespace AnalyticESC
@@ -388,7 +388,7 @@ theorem exists_dualProj_small (S : Φ.CondSeq) :
   exact ⟨η', hη'pos, hη'small, hη'close⟩
 
 /-- Bounded common suffixes: pass to the limit on the fixed nondegenerate image
-interval using Lemma 2.10, then use the analytic identity theorem. -/
+interval using Lemma 2.11, then use the analytic identity theorem. -/
 theorem dualProj_eq_of_fixed_suffix (S : Φ.CondSeq) {u : List (Fin N)}
     (hu : ∀ k, S.u k = u) {i j : ℕ → Fin N}
     (hi : Word.TendstoPrefix (fun k => .fin (S.a k).reverse) (.inf i))

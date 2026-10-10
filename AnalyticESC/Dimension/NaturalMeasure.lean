@@ -429,7 +429,7 @@ theorem isGibbs_of_isGibbsMeasure (hN : 0 < N) {s : ℝ}
 
 end IFS
 
-/-- The remark at the end of Section 1.2.2, from Bowen's theorem: the pressure of the example has
+/-- The natural measure of the polynomial example in Section 1.2.2, from Bowen's theorem: the pressure of the example has
 a unique zero `s = s(Φ)`, the potential `s log|f'_{ω₀}(π(σω))|` has a Gibbs measure, and for every
 such Gibbs measure `ν` the natural measure `ν ∘ π⁻¹` has local dimension `s(Φ) - 1/3` at `0`. -/
 theorem example_localDim_of_bowen (hB : BowenGibbsStatement) :

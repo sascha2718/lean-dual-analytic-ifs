@@ -37,6 +37,10 @@ jobs:
         working-directory: project
         run: python3 scripts/check_module_headers.py
 
+      - name: Test manuscript correspondence checker
+        working-directory: project
+        run: python3 -m unittest discover -s scripts -p 'test_*.py'
+
       # Mathlib arrives through `lake exe cache get`; this caches our own oleans,
       # which are the expensive part of a rebuild.
       - name: Cache the library build output

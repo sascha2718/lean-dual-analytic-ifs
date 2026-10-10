@@ -7,9 +7,9 @@ public import AnalyticESC.Main.LocalDimension
 /-!
 # Dimension theory: vocabulary and cited results
 
-The vocabulary of Section 1.2.1 and of the remark at the end of Section 1.2.2: entropy, Lyapunov
-exponent, self-conformal measures, the equality in (1.6), the potential `s log|f'_{ω₀}(π(σω))|`
-and its Gibbs measures.
+The vocabulary of Section 1.2.1 and of the natural measure of the polynomial example
+in Section 1.2.2: entropy, Lyapunov exponent, self-conformal measures, the equality in (1.6),
+the potential `s log|f'_{ω₀}(π(σω))|` and its Gibbs measures.
 
 The three results cited from the literature are recorded as propositions, which the theorems of
 the library take as hypotheses. `Challenge.lean` states them identically, as hypotheses of the

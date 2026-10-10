@@ -94,7 +94,7 @@ theorem exists_inClass {U : Set ℂ} (hU : IsOpen U) (hIU : ((↑) : ℝ → ℂ
 
 /-- `S^ω(I)` consists of the maps complex analytic on an open neighbourhood of
 `I`, real at its real points, with `f(I) ⊆ I` and `0 < |f'| < 1` on `I`. -/
-theorem lemma_4_1 {f : ℂ → ℂ} :
+theorem exists_inClass_iff {f : ℂ → ℂ} :
     (∃ ε > 0, InClass ε f) ↔ ∃ U : Set ℂ, IsOpen U ∧ ((↑) : ℝ → ℂ) '' I ⊆ U ∧
       DifferentiableOn ℂ f U ∧ (∀ x : ℝ, (x : ℂ) ∈ U → (f x).im = 0) ∧
       (∀ x ∈ I, (f x).re ∈ I) ∧ ∀ x ∈ I, deriv f x ≠ 0 ∧ ‖deriv f x‖ < 1 := by
