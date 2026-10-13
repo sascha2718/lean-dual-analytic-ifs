@@ -32,6 +32,12 @@ repeats that vocabulary and proves the statements from [AnalyticESC](AnalyticESC
 The library and solution have no proof holes. The non-polynomial example and radius-independence
 results are proved in the library and are outside the twelve Challenge endpoints.
 
+Every quotient with a variable denominator in the challenge requires a nonzero proof.
+The derivative and contraction guards follow from the class hypotheses, and the library
+proves positivity of the Lyapunov exponent. Pressure limits start at length `n + 1`;
+local-dimension and `L^q` limits use `0 < r < 1`. Their equivalence with the original limits
+is proved in the solution and library. Fixed nonzero numerical denominators use ordinary division.
+
 Five headline statements have named literature hypotheses:
 
 - `BowenGibbsStatement`: Bowen, *Equilibrium states and the ergodic theory of Anosov

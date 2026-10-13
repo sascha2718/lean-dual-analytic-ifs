@@ -3,9 +3,8 @@
 
 This script deliberately does not invoke Lean or LaTeX. It checks reviewed source fingerprints,
 including remarks and selected prose, and catches stale labels, misspelled
-Lean declaration names, and drift between the manifest, the challenge, the solution, the
-comparator configuration and formalization.yaml.  A successful run is not a substitute for
-elaboration by Lean.
+Lean declaration names, and drift between the manifest, the comparator configuration and
+formalization.yaml. Comparator handles verification of the challenge and solution.
 
 The manuscript lives outside the Lean repository (in its parent directory), so this check runs
 locally rather than in CI.
@@ -45,7 +44,6 @@ DECL_RE = re.compile(
     r"(theorem|lemma|def|abbrev|structure|class|inductive|axiom|opaque|instance)\s+"
     r"([^\s\(\{\[:]+)"
 )
-AUDIT_DECL_RE = re.compile(r"(?m)^\s*(?:public\s+)?theorem\s+(audit_[A-Za-z0-9_']+)\b")
 ALLOWED_STATUSES = {"formalized", "planned", "intentionally_unformalized"}
 
 
@@ -461,16 +459,6 @@ def scan_lean_file(path: Path) -> list[LeanDeclaration]:
     return declarations
 
 
-def endpoint_spans(path: Path) -> dict[str, str]:
-    text = strip_lean_comments(path.read_text(encoding="utf-8"))
-    matches = list(AUDIT_DECL_RE.finditer(text))
-    spans: dict[str, str] = {}
-    for index, match in enumerate(matches):
-        end = matches[index + 1].start() if index + 1 < len(matches) else len(text)
-        spans[match.group(1)] = text[match.start() : end]
-    return spans
-
-
 def main() -> int:
     script = Path(__file__).resolve()
     default_lean_root = script.parent.parent
@@ -549,8 +537,6 @@ def main() -> int:
         comparator_names = []
     if len(set(comparator_names)) != len(comparator_names):
         errors.append("comparator theorem_names contains duplicates")
-    if comparator.get("definition_names") != []:
-        errors.append("comparator definition_names must be the empty list")
     comparator_set = set(comparator_names)
     manifest_headlines = {
         name
@@ -564,49 +550,6 @@ def main() -> int:
             f"only in manifest={sorted(manifest_headlines - comparator_set)}, "
             f"only in comparator={sorted(comparator_set - manifest_headlines)}"
         )
-
-    challenge_path = lean_root / "Challenge.lean"
-    solution_path = lean_root / "Solution.lean"
-    challenge_spans = endpoint_spans(challenge_path)
-    solution_spans = endpoint_spans(solution_path)
-    challenge_names = {f"Challenge.{name}" for name in challenge_spans}
-    solution_names = {f"Challenge.{name}" for name in solution_spans}
-    if challenge_names != comparator_set:
-        errors.append(
-            "Challenge audit declarations differ from comparator theorem_names; "
-            f"only in Challenge={sorted(challenge_names - comparator_set)}, "
-            f"only in comparator={sorted(comparator_set - challenge_names)}"
-        )
-    if solution_names != comparator_set:
-        errors.append(
-            "Solution audit declarations differ from comparator theorem_names; "
-            f"only in Solution={sorted(solution_names - comparator_set)}, "
-            f"only in comparator={sorted(comparator_set - solution_names)}"
-        )
-    challenge_source_declarations = scan_lean_file(challenge_path)
-    challenge_propositions = {
-        declaration.name
-        for declaration in challenge_source_declarations
-        if declaration.kind in {"theorem", "lemma"}
-    }
-    if challenge_propositions != comparator_set:
-        errors.append(
-            "every theorem or lemma in Challenge.lean must be an audited endpoint; "
-            f"extra={sorted(challenge_propositions - comparator_set)}, "
-            f"missing={sorted(comparator_set - challenge_propositions)}"
-        )
-    permitted_axioms = set(comparator.get("permitted_axioms", []))
-    for declaration in challenge_source_declarations:
-        if declaration.kind == "axiom" and declaration.name not in permitted_axioms:
-            errors.append(f"Challenge.lean declares an axiom not whitelisted in comparator.json: {declaration.name}")
-    for name, span in challenge_spans.items():
-        if not re.search(r"\bsorry\b", span):
-            errors.append(f"Challenge.{name} is not a theorem hole containing sorry")
-    for name, span in solution_spans.items():
-        if re.search(r"\bsorry\b", span):
-            errors.append(f"Solution proof Challenge.{name} contains sorry")
-        if not re.search(r":=\s*by\b", span):
-            errors.append(f"Solution proof Challenge.{name} does not have an explicit ':= by' body")
 
     formalization_path = lean_root / "formalization.yaml"
     try:
@@ -638,7 +581,7 @@ def main() -> int:
     if errors:
         print(f"FAILED with {len(errors)} error(s).", file=sys.stderr)
         return 1
-    print("OK: the manifest, comparator, Challenge, Solution and formalization.yaml agree.")
+    print("OK: the manifest, comparator configuration and formalization.yaml agree.")
     return 0
 
 

@@ -57,7 +57,7 @@ entries:
     lean: ["Challenge.audit_sesc_of_dualProj"]
     relation: "exact"
     headline: true
-    note: "Library form AnalyticESC.IFS.theorem_1_5. Challenge separates finite equal-length words from infinite words. Lean proves Theorem 2.2 first, then deduces this result by compactness and Lemma 2.6, using only the infinite-word hypothesis."
+    note: "Library form AnalyticESC.IFS.theorem_1_5. Challenge separates finite equal-length words from infinite words. Lean proves Theorem 2.2 first, then deduces this result by compactness and Lemma 2.6, using only the infinite-word hypothesis. Challenge makes nonvanishing of derivatives along finite orbits explicit; Solution derives this guard from InClass."
 
   - source: "thm:RapaportMain"
     kind: "theorem"
@@ -66,7 +66,7 @@ entries:
     lean: ["Challenge.audit_dim_of_esc"]
     relation: "representation"
     headline: true
-    note: "Library form AnalyticESC.IFS.theorem_1_6, assuming N > 0 and the cited RapaportMeasureStatement and RapaportSetStatement. Measure dimension is expressed as almost-everywhere local dimension, including Feng–Hu exact dimensionality in the literature hypothesis."
+    note: "Library form AnalyticESC.IFS.theorem_1_6, assuming N > 0 and the cited RapaportMeasureStatement and RapaportSetStatement. Measure dimension is expressed as almost-everywhere local dimension, including Feng–Hu exact dimensionality in the literature hypothesis. The Lyapunov quotient requires a nonzero proof; positivity is proved in the library. Pressure uses lengths n+1 and local dimension uses scales in (0,1), with equivalence to the original limits proved."
 
   - source: "cor:dim"
     kind: "corollary"
@@ -75,7 +75,7 @@ entries:
     lean: ["Challenge.audit_dim_open_dense"]
     relation: "representation"
     headline: true
-    note: "Library form AnalyticESC.corollary_1_7, assuming Rapaport's results, for N >= 2. The manuscript's trivial N = 1 case remains outside the formalisation."
+    note: "Library form AnalyticESC.corollary_1_7, assuming Rapaport's results, for N >= 2. The manuscript's trivial N = 1 case remains outside the formalisation. The guarded DimEquality is proved equivalent to the library property for nonempty systems."
 
   - source: "prop:example"
     kind: "proposition"
@@ -84,7 +84,7 @@ entries:
     lean: ["Challenge.audit_example_criterion"]
     relation: "split"
     headline: true
-    note: "Library form AnalyticESC.IFS.proposition_1_8. Lean explicitly assumes N >= 2 for beta > 0; the manuscript does not explicitly impose this restriction. Finite and infinite equal-length words are separated in Challenge. The examples below have their own prose entries."
+    note: "Library form AnalyticESC.IFS.proposition_1_8. Lean explicitly assumes N >= 2 for beta > 0; the manuscript does not explicitly impose this restriction. Finite and infinite equal-length words are separated in Challenge. The examples below have their own prose entries. The derivative and 1-c_max quotients require explicit nonzero proofs, both derivable from InClass."
 
   - source: "prose:polynomial-example"
     kind: "prose"
@@ -96,7 +96,7 @@ entries:
     lean: ["Challenge.audit_example_sesc", "Challenge.audit_example_dim"]
     relation: "split"
     headline: true
-    note: "The polynomial example uses epsilon = 1/100, c_max < 1/5, beta <= 1 and separation 1/2 at zero. Assuming Rapaport's results, the dimension proof uses Theorem 1.6 and the coarser bound 3 c_max < 1 instead of the displayed sum 7/16."
+    note: "The polynomial example uses epsilon = 1/100, c_max < 1/5, beta <= 1 and separation 1/2 at zero. Assuming Rapaport's results, the dimension proof uses Theorem 1.6 and the coarser bound 3 c_max < 1 instead of the displayed sum 7/16. The pressure sequence starts at n+1; the local-dimension quotient uses scales in (0,1) and a nonzero Lyapunov proof."
 
   - source: "prose:natural-measure-example"
     kind: "prose"
@@ -108,7 +108,7 @@ entries:
     lean: ["Challenge.audit_example_localDim", "Challenge.audit_example_lq"]
     relation: "split"
     headline: true
-    note: "The natural measure is the projection of a probability Gibbs measure for s(Phi) log|f'|, assuming BowenGibbsStatement. Lean computes local dimension s(Phi)-1/3 at zero and the Lq upper bound q(s(Phi)-1/3)/(q-1), strictly below s(Phi) for q > 3s(Phi). The needed special case of Shmerkin's ball-mass estimate and the Lq summability bounds are proved internally."
+    note: "The natural measure is the projection of a probability Gibbs measure for s(Phi) log|f'|, assuming BowenGibbsStatement. Lean computes local dimension s(Phi)-1/3 at zero and the Lq upper bound q(s(Phi)-1/3)/(q-1), strictly below s(Phi) for q > 3s(Phi). The needed special case of Shmerkin's ball-mass estimate and the Lq summability bounds are proved internally. The logarithmic ratios use scales in (0,1), and each Lq quotient requires a proof that q-1 is nonzero. The restricted limits and liminf are proved equivalent to the original ones."
 
   - source: "prose:non-polynomial-example"
     kind: "prose"
@@ -156,7 +156,7 @@ entries:
     lean: ["Challenge.audit_conj_similarity", "Challenge.audit_conj_iff", "Challenge.audit_subconj_iff"]
     relation: "split"
     headline: true
-    note: "Library forms AnalyticESC.IFS.theorem_1_12_similarity and AnalyticESC.IFS.theorem_1_12. The first claim linearises each chosen map. Part (a) uses the non-singleton attractor; part (b) also handles a common fixed point by commutation and does not need that hypothesis."
+    note: "Library forms AnalyticESC.IFS.theorem_1_12_similarity and AnalyticESC.IFS.theorem_1_12. The first claim linearises each chosen map. Part (a) uses the non-singleton attractor; part (b) also handles a common fixed point by commutation and does not need that hypothesis. Challenge requires the derivative guard for the dual projections; Solution derives it from InClass."
 
   - source: "unlabelled:remark-constant-periodic"
     kind: "remark"

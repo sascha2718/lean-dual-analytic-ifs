@@ -32,6 +32,19 @@ namespace AnalyticESC
 
 open Set Metric Filter Topology MeasureTheory
 
+/-- Division with a proof that the denominator is nonzero. -/
+noncomputable def divide (a b : ℝ) (_hb : b ≠ 0) : ℝ := a / b
+
+/-- The scales `0 < r < 1`, on which `log r` is nonzero. -/
+abbrev Scale := {r : ℝ // 0 < r ∧ r < 1}
+
+/-- Scales tending to zero from above. -/
+def scaleZero : Filter Scale := comap Subtype.val (𝓝[>] (0 : ℝ))
+
+/-- The logarithmic ratio at a scale in `(0,1)`. -/
+noncomputable def logRatio (a : ℝ) (r : Scale) : ℝ :=
+  divide (Real.log a) (Real.log r) (Real.log_neg r.2.1 r.2.2).ne
+
 /-! ### Rapaport's setting: real analytic IFSs on `I` -/
 
 /-- `φ_u = φ_{u₁} ∘ ⋯ ∘ φ_{uₙ}` for real maps and a finite word `u`, with `φ_∅ = id`. -/
@@ -61,9 +74,10 @@ def RapaportMeasureStatement : Prop :=
     ∀ p : Fin N → ℝ, (∀ i, 0 < p i) → ∑ i, p i = 1 →
     ∀ μ : Measure ℝ, IsProbabilityMeasure μ → μ Iᶜ = 0 →
       μ = ∑ i, ENNReal.ofReal (p i) • μ.map (φ i) →
-      ∀ᵐ x ∂μ, Tendsto (fun δ => Real.log (μ.real (closedBall x δ)) / Real.log δ) (𝓝[>] 0)
-        (𝓝 (min 1 ((-∑ i, p i * Real.log (p i)) /
-          (-∑ i, p i * ∫ y, Real.log |deriv (φ i) y| ∂μ))))
+      ∀ hχ : (-∑ i, p i * ∫ y, Real.log |deriv (φ i) y| ∂μ) ≠ 0,
+      ∀ᵐ x ∂μ, Tendsto (fun r : Scale => logRatio (μ.real (closedBall x r)) r) scaleZero
+        (𝓝 (min 1 (divide (-∑ i, p i * Real.log (p i))
+          (-∑ i, p i * ∫ y, Real.log |deriv (φ i) y| ∂μ) hχ)))
 
 /-- Rapaport's Corollary 1.3: the attractor `K`, the nonempty compact set `K ⊆ I` with
 `K = ⋃_i φ_i(K)`, has Hausdorff dimension `min{1, s(Φ)}`, where `s(Φ)` is the zero of the pressure
@@ -71,8 +85,9 @@ def RapaportMeasureStatement : Prop :=
 def RapaportSetStatement : Prop :=
   ∀ {N : ℕ} (φ : Fin N → ℝ → ℝ), RapaportHyp φ →
     ∀ K : Set ℝ, K.Nonempty → IsCompact K → K ⊆ I → K = ⋃ i, φ i '' K →
-    ∀ s : ℝ, Tendsto (fun n : ℕ => Real.log (∑ u : Fin n → Fin N,
-        (⨆ x : I, |deriv (realComp φ (List.ofFn u)) x|) ^ s) / n) atTop (𝓝 0) →
+    ∀ s : ℝ, Tendsto (fun n : ℕ => divide (Real.log (∑ u : Fin (n + 1) → Fin N,
+        (⨆ x : I, |deriv (realComp φ (List.ofFn u)) x|) ^ s)) ((n + 1 : ℕ) : ℝ)
+        (Nat.cast_ne_zero.mpr (Nat.succ_ne_zero n))) atTop (𝓝 0) →
       dimH K = ENNReal.ofReal (min 1 s)
 
 /-! ### Gibbs measures -/
@@ -138,5 +153,28 @@ noncomputable def potential (s : ℝ) (ω : ℕ → Fin N) : ℝ :=
   s * Real.log ‖deriv (Φ.f (ω 0)) (Φ.natProj fun i => ω (i + 1))‖
 
 end IFS
+
+/-- Restricting to scales in `(0,1)` does not change the filter at zero from above. -/
+theorem scaleZero_map : map (fun r : Scale => (r : ℝ)) scaleZero = 𝓝[>] (0 : ℝ) := by
+  apply map_comap_of_mem
+  filter_upwards [Ioo_mem_nhdsGT (show (0 : ℝ) < 1 from zero_lt_one)] with r hr
+  exact ⟨⟨r, hr⟩, rfl⟩
+
+theorem scale_tendsto_iff (g : ℝ → ℝ) (l : Filter ℝ) :
+    Tendsto (fun r : Scale => g r) scaleZero l ↔ Tendsto g (𝓝[>] 0) l := by
+  rw [← scaleZero_map, tendsto_map'_iff]
+  rfl
+
+theorem scale_liminf (g : ℝ → ℝ) :
+    liminf (fun r : Scale => g r) scaleZero = liminf g (𝓝[>] 0) := by
+  rw [← scaleZero_map]
+  rfl
+
+theorem positive_length_tendsto_iff (g : ℕ → ℝ) :
+    Tendsto (fun n : ℕ => divide (g (n + 1)) ((n + 1 : ℕ) : ℝ)
+      (Nat.cast_ne_zero.mpr (Nat.succ_ne_zero n))) atTop (𝓝 0) ↔
+    Tendsto (fun n : ℕ => g n / n) atTop (𝓝 0) := by
+  simpa only [divide] using
+    (tendsto_add_atTop_iff_nat (f := fun n : ℕ => g n / (n : ℝ)) (l := 𝓝 0) 1)
 
 end AnalyticESC

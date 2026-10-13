@@ -123,7 +123,11 @@ fidelity:
   divergences: >-
     Maps are holomorphic extensions; derivatives at real points are complex derivatives
     agreeing with the real ones. Challenge separates finite and infinite words, represented
-    together internally. Open and dense subsets are relative to the union over admissible radii,
+    together internally. Division by a variable denominator in Challenge requires an explicit
+    nonzero proof. Derivative and 1-c_max guards are redundant consequences of InClass;
+    the library proves positivity of the Lyapunov exponent. Pressure limits start at word
+    length n+1, and local-dimension and Lq limits use scales in (0,1). The equivalence of
+    these limits with the unrestricted library formulas is proved. Open and dense subsets are relative to the union over admissible radii,
     as in Section 1.1. Proposition 1.8 has an explicit N >= 2 hypothesis in Lean, and Corollary 1.7 omits N = 1. Nonempty IFS hypotheses
     are explicit. Conjugacy is expressed by an intertwining equation for an injective analytic
     coordinate. The function space requires boundary continuity, as in the manuscript, and

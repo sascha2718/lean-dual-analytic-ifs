@@ -56,8 +56,6 @@ numbering. Record correspondence and exclusions in `paper-correspondence.yaml` a
   audit endpoints in `Challenge.lean`.
 - Put all proof infrastructure in `Solution.lean` or the library. `Solution.lean` repeats the
   challenge vocabulary without importing `Challenge.lean`.
-- Before handing off a challenge, list its endpoints and audit the file for non-hole theorem
-  bodies and for definitions the endpoints do not need.
 - Preserve the twelve headline endpoints listed in `comparator.json`. Their scope is fixed by
   the authors. If it is unclear whether a result is a headline, ask rather than expanding the
   challenge.

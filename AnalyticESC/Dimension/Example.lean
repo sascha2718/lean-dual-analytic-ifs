@@ -21,57 +21,6 @@ namespace IFS
 
 variable {N : ℕ} {ε : ℝ} (Φ : IFS N ε)
 
-/-- On `I`, the derivative of the real map `f_i` has absolute value `‖f_i'(x)‖`. -/
-private theorem exdim_abs_deriv_realMap (i : Fin N) {x : ℝ} (hx : x ∈ I) :
-    |deriv (Φ.realMap i) x| = ‖deriv (Φ.f i) x‖ := by
-  have hcl : (x : ℂ) ∈ closure (nbhd ε) := subset_closure (ofReal_mem_nbhd Φ.ε_pos hx)
-  have hd : HasDerivAt (Φ.realMap i) (deriv (Φ.f i) x).re x :=
-    hasDerivAt_re_ofReal (Φ.differentiableAt_f i hcl)
-  rw [hd.deriv]
-  exact Complex.abs_re_eq_norm.2
-    (Φ.im_deriv_f_ofReal i (nbhd_subset_two (ofReal_mem_nbhd Φ.ε_pos hx)))
-
-/-- `log c_min ≤ log |f_i'(x)| ≤ log c_max` for `x ∈ I`. -/
-private theorem exdim_log_abs_deriv_realMap_mem (hN : 0 < N) (i : Fin N) {x : ℝ} (hx : x ∈ I) :
-    Real.log Φ.cmin ≤ Real.log |deriv (Φ.realMap i) x| ∧
-      Real.log |deriv (Φ.realMap i) x| ≤ Real.log Φ.cmax := by
-  have hcl : (x : ℂ) ∈ closure (nbhd ε) := subset_closure (ofReal_mem_nbhd Φ.ε_pos hx)
-  have h1 := Φ.cmin_le_norm_deriv i hcl
-  have h2 := Φ.norm_deriv_le_cmax i hcl
-  have h0 := Φ.cmin_pos hN
-  rw [Φ.exdim_abs_deriv_realMap i hx]
-  exact ⟨Real.log_le_log h0 h1, Real.log_le_log (h0.trans_le h1) h2⟩
-
-/-- For a probability measure `μ` on `I`, `∫ log |f_i'| dμ ≤ log c_max`. -/
-private theorem exdim_integral_le (hN : 0 < N) (i : Fin N) {μ : Measure ℝ}
-    [IsProbabilityMeasure μ] (hμ : μ Iᶜ = 0) :
-    ∫ x, Real.log |deriv (Φ.realMap i) x| ∂μ ≤ Real.log Φ.cmax := by
-  have hI : ∀ᵐ x ∂μ, x ∈ I := ae_iff.2 hμ
-  have hb : ∀ᵐ x ∂μ, Real.log Φ.cmin ≤ Real.log |deriv (Φ.realMap i) x| ∧
-      Real.log |deriv (Φ.realMap i) x| ≤ Real.log Φ.cmax :=
-    hI.mono fun x hx => Φ.exdim_log_abs_deriv_realMap_mem hN i hx
-  have hm : AEStronglyMeasurable (fun x => Real.log |deriv (Φ.realMap i) x|) μ :=
-    (measurable_deriv (Φ.realMap i)).abs.log.aestronglyMeasurable
-  have hint : Integrable (fun x => Real.log |deriv (Φ.realMap i) x|) μ := by
-    refine Integrable.of_bound hm (|Real.log Φ.cmin| + |Real.log Φ.cmax|)
-      (hb.mono fun x hx => ?_)
-    rw [Real.norm_eq_abs, abs_le]
-    constructor <;> linarith [neg_abs_le (Real.log Φ.cmin), le_abs_self (Real.log Φ.cmax),
-      abs_nonneg (Real.log Φ.cmin), abs_nonneg (Real.log Φ.cmax)]
-  calc ∫ x, Real.log |deriv (Φ.realMap i) x| ∂μ ≤ ∫ _x, Real.log Φ.cmax ∂μ :=
-        integral_mono_ae hint (integrable_const _) (hb.mono fun x hx => hx.2)
-    _ = Real.log Φ.cmax := by simp
-
-/-- The Lyapunov exponent of a self-conformal measure satisfies `χ ≥ -log c_max`. -/
-private theorem exdim_neg_log_cmax_le_lyapunov (hN : 0 < N) {p : Fin N → ℝ} (hp : IsProbVec p)
-    {μ : Measure ℝ} (hμ : Φ.IsSelfConformal p μ) : -Real.log Φ.cmax ≤ Φ.lyapunov p μ := by
-  obtain ⟨hμ1, hμ2, -⟩ := hμ
-  rw [lyapunov, neg_le_neg_iff]
-  calc ∑ i, p i * ∫ x, Real.log |deriv (Φ.realMap i) x| ∂μ ≤ ∑ i, p i * Real.log Φ.cmax :=
-        Finset.sum_le_sum fun i _ =>
-          mul_le_mul_of_nonneg_left (Φ.exdim_integral_le hN i hμ2) (hp.1 i).le
-    _ = Real.log Φ.cmax := by rw [← Finset.sum_mul, hp.2, one_mul]
-
 /-- If `N c_max < 1`, then `H(p) < -log c_max` for every positive probability vector `p`: by
 `log x ≤ x - 1`, `∑ p_i log (c_max / p_i) ≤ N c_max - 1 < 0`. -/
 private theorem exdim_entropy_lt (hN : 0 < N) (hc : N * Φ.cmax < 1) {p : Fin N → ℝ}
@@ -169,12 +118,12 @@ theorem example_dim (hM : RapaportMeasureStatement) (hS : RapaportSetStatement) 
   refine ⟨s, hs, hs1, by rw [hdim, min_eq_right hs1.le], fun p hp μ hμ => ?_⟩
   have hH : entropy p < exampleIFS.lyapunov p μ :=
     (exampleIFS.exdim_entropy_lt hN hc hp).trans_le
-      (exampleIFS.exdim_neg_log_cmax_le_lyapunov hN hp hμ)
+      (exampleIFS.neg_log_cmax_le_lyapunov hN hp hμ)
   have hc0 : 0 < exampleIFS.cmax :=
     (exampleIFS.cmin_pos hN).trans_le (exampleIFS.cmin_le_cmax hN)
   have hχ : 0 < exampleIFS.lyapunov p μ :=
     (neg_pos.2 (Real.log_neg hc0 exampleIFS.cmax_lt_one)).trans_le
-      (exampleIFS.exdim_neg_log_cmax_le_lyapunov hN hp hμ)
+      (exampleIFS.neg_log_cmax_le_lyapunov hN hp hμ)
   refine ⟨hH, ?_⟩
   have h := hloc p hp μ hμ
   rwa [min_eq_right ((div_lt_one hχ).2 hH).le] at h
