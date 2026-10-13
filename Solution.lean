@@ -71,7 +71,7 @@ letters, `i` the next letter and `f_{v^←} = f_{v_n} ∘ ⋯ ∘ f_{v_1}`. -/
 noncomputable def dualProjFin (f : Fin N → ℂ → ℂ) (hd : NonzeroDerivatives f)
     (w : List (Fin N)) (x : I) : ℂ :=
   ∑ n : Fin w.length,
-    nonlin (f w[n]) (comp f (w.take n).reverse x) (hd w[n] (w.take n).reverse x) *
+    nonlin (f (w.get n)) (comp f (w.take n).reverse x) (hd (w.get n) (w.take n).reverse x) *
       deriv (comp f (w.take n).reverse) x
 
 /-- The dual natural projection `H_w` of (1.4) for an infinite word `w`. -/

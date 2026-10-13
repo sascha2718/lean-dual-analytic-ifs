@@ -34,12 +34,12 @@ sources:
       - "István Kolossváry"
       - "Sascha Troscheit"
     type: "paper"
-    id: "arXiv:2509.07888"
-    location: "../analytic.tex, Sections 1 to 5; source fingerprints in paper-correspondence.yaml"
+    id: "arXiv:2509.07888v3"
+    location: "arXiv:2509.07888v3"
     relationship: "formalizes"
     note: >-
-      The reference text is ../analytic.tex. paper-correspondence.yaml identifies it by source
-      fingerprints and records statement and prose mappings, exclusions and qualifications.
+      paper-correspondence.yaml records statement
+      and prose mappings, exclusions and qualifications.
       Numbered Lean declarations and documentation follow its theorem numbering.
     author_endorsement: "participated"
   - title: "Dimension of self-conformal measures associated to an exponentially separated analytic IFS on R"
@@ -114,8 +114,7 @@ automation:
       prompting_notes: "n/a"
   spend_usd: "not tracked"
   notes: >-
-    AI tools are used in the Lean development, following the principles of the Leiden
-    Declaration on the responsible use of artificial intelligence in research. The authors
+    AI tools are used in the Lean development. The authors
     review the Challenge statements against the paper and accept responsibility for the
     formalisation.
 

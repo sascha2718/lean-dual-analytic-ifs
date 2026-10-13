@@ -1,11 +1,12 @@
 version: 2
 
-# Correspondence with analytic.tex. Numbered Lean declarations follow its theorem numbering.
+# Correspondence with arXiv:2509.07888v3 in analytic.tex.
+# Numbered Lean declarations follow its theorem numbering.
 # SHA-256 values hash TeX tokens, ignoring comments and layout whitespace. Update them only
 # after reviewing changed mathematics and its Lean coverage, including prose and proofs.
-source_version: "analytic.tex"
+source_version: "arXiv:2509.07888v3"
 manuscript_files: ["analytic.tex"]
-manuscript_sha256: {"analytic.tex": "f88cf0c413d5d429b490e65d8be3fedb2fcd11d48cd3b04803f18882f0aac53f"}
+manuscript_sha256: {"analytic.tex": "262fbdc7df62929cf88b83194481145b73c944cdcf949e577d534debdff28500"}
 
 # Every theorem-like environment, including remarks, has an entry. Unlabelled environments
 # use unique text matches; selected prose uses unique start/end anchors. The full manuscript
@@ -209,7 +210,7 @@ entries:
   - source: "unlabelled:remark-schwarzian-mobius"
     kind: "remark"
     match: "The same construction applies to conjugation"
-    sha256: "637487d97fe3524dce71452ef8470947204f7c4032c759ffa9c527852ab3d46e"
+    sha256: "985fa05c7c969578327f0c5c0dd54ae403a8abe60db264daad58eef2d788c905"
     status: "intentionally_unformalized"
     headline: false
     reason: "Remark 2.4 on the Schwarzian dual IFS and conjugacy to Möbius maps is explicitly excluded from formalisation by the authors."
