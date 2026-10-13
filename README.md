@@ -2,9 +2,8 @@
 
 Lean 4 formalisation of *On exponential separation of analytic self-conformal sets on the real line*
 by Balázs Bárány, István Kolossváry and Sascha Troscheit
-([arXiv:2509.07888](https://arxiv.org/abs/2509.07888)). The reference text is `../analytic.tex`,
-identified by the source fingerprints in [paper-correspondence.yaml](paper-correspondence.yaml).
-Theorem numbers in the Lean declarations and documentation follow this manuscript.
+([arXiv:2509.07888](https://arxiv.org/abs/2509.07888)). 
+
 
 ## Scope
 
@@ -13,13 +12,13 @@ explicit distortion criteria, conjugacy characterisations, and supporting result
 It includes both examples of Section 1.2.2 and the independence of the admissible radius for the
 dual operators, attractor, SSC, singleton property and common fixed points of dual compositions.
 
-The dimension consequences use explicit literature hypotheses. The polynomial example includes
+The dimension consequences use explicit literature hypotheses, see also below.
+The polynomial example includes
 local dimension `s(Φ) - 1/3` at zero and the bound `D_μ(q) ≤ q(s(Φ) - 1/3)/(q - 1)`.
 The non-polynomial example proves SESC with `α = 1/4`, `β = 1/2` and an admissible radius
 with `c_max < 1/5`.
 
-**Excluded:** Remark 2.4 on Schwarzian derivatives and Möbius conjugacy, by author instruction,
-and the background remark comparing smooth and analytic conjugacy. Corollary 1.7 is formalised
+**Excluded:** Corollary 1.7 is formalised
 for `N ≥ 2`, omitting its trivial `N = 1` case. Proposition 1.8 explicitly assumes `N ≥ 2` in Lean.
 Maps are represented by holomorphic extensions; proof constants may be larger than those displayed.
 The correspondence manifest records the remaining representation and proof differences.
@@ -32,13 +31,7 @@ repeats that vocabulary and proves the statements from [AnalyticESC](AnalyticESC
 The library and solution have no proof holes. The non-polynomial example and radius-independence
 results are proved in the library and are outside the twelve Challenge endpoints.
 
-Every quotient with a variable denominator in the challenge requires a nonzero proof.
-The derivative and contraction guards follow from the class hypotheses, and the library
-proves positivity of the Lyapunov exponent. Pressure limits start at length `n + 1`;
-local-dimension and `L^q` limits use `0 < r < 1`. Their equivalence with the original limits
-is proved in the solution and library. Fixed nonzero numerical denominators use ordinary division.
-
-Five headline statements have named literature hypotheses:
+Five headline statements have literature hypotheses:
 
 - `BowenGibbsStatement`: Bowen, *Equilibrium states and the ergodic theory of Anosov
   diffeomorphisms*, LNM 470 (1975), [Theorem 1.4](https://doi.org/10.1007/BFb0081279),
@@ -48,15 +41,12 @@ Five headline statements have named literature hypotheses:
   [*Dimension theory of iterated function systems*](https://doi.org/10.1002/cpa.20276), Theorem 2.8.
 - `RapaportSetStatement`: Rapaport, the same paper, Corollary 1.3.
 
-These are hypotheses, not axioms. [comparator.json](comparator.json) selects the twelve endpoints
-and permits only `propext`, `Classical.choice` and `Quot.sound`.
+The file [comparator.json](comparator.json) lists the twelve endpoints in the Challenge file
+and permits only the standard `propext`, `Classical.choice` and `Quot.sound` axioms.
 
-[paper-correspondence.yaml](paper-correspondence.yaml) maps statements, remarks and selected prose
-to Lean or an explicit exclusion. Fingerprints detect changes even when labels and counts stay
-fixed; a manuscript fingerprint also flags additions outside mapped passages. Update fingerprints
-only after reviewing the changed mathematics and its coverage. These checks detect source drift;
-they do not establish mathematical equivalence. [formalization.yaml](formalization.yaml) records
-scope, qualifications, literature sources, authorship and AI assistance.
+The file [paper-correspondence.yaml](paper-correspondence.yaml) maps statements, remarks and selected prose
+to Lean or an explicit exclusion. In [formalization.yaml](formalization.yaml) the
+scope, qualifications, literature sources, authorship and AI assistance are recorded.
 
 ## Build and verification
 
