@@ -157,7 +157,7 @@ entries:
     lean: ["Challenge.audit_conj_similarity", "Challenge.audit_conj_iff", "Challenge.audit_subconj_iff"]
     relation: "split"
     headline: true
-    note: "Library forms AnalyticESC.IFS.theorem_1_12_similarity and AnalyticESC.IFS.theorem_1_12. The first claim linearises each chosen map. Part (a) uses the non-singleton attractor; part (b) also handles a common fixed point by commutation and does not need that hypothesis. Challenge requires the derivative guard for the dual projections; Solution derives it from InClass."
+    note: "Library forms AnalyticESC.IFS.theorem_1_12_similarity and AnalyticESC.IFS.theorem_1_12. The first claim linearises each chosen map. Both parts (a) and (b) assume that the attractor is not a singleton, as in v3. Challenge requires the derivative guard for the dual projections; Solution derives it from InClass."
 
   - source: "unlabelled:remark-constant-periodic"
     kind: "remark"
