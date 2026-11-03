@@ -8,6 +8,7 @@ public import AnalyticESC.Dimension.NaturalMeasure
 public import AnalyticESC.Dimension.OpenDense
 public import AnalyticESC.Dimension.Example
 public import AnalyticESC.Dimension.Lq
+public import AnalyticESC.Literature
 
 @[expose] public section
 
@@ -196,7 +197,7 @@ shift. -/
 noncomputable def potential (f : Fin N → ℂ → ℂ) (s : ℝ) (ω : ℕ → Fin N) : ℝ :=
   s * Real.log ‖deriv (f (ω 0)) (natProj f fun i => ω (i + 1))‖
 
-/-- `ν` is a Gibbs measure for the potential `φ` on `Σ = (Fin N)^ℕ` in Bowen's sense: there are
+/-- `ν` is a Gibbs measure for the potential `φ` on `Σ = (Fin N)^ℕ`: there are
 `c₁, c₂ > 0` and `P` with `c₁ ≤ ν[x₀ ⋯ x_{m-1}] / exp(-P m + ∑_{k<m} φ(σ^k x)) ≤ c₂` for every
 `x ∈ Σ` and `m ≥ 0`, where `σ` is the left shift. -/
 def IsGibbsMeasure (φ : (ℕ → Fin N) → ℝ) (ν : Measure (ℕ → Fin N)) : Prop :=
@@ -212,71 +213,6 @@ noncomputable def lqDim (μ : Measure ℝ) (q : ℝ) (hq : q - 1 ≠ 0) : ℝ :=
   divide (liminf (fun r : Scale =>
     logRatio (∑' k : ℤ, μ.real (Ico (k * (r : ℝ)) ((k + 1) * (r : ℝ))) ^ q) r)
     scaleZero) (q - 1) hq
-
-/-! ### Cited results
-
-The results that the paper cites are stated as in their sources and are explicit hypotheses of
-the theorems that use them. Rapaport's results are stated, as in his paper, for real maps `φ_i`
-of `I = [0,1]`. -/
-
-/-- `φ_u = φ_{u₁} ∘ ⋯ ∘ φ_{uₙ}` for real maps and a finite word `u`, with `φ_∅ = id`. -/
-def realComp (φ : Fin N → ℝ → ℝ) (u : List (Fin N)) : ℝ → ℝ := u.foldr (fun i g => φ i ∘ g) id
-
-/-- The hypotheses of Rapaport's Theorem 1.2 and Corollary 1.3: `φ_i(I) ⊆ I`, each `φ_i` is real
-analytic on a neighbourhood of each point of `I`, `0 < |φ_i'(x)| < 1` for `x ∈ I`, the maps have no
-common fixed point in `I`, and the system is exponentially separated: there is `c > 0` such that
-for infinitely many `n`, `sup_{x ∈ I} |φ_u(x) - φ_v(x)| ≥ c^n` for all distinct `u, v` of length
-`n`. -/
-structure RapaportHyp (φ : Fin N → ℝ → ℝ) : Prop where
-  mapsTo : ∀ i, MapsTo (φ i) I I
-  analytic : ∀ i, AnalyticOnNhd ℝ (φ i) I
-  deriv_pos : ∀ i, ∀ x ∈ I, 0 < |deriv (φ i) x|
-  deriv_lt_one : ∀ i, ∀ x ∈ I, |deriv (φ i) x| < 1
-  no_common_fixed_point : ¬ ∃ x ∈ I, ∀ i, φ i x = x
-  exp_separated : ∃ c > 0, ∃ᶠ n in atTop, ∀ u v : Fin n → Fin N, u ≠ v →
-    c ^ n ≤ ⨆ x : I, |realComp φ (List.ofFn u) x - realComp φ (List.ofFn v) x|
-
-/-- **Cited result.** R. Bowen, *Equilibrium states and the ergodic theory of Anosov
-diffeomorphisms*, Lecture Notes in Mathematics 470, Springer, 1975, Theorem 1.4, for the one-sided
-full shift on `N ≥ 1` symbols: a potential `φ` with
-`sup{|φ(x) - φ(y)| : x_i = y_i for i < k} ≤ b α^k` for all `k`, where `b > 0` and `0 < α < 1`, has a
-Gibbs measure. Bowen states the theorem for two-sided mixing subshifts of finite type; a potential
-of the coordinates `i ≥ 0` has the same variations, and the image of the two-sided Gibbs measure
-under `x ↦ (x_i)_{i ≥ 0}` has the same cylinder measures. -/
-def BowenGibbsStatement : Prop :=
-  ∀ {N : ℕ}, 0 < N → ∀ (φ : (ℕ → Fin N) → ℝ) {b α : ℝ}, 0 < b → 0 < α → α < 1 →
-    (∀ (k : ℕ) (x y : ℕ → Fin N), (∀ i < k, x i = y i) → |φ x - φ y| ≤ b * α ^ k) →
-    ∃ ν : Measure (ℕ → Fin N), IsProbabilityMeasure ν ∧ IsGibbsMeasure φ ν
-
-/-- **Cited result.** A. Rapaport, *Dimension of self-conformal measures associated to an
-exponentially separated analytic IFS on ℝ*, arXiv:2412.16753v2, Theorem 1.2, together with the exact
-dimensionality of self-conformal measures, D.-J. Feng and H. Hu, *Dimension theory of iterated
-function systems*, Comm. Pure Appl. Math. 62 (2009): under `RapaportHyp`, for a positive
-probability vector `p`, the self-conformal measure `μ = ∑_i p_i φ_i μ` on `I` satisfies
-`lim_{δ → 0} log μ(B(x,δ)) / log δ = min{1, H(p)/χ}` for `μ`-almost every `x`, where
-`H(p) = -∑ p_i log p_i` and `χ = -∑ p_i ∫ log|φ_i'| dμ`. -/
-def RapaportMeasureStatement : Prop :=
-  ∀ {N : ℕ} (φ : Fin N → ℝ → ℝ), RapaportHyp φ →
-    ∀ p : Fin N → ℝ, (∀ i, 0 < p i) → ∑ i, p i = 1 →
-    ∀ μ : Measure ℝ, IsProbabilityMeasure μ → μ Iᶜ = 0 →
-      μ = ∑ i, ENNReal.ofReal (p i) • μ.map (φ i) →
-      ∀ hχ : (-∑ i, p i * ∫ y, Real.log |deriv (φ i) y| ∂μ) ≠ 0,
-      ∀ᵐ x ∂μ, Tendsto (fun r : Scale => logRatio (μ.real (closedBall x r)) r) scaleZero
-        (𝓝 (min 1 (divide (-∑ i, p i * Real.log (p i))
-          (-∑ i, p i * ∫ y, Real.log |deriv (φ i) y| ∂μ) hχ)))
-
-/-- **Cited result.** A. Rapaport, *Dimension of self-conformal measures associated to an
-exponentially separated analytic IFS on ℝ*, arXiv:2412.16753v2, Corollary 1.3: under `RapaportHyp`,
-the attractor `K`, the nonempty compact set `K ⊆ I` with `K = ⋃_i φ_i(K)`, has Hausdorff dimension
-`min{1, s(Φ)}`, where `s(Φ)` is the zero of the pressure
-`P(t) = lim_n (1/n) log ∑_{u ∈ Σ_n} (sup_{x ∈ I} |φ_u'(x)|)^t`. -/
-def RapaportSetStatement : Prop :=
-  ∀ {N : ℕ} (φ : Fin N → ℝ → ℝ), RapaportHyp φ →
-    ∀ K : Set ℝ, K.Nonempty → IsCompact K → K ⊆ I → K = ⋃ i, φ i '' K →
-    ∀ s : ℝ, Tendsto (fun n : ℕ => divide (Real.log (∑ u : Fin (n + 1) → Fin N,
-        (⨆ x : I, |deriv (realComp φ (List.ofFn u)) x|) ^ s)) ((n + 1 : ℕ) : ℝ)
-        (Nat.cast_ne_zero.mpr (Nat.succ_ne_zero n))) atTop (𝓝 0) →
-      dimH K = ENNReal.ofReal (min 1 s)
 
 end Dimension
 
@@ -502,43 +438,25 @@ theorem dimEquality_iff_lib {ε : ℝ} (Φ : AnalyticESC.IFS N ε) (hN : 0 < N) 
   filter_upwards [hm p hp μ hμ hχ] with x hx
   exact (logRatio_tendsto_iff _ _).mp hx
 
-/-- `BowenGibbsStatement` in the form used by the library. -/
-theorem bowenGibbs_lib (hB : BowenGibbsStatement) : AnalyticESC.BowenGibbsStatement := by
-  intro N hN φ b α hb hα₀ hα₁ hφ
-  exact hB hN φ hb hα₀ hα₁ hφ
-
-/-- `RapaportMeasureStatement` in the form used by the library. -/
-theorem rapaportMeasure_lib (hM : RapaportMeasureStatement) :
-    AnalyticESC.RapaportMeasureStatement := by
-  intro N φ hφ p hp hp1 μ hμ hμI hμφ
-  exact hM φ ⟨hφ.1, hφ.2, hφ.3, hφ.4, hφ.5, hφ.6⟩ p hp hp1 μ hμ hμI hμφ
-
-/-- `RapaportSetStatement` in the form used by the library. -/
-theorem rapaportSet_lib (hS : RapaportSetStatement) : AnalyticESC.RapaportSetStatement := by
-  intro N φ hφ K hK hKc hKI hKφ s hs
-  exact hS φ ⟨hφ.1, hφ.2, hφ.3, hφ.4, hφ.5, hφ.6⟩ K hK hKc hKI hKφ s hs
-
-/-- Theorem 1.6 (Rapaport), from Rapaport's Theorem 1.2 and Corollary 1.3. Let
-`Φ = (f_i)_{i ∈ Fin N}`, `N ≥ 1`, be an analytic IFS in `𝔖_N` whose attractor is not a singleton.
-If `Φ` satisfies the ESC, then there is equality in (1.6). -/
-theorem audit_dim_of_esc (hM : RapaportMeasureStatement) (hS : RapaportSetStatement) {ε : ℝ}
-    (hε : 0 < ε) (f : Fin N → ℂ → ℂ) (hf : ∀ i, InClass ε (f i))
+/-- Theorem 1.6. Let `Φ = (f_i)_{i ∈ Fin N}`, `N ≥ 1`, be an analytic IFS in `𝔖_N` whose attractor is
+not a singleton. If `Φ` satisfies the ESC, then there is equality in (1.6). -/
+theorem audit_dim_of_esc {ε : ℝ} (hε : 0 < ε) (f : Fin N → ℂ → ℂ) (hf : ∀ i, InClass ε (f i))
     (hN : 0 < N) (hnd : ¬ ∃ x, attractor f = {x}) (hesc : ESC f) : DimEquality f := by
   exact dimEquality_of_lib (toIFS hε f hf)
-    ((toIFS hε f hf).theorem_1_6 (rapaportMeasure_lib hM) (rapaportSet_lib hS) hN hnd hesc)
+    ((toIFS hε f hf).theorem_1_6 AnalyticESC.Literature.rapaportMeasureStatement
+      AnalyticESC.Literature.rapaportSetStatement hN hnd hesc)
 
-/-- Corollary 1.7, from Rapaport's Theorem 1.2 and Corollary 1.3. For `N ≥ 2`, the IFSs in `𝔖_N`
-with equality in (1.6) contain a subset `U` of `𝔖_N` that is open and dense in `𝔖_N` for the `𝒞²`
-metric `d₂`. Corollary 1.7 is stated for every `N`; its `N = 1` case is omitted here. -/
-theorem audit_dim_open_dense (hM : RapaportMeasureStatement) (hS : RapaportSetStatement)
-    (hN : 2 ≤ N) :
+/-- Corollary 1.7. For `N ≥ 2`, the IFSs in `𝔖_N` with equality in (1.6) contain a subset `U` of
+`𝔖_N` that is open and dense in `𝔖_N` for the `𝒞²` metric `d₂`. The `N = 1` case is omitted. -/
+theorem audit_dim_open_dense (hN : 2 ≤ N) :
     ∃ U : Set (Fin N → ℂ → ℂ), (∀ f ∈ U, InUnionClass f ∧ DimEquality f) ∧
       (∀ f ∈ U, ∃ r > 0, ∀ g, InUnionClass g → d2 f g < r → g ∈ U) ∧
       (∀ f, InUnionClass f → ∀ r > 0, ∃ g ∈ U, d2 f g < r) := by
   have hlib : ∀ f : Fin N → ℂ → ℂ, InUnionClass f → AnalyticESC.InUnionClass f :=
     fun f ⟨ε, hε, hf⟩ => ⟨ε, hε, fun i => inClass_iff_lib.mp (hf i)⟩
   obtain ⟨U, hE, hO, hD⟩ :=
-    AnalyticESC.corollary_1_7 (rapaportMeasure_lib hM) (rapaportSet_lib hS) hN
+    AnalyticESC.corollary_1_7 AnalyticESC.Literature.rapaportMeasureStatement
+      AnalyticESC.Literature.rapaportSetStatement hN
   refine ⟨U, fun f hf => ?_, fun f hf => ?_, fun f hf r hr => hD f (hlib f hf) r hr⟩
   · obtain ⟨ε, ⟨g, hε, hg⟩, rfl, hDE⟩ := hE f hf
     exact ⟨⟨ε, hε, fun i => inClass_iff_lib.mpr (hg i)⟩,
@@ -546,10 +464,10 @@ theorem audit_dim_open_dense (hM : RapaportMeasureStatement) (hS : RapaportSetSt
   · obtain ⟨r, hr, h⟩ := hO f hf
     exact ⟨r, hr, fun g hg hd => h g (hlib g hg) hd⟩
 
-/-- The polynomial example of Section 1.2.2, from Rapaport's Theorem 1.2 and Corollary 1.3:
-`dim_H Λ = s(Φ) < 1`, where `s(Φ)` is the unique zero of the pressure, and `dim μ_p = H(p)/χ < 1` at
-`μ_p`-almost every point, for every positive probability vector `p`, by Theorem 1.6. -/
-theorem audit_example_dim (hM : RapaportMeasureStatement) (hS : RapaportSetStatement) :
+/-- The polynomial example of Section 1.2.2: `dim_H Λ = s(Φ) < 1`, where `s(Φ)` is the unique zero
+of the pressure, and `dim μ_p = H(p)/χ < 1` at `μ_p`-almost every point, for every positive
+probability vector `p`. -/
+theorem audit_example_dim :
     ∃ s : ℝ,
       (∀ t, Tendsto (pressureRatio exampleMaps t) atTop (𝓝 0) ↔
         t = s) ∧
@@ -560,7 +478,8 @@ theorem audit_example_dim (hM : RapaportMeasureStatement) (hS : RapaportSetState
         ∀ᵐ x ∂μ, Tendsto (fun r : Scale => logRatio (μ.real (closedBall x r)) r) scaleZero
           (𝓝 (divide (entropy p) (lyapunov exampleMaps p μ) hχ)) := by
   obtain ⟨s, hs, hs1, hset, hm⟩ :=
-    AnalyticESC.example_dim (rapaportMeasure_lib hM) (rapaportSet_lib hS)
+    AnalyticESC.example_dim AnalyticESC.Literature.rapaportMeasureStatement
+      AnalyticESC.Literature.rapaportSetStatement
   refine ⟨s, fun t => (pressureRatio_tendsto_iff exampleMaps t).trans (hs t), hs1, hset, ?_⟩
   intro p hp μ hμ hχ
   obtain ⟨hent, hlocal⟩ := hm p hp μ hμ
@@ -568,11 +487,10 @@ theorem audit_example_dim (hM : RapaportMeasureStatement) (hS : RapaportSetState
   filter_upwards [hlocal] with x hx
   exact (logRatio_tendsto_iff _ _).mpr hx
 
-/-- The natural measure of the polynomial example in Section 1.2.2, from Bowen's theorem:
-the pressure has a unique zero `s = s(Φ)`, the potential `s log|f'_{ω₀}(π(σω))|` has a Gibbs measure,
-and for every such Gibbs measure `ν` the natural measure `μ = ν ∘ π⁻¹` has local dimension `s(Φ) - 1/3 < s(Φ)`
-at `0`. -/
-theorem audit_example_localDim (hB : BowenGibbsStatement) :
+/-- The natural measure of the polynomial example in Section 1.2.2: the pressure has a unique zero
+`s = s(Φ)`, the potential `s log|f'_{ω₀}(π(σω))|` has a Gibbs measure, and for every such Gibbs
+measure `ν` the natural measure `μ = ν ∘ π⁻¹` has local dimension `s(Φ) - 1/3 < s(Φ)` at `0`. -/
+theorem audit_example_localDim :
     ∃ s : ℝ,
       (∀ t, Tendsto (pressureRatio exampleMaps t) atTop (𝓝 0) ↔
         t = s) ∧
@@ -582,15 +500,15 @@ theorem audit_example_localDim (hB : BowenGibbsStatement) :
         IsGibbsMeasure (potential exampleMaps s) ν →
         Tendsto (fun r : Scale => logRatio ((ν.map (natProj exampleMaps)).real (closedBall 0 r)) r)
           scaleZero (𝓝 (s - 1 / 3)) := by
-  obtain ⟨s, hs, hG, hm⟩ := AnalyticESC.example_localDim_of_bowen (bowenGibbs_lib hB)
+  obtain ⟨s, hs, hG, hm⟩ := AnalyticESC.example_localDim_of_bowen AnalyticESC.Literature.bowenGibbsStatement
   refine ⟨s, fun t => (pressureRatio_tendsto_iff exampleMaps t).trans (hs t), hG, ?_⟩
   intro ν hν hGν
   exact (logRatio_tendsto_iff _ _).mpr (hm ν hν hGν)
 
-/-- `L^q` dimensions of the polynomial example in Section 1.2.2, from Bowen's theorem:
-for every Gibbs measure `ν` of the potential `s(Φ) log|f'_{ω₀}(π(σω))|` and every `q > 1`,
-the natural measure `μ = ν ∘ π⁻¹` has `D_μ(q) ≤ q (s(Φ) - 1/3) / (q - 1)`, which is smaller than `s(Φ)` for `q > 3 s(Φ)`. -/
-theorem audit_example_lq (hB : BowenGibbsStatement) :
+/-- `L^q` dimensions of the polynomial example in Section 1.2.2: for every Gibbs measure `ν` of the
+potential `s(Φ) log|f'_{ω₀}(π(σω))|` and every `q > 1`, the natural measure `μ = ν ∘ π⁻¹` has
+`D_μ(q) ≤ q (s(Φ) - 1/3) / (q - 1)`, which is smaller than `s(Φ)` for `q > 3 s(Φ)`. -/
+theorem audit_example_lq :
     ∃ s : ℝ,
       (∀ t, Tendsto (pressureRatio exampleMaps t) atTop (𝓝 0) ↔
         t = s) ∧
@@ -598,7 +516,7 @@ theorem audit_example_lq (hB : BowenGibbsStatement) :
         IsGibbsMeasure (potential exampleMaps s) ν → ∀ q > 1, ∀ hq : q - 1 ≠ 0,
         lqDim (ν.map (natProj exampleMaps)) q hq ≤ divide q (q - 1) hq * (s - 1 / 3) ∧
         (3 * s < q → lqDim (ν.map (natProj exampleMaps)) q hq < s) := by
-  obtain ⟨s, hs, hq⟩ := AnalyticESC.example_lq_of_bowen (bowenGibbs_lib hB)
+  obtain ⟨s, hs, hq⟩ := AnalyticESC.example_lq_of_bowen AnalyticESC.Literature.bowenGibbsStatement
   refine ⟨s, fun t => (pressureRatio_tendsto_iff exampleMaps t).trans (hs t), ?_⟩
   intro ν hν hG q hq1 hq0
   simp only [lqDim_eq_lib, divide]

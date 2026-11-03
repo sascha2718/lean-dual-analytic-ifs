@@ -31,10 +31,13 @@ numbering. Record correspondence and exclusions in `paper-correspondence.yaml` a
 - The library is `AnalyticESC`, rooted at `AnalyticESC.lean`, which imports every finished
   module. Modules imported by the root, and `Solution`, must be free of `sorry`. Unfinished work
   stays in modules outside the root's imports.
-- Only `propext`, `Classical.choice` and `Quot.sound` are permitted. Introducing a literature
-  axiom requires the authors' explicit decision. The agreed literature inputs are the named
-  hypotheses `BowenGibbsStatement`, `RapaportMeasureStatement` and `RapaportSetStatement`,
-  repeated in Challenge, Solution and `Dimension/Defs.lean`.
+- Only `propext`, `Classical.choice` and `Quot.sound` are permitted; the con-ron kernel, which
+  the CI audit and Palomar run, rejects every other axiom. The cited results of Bowen and
+  Rapaport are stated in `Dimension/Defs.lean` and proved in `Literature.lean`.
+- `AnalyticESC/Literature/` holds modules copied from the library `FractalGeometry` and from the
+  Kittle–Kogler library `ExactOverlaps` (BSD Zero Clause License). They keep the namespaces of
+  their origin. Change them only with the owner's agreement, and record every change in the module
+  docstring.
 - Where the Lean proof departs from the paper's proof or statement, record it in the
   manifest note and in `formalization.yaml` under `fidelity.divergences`.
 
@@ -42,16 +45,8 @@ numbering. Record correspondence and exclusions in `paper-correspondence.yaml` a
 
 - Treat `Challenge.lean` as the human-facing problem statement, never as a proof-audit ledger or
   development log.
-- Put only the minimal definitions required to state the headline results in `Challenge.lean`,
-  any explicitly agreed and precisely stated literature results used as permitted axioms, and the
-  headline declarations with `sorry`.
-- Every permitted literature axiom must be conspicuously named and cited, identically declared in
-  Challenge and Solution, and individually whitelisted in `comparator.json`.
-- Prefer named hypotheses to literature axioms: the con-ron kernel, which the CI audit and
-  Palomar run, rejects every non-standard axiom. A cited result the authors agree to assume is a
-  named, cited `Prop` in Challenge and Solution, stated as in its source, and an explicit
-  hypothesis of the endpoints that use it. These endpoints are the only permitted conditional
-  statements in `Challenge.lean`.
+- Put only the minimal definitions required to state the headline results and the headline
+  declarations with `sorry` in `Challenge.lean`. Cited results belong in the library.
 - Never put proof bodies, proved helper lemmas, internal reductions, conditional variants or
   audit endpoints in `Challenge.lean`.
 - Put all proof infrastructure in `Solution.lean` or the library. `Solution.lean` repeats the

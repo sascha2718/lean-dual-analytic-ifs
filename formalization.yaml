@@ -13,8 +13,8 @@ project:
     on the real line. Strong exponential separation holds on an open and dense subset in
     the C2 topology and follows from an explicit criterion involving dual projections.
     The development characterises conjugacy to self-similar systems and proves dimension
-    consequences conditional on cited results of Rapaport and Bowen, including a drop in
-    the L^q dimensions of the natural measure of a concrete three-map example.
+    consequences, including a drop in the L^q dimensions of the natural measure of a concrete
+    three-map example, together with the cited results of Rapaport and Bowen.
   authors:
     - "Balázs Bárány"
     - "István Kolossváry"
@@ -49,25 +49,44 @@ sources:
     id: "arXiv:2412.16753v2"
     location: "arXiv:2412.16753v2, 10 January 2025, Theorem 1.2 and Corollary 1.3"
     relationship: "background"
-    note: "These results are explicit named hypotheses of the dimension endpoints; their proofs are not formalised."
+    note: "Stated as RapaportMeasureStatement and RapaportSetStatement in Dimension/Defs.lean and proved in AnalyticESC/Literature (Rapaport/Analytic and Rapaport/Attractor)."
   - title: "Equilibrium states and the ergodic theory of Anosov diffeomorphisms"
     authors: ["Rufus Bowen"]
     type: "book"
     location: "Lecture Notes in Mathematics 470, Springer, 1975, Theorem 1.4"
     relationship: "background"
-    note: "Gibbs-measure existence for the one-sided full shift is an explicit named hypothesis."
+    note: "Gibbs-measure existence for the one-sided full shift is BowenGibbsStatement, proved in AnalyticESC/Literature/Bowen."
   - title: "Dimension theory of iterated function systems"
     authors: ["De-Jun Feng", "Huyi Hu"]
     type: "paper"
     location: "Comm. Pure Appl. Math. 62 (2009), no. 11, 1435–1500, Theorem 2.8"
     relationship: "background"
-    note: "Exact dimensionality is included in RapaportMeasureStatement; its proof is not formalised."
+    note: "Exact dimensionality is included in RapaportMeasureStatement and proved in AnalyticESC/Literature/SelfConformal/FengHu."
+  - title: "On self-similar sets with overlaps and inverse theorems for entropy"
+    authors: ["Michael Hochman"]
+    type: "paper"
+    location: "Ann. of Math. 180 (2014), no. 2, 773–822, Theorem 2.8"
+    relationship: "background"
+    note: "Entropy growth under convolution, proved in AnalyticESC/Literature/Hochman in the form of Bárány, Hochman and Rapaport."
+  - title: "Hausdorff dimension of planar self-affine sets and measures"
+    authors: ["Balázs Bárány", "Michael Hochman", "Ariel Rapaport"]
+    type: "paper"
+    location: "Invent. Math. 216 (2019), no. 3, 601–659, Section 4.1"
+    relationship: "background"
+    note: "The form of Hochman's entropy growth theorem that is proved in AnalyticESC/Literature/Hochman."
+  - title: "The exact overlaps conjecture for self-similar measures on the real line"
+    authors: ["Samuel Kittle", "Constantin Kogler"]
+    type: "preprint"
+    id: "arXiv:2610.10511v1"
+    location: "arXiv:2610.10511v1"
+    relationship: "background"
+    note: "Their Lean library is copied into AnalyticESC/Literature/ExactOverlaps (BSD Zero Clause License) for the inverse theorem for entropy and the dyadic entropy toolkit."
   - title: "On Furstenberg's intersection conjecture, self-similar measures, and the L^q norms of convolutions"
     authors: ["Pablo Shmerkin"]
     type: "paper"
     location: "Ann. of Math. 189 (2019), no. 2, 319–391, Lemma 1.7; DOI 10.4007/annals.2019.189.2.1"
     relationship: "background"
-    note: "The required ball-mass estimate at 0 is proved in the library, not assumed."
+    note: "The required ball-mass estimate at 0 is proved in the library."
 
 related_formalizations: []
 
@@ -75,9 +94,8 @@ status:
   scope: >-
     Twelve comparator endpoints cover Theorems 1.4, 1.5 and 1.6, individual-map linearisation
     and parts (a) and (b) of Theorem 1.12, Corollary 1.7 for N >= 2, Proposition 1.8, and the
-    polynomial example of Section 1.2.2. Seven endpoints are unconditional and five use the
-    named literature hypotheses BowenGibbsStatement, RapaportMeasureStatement or
-    RapaportSetStatement, identically defined in Challenge, Solution and Dimension/Defs.lean.
+    polynomial example of Section 1.2.2. The cited results of Bowen, Rapaport and Feng–Hu are
+    stated in Dimension/Defs.lean and proved in AnalyticESC/Literature.
     The library also proves the non-polynomial example and independence of the admissible
     radius for the dual system, as library results outside the twelve Challenge endpoints. Supporting results and
     qualifications are mapped in paper-correspondence.yaml. Remark 2.4 on Schwarzian
@@ -94,6 +112,15 @@ automation:
       models: ["Claude Opus (Anthropic)"]
       framework: "Claude Code (Anthropic)"
       tool_setup: "Agentic planning of the formalisation and set-up of the repository framework."
+      cost:
+        wall_time: "not tracked"
+        spend_usd: "subscription-based"
+        hardware: "local machine"
+      prompting_notes: "n/a"
+    - method: "agent"
+      models: ["Claude Opus 5.5 (Anthropic)", "Claude Fable 5.1 (Anthropic)"]
+      framework: "Claude Code (Anthropic)"
+      tool_setup: "Proofs of the cited results of Bowen, Rapaport, Feng–Hu and Hochman in AnalyticESC/Literature."
       cost:
         wall_time: "not tracked"
         spend_usd: "subscription-based"
@@ -136,8 +163,10 @@ fidelity:
     cylinder valid in a neighbourhood before perturbing. The multiplicative bump proof uses
     equal widths, pads an empty Z, controls a product ratio by continuity and supplies the
     estimates left to the reader. Constants may overestimate the displayed choices.
-    Literature inputs are explicit hypotheses, not axioms: Bowen's one-sided full-shift
-    Gibbs theorem and Rapaport's results together with Feng–Hu exact dimensionality. The
+    The cited results of Bowen, Rapaport and Feng–Hu are proved in AnalyticESC/Literature, with
+    Hochman's entropy growth theorem in the form of Bárány, Hochman and Rapaport and the inverse
+    theorem for entropy of Kittle and Kogler; deviations from the cited proofs are recorded in the
+    module docstrings. The
     natural measure is the projection of any probability Gibbs measure for s(Phi) log|f'|.
     Lean expands the local-dimension and Lq calculations, proves the needed special case of
     Shmerkin's ball-mass estimate, and constructs the pressure zero via Fekete's lemma.
@@ -191,37 +220,37 @@ alignment:
       lean: "Challenge.audit_conj_iff"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Conjugation.PeriodicPoints (IFS.theorem_1_12), assuming that the attractor is not a singleton, as in Theorem 1.12 of v3."
+      note: "Proved in Solution from AnalyticESC.Conjugation.PeriodicPoints (IFS.theorem_1_12), for attractors that are not singletons."
     - source: "Theorem 1.12 (b) (sub-conjugacy to a self-similar IFS)"
       lean: "Challenge.audit_subconj_iff"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Conjugation.PeriodicPoints (IFS.theorem_1_12), assuming that the attractor is not a singleton, as in Theorem 1.12 of v3."
-    - source: "Theorem 1.6 (Rapaport: dimension under the ESC)"
+      note: "Proved in Solution from AnalyticESC.Conjugation.PeriodicPoints (IFS.theorem_1_12), for attractors that are not singletons."
+    - source: "Theorem 1.6 (dimension under the ESC)"
       lean: "Challenge.audit_dim_of_esc"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Dimension.Rapaport assuming Rapaport's Theorem 1.2 and Corollary 1.3 (RapaportMeasureStatement, RapaportSetStatement)."
+      note: "Proved in Solution from AnalyticESC.Dimension.Rapaport and AnalyticESC.Literature."
     - source: "Corollary 1.7 (open and dense set of systems without dimension drop)"
       lean: "Challenge.audit_dim_open_dense"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Dimension.OpenDense assuming Rapaport's results, for N ≥ 2; Corollary 1.7 is stated for every N, and its N = 1 case is omitted here."
+      note: "Proved in Solution from AnalyticESC.Dimension.OpenDense and AnalyticESC.Literature, for N ≥ 2; the N = 1 case is omitted."
     - source: "The polynomial example of Section 1.2.2 (dimensions of the attractor and of self-conformal measures)"
       lean: "Challenge.audit_example_dim"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Dimension.Example, assuming Rapaport's results, from Theorem 1.6 after proving s(Φ) < 1 and H(p) < χ."
+      note: "Proved in Solution from AnalyticESC.Dimension.Example and AnalyticESC.Literature, by Theorem 1.6 after proving s(Φ) < 1 and H(p) < χ."
     - source: "Section 1.2.2, polynomial example (local dimension of the natural measure at 0)"
       lean: "Challenge.audit_example_localDim"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Dimension.NaturalMeasure assuming Bowen's theorem (BowenGibbsStatement)."
+      note: "Proved in Solution from AnalyticESC.Dimension.NaturalMeasure and AnalyticESC.Literature."
     - source: "Section 1.2.2, polynomial example (L^q dimensions of the natural measure)"
       lean: "Challenge.audit_example_lq"
       module: "Challenge"
       status: "proved"
-      note: "Proved in Solution from AnalyticESC.Dimension.Lq assuming Bowen's theorem (BowenGibbsStatement). Summability and boundedness for the L^q definition remain proved in the library, outside the headline statement."
+      note: "Proved in Solution from AnalyticESC.Dimension.Lq and AnalyticESC.Literature. Summability and boundedness for the L^q definition are proved in the library, outside the headline statement."
 
 acknowledgements: >-
   Lean 4 and Mathlib (leanprover-community), the leanprover comparator, lean4export and nanoda.

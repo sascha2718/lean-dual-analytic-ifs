@@ -149,7 +149,7 @@ private theorem lq_liminf_le (μ : Measure ℝ) [IsProbabilityMeasure μ] (h0 : 
 
 /-- The ball-mass estimate in Shmerkin's Lemma 1.7, specialised to the point `0` of a
 measure supported on `[0,∞)`. At scale `r`, one grid interval covers `B(0,r/2)` up to a null
-set. This is proved here, not assumed. See P. Shmerkin, Ann. of Math. 189 (2019), 319–391,
+set. See P. Shmerkin, Ann. of Math. 189 (2019), 319–391,
 Lemma 1.7, DOI 10.4007/annals.2019.189.2.1. -/
 theorem shmerkin_ball_bound_zero (μ : Measure ℝ) [IsProbabilityMeasure μ]
     (h0 : μ (Iio 0) = 0) (hpos : ∀ r > 0, 0 < μ.real (closedBall 0 r))

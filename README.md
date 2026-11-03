@@ -12,18 +12,17 @@ explicit distortion criteria, conjugacy characterisations, and supporting result
 It includes both examples of Section 1.2.2 and the independence of the admissible radius for the
 dual operators, attractor, SSC, singleton property and common fixed points of dual compositions.
 
-The dimension consequences use explicit literature hypotheses, see also below.
-The polynomial example includes
-local dimension `s(Φ) - 1/3` at zero and the bound `D_μ(q) ≤ q(s(Φ) - 1/3)/(q - 1)`.
-The non-polynomial example proves SESC with `α = 1/4`, `β = 1/2` and an admissible radius
-with `c_max < 1/5`.
+The dimension results of Section 1.2 are proved together with the cited results of Bowen and
+Rapaport that they use. The polynomial example includes local dimension `s(Φ) - 1/3` at zero and
+the bound `D_μ(q) ≤ q(s(Φ) - 1/3)/(q - 1)`. The non-polynomial example proves SESC with
+`α = 1/4`, `β = 1/2` and an admissible radius with `c_max < 1/5`.
 
 **Excluded:** Corollary 1.7 is formalised
 for `N ≥ 2`, omitting its trivial `N = 1` case. Proposition 1.8 explicitly assumes `N ≥ 2` in Lean.
 Maps are represented by holomorphic extensions; proof constants may be larger than those displayed.
 The correspondence manifest records the remaining representation and proof differences.
 
-## Statements and literature inputs
+## Statements
 
 [Challenge.lean](Challenge.lean) contains twelve headline statements, each with an
 intentional `sorry`, and their minimal vocabulary over Mathlib. [Solution.lean](Solution.lean)
@@ -31,15 +30,15 @@ repeats that vocabulary and proves the statements from [AnalyticESC](AnalyticESC
 The library and solution have no proof holes. The non-polynomial example and radius-independence
 results are proved in the library and are outside the twelve Challenge endpoints.
 
-Five headline statements have literature hypotheses:
-
-- `BowenGibbsStatement`: Bowen, *Equilibrium states and the ergodic theory of Anosov
-  diffeomorphisms*, LNM 470 (1975), [Theorem 1.4](https://doi.org/10.1007/BFb0081279),
-  specialised to the one-sided full shift.
-- `RapaportMeasureStatement`: Rapaport, [arXiv:2412.16753v2](https://arxiv.org/abs/2412.16753v2),
-  Theorem 1.2, together with exact dimensionality from Feng–Hu,
-  [*Dimension theory of iterated function systems*](https://doi.org/10.1002/cpa.20276), Theorem 2.8.
-- `RapaportSetStatement`: Rapaport, the same paper, Corollary 1.3.
+The dimension statements use three cited results, stated in `AnalyticESC/Dimension/Defs.lean` and
+proved in [AnalyticESC/Literature.lean](AnalyticESC/Literature.lean): Bowen's existence theorem
+for Gibbs measures ([LNM 470, Theorem 1.4](https://doi.org/10.1007/BFb0081279)), Rapaport's
+Theorem 1.2 ([arXiv:2412.16753](https://arxiv.org/abs/2412.16753)) with the exact dimensionality
+of [Feng and Hu](https://doi.org/10.1002/cpa.20276), and Rapaport's Corollary 1.3. The proofs in
+`AnalyticESC/Literature/` are copied from the library `FractalGeometry` of the third author; they
+include Hochman's entropy growth theorem and use the inverse theorem for entropy of the
+Kittle–Kogler library [`ExactOverlaps`](https://github.com/ckkogler/exact-overlaps-one-dim-lean),
+copied to `AnalyticESC/Literature/ExactOverlaps`.
 
 The file [comparator.json](comparator.json) lists the twelve endpoints in the Challenge file
 and permits only the standard `propext`, `Classical.choice` and `Quot.sound` axioms.
@@ -72,4 +71,9 @@ A local build is not a Palomar acceptance verdict.
 ## Attribution and licence
 
 The paper and formalisation are developed by the same authors, with AI assistance in Lean
-development and review. The Lean sources use the [Apache License 2.0](LICENSE).
+development and review. The Lean sources use the [Apache License 2.0](LICENSE). The modules of
+`AnalyticESC/Literature/ExactOverlaps` are copied from the Kittle–Kogler library
+[`ExactOverlaps`](https://github.com/ckkogler/exact-overlaps-one-dim-lean) under the
+[BSD Zero Clause License](AnalyticESC/Literature/ExactOverlaps/LICENSE); the notice of the adapted
+`LpSelfSimilar` code is in
+[LpSelfSimilar-LICENSE](AnalyticESC/Literature/ExactOverlaps/LpSelfSimilar-LICENSE).

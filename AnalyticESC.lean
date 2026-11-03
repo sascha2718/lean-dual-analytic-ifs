@@ -44,6 +44,7 @@ public import AnalyticESC.Dimension.Rapaport
 public import AnalyticESC.Dimension.OpenDense
 public import AnalyticESC.Dimension.Example
 public import AnalyticESC.Dimension.Lq
+public import AnalyticESC.Literature
 
 /-!
 # Exponential separation of analytic self-conformal sets on the real line
@@ -105,4 +106,6 @@ fingerprints and maps manuscript statements to Lean declarations.
 * `Dimension.Example`: the dimensions of the attractor and of the self-conformal measures of the
   polynomial example of Section 1.2.2.
 * `Dimension.Lq`: the `L^q` dimensions of the natural measure of the polynomial example.
+* `Literature`: proofs of the cited results of Bowen and Rapaport stated in `Dimension.Defs`, in
+  modules copied from the library `FractalGeometry` and the Kittle–Kogler library `ExactOverlaps`.
 -/
