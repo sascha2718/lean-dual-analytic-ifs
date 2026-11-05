@@ -7,20 +7,16 @@ by Balázs Bárány, István Kolossváry and Sascha Troscheit
 
 ## Scope
 
-The library proves genericity of SESC in the relative `𝒞²` topology, the dual-projection and
-explicit distortion criteria, conjugacy characterisations, and supporting results of Sections 2–5.
-It includes both examples of Section 1.2.2 and the independence of the admissible radius for the
-dual operators, attractor, SSC, singleton property and common fixed points of dual compositions.
+The library formalises the following results for analytic iterated function systems on the real line, together with their supporting results in Sections 2–5:
 
-The dimension results of Section 1.2 are proved together with the cited results of Bowen and
-Rapaport that they use. The polynomial example includes local dimension `s(Φ) - 1/3` at zero and
-the bound `D_μ(q) ≤ q(s(Φ) - 1/3)/(q - 1)`. The non-polynomial example proves SESC with
-`α = 1/4`, `β = 1/2` and an admissible radius with `c_max < 1/5`.
+- **Generic separation (Theorem 1.4):** the strong exponential separation condition (SESC) holds on an open and dense subset of the paper’s analytic class in the relative `𝒞²` topology.
+- **Separation criteria (Theorem 1.5 and Proposition 1.8):** a sufficient condition for SESC in terms of dual projections, and an explicit criterion using derivative and distortion bounds.
+- **Dimension formulas (Theorem 1.6 and Corollary 1.7):** the dimensions of attractors and self-conformal measures under exponential separation, and an open and dense family with no dimension drop.
+- **Conjugacy (Theorem 1.12):** individual-map linearisation and characterisations of analytic conjugacy and sub-conjugacy to self-similar systems through the dual system.
 
-**Excluded:** Corollary 1.7 is formalised
-for `N ≥ 2`, omitting its trivial `N = 1` case. Proposition 1.8 explicitly assumes `N ≥ 2` in Lean.
-Maps are represented by holomorphic extensions; proof constants may be larger than those displayed.
-The correspondence manifest records the remaining representation and proof differences.
+Both examples of Section 1.2.2 are formalised. For the polynomial example, this includes the attractor and measure dimensions, the natural measure’s local dimension at zero, and the resulting drop in its `L^q` dimensions. The library also proves independence of the admissible radius for the dual construction and the properties used in the paper. The required results of Bowen, Rapaport and Feng–Hu are proved within the development.
+
+Corollary 1.7 omits the trivial `N = 1` case, and Proposition 1.8 explicitly assumes `N ≥ 2`. Remark 2.4 on Schwarzian derivatives and Möbius conjugacy, and the background comparison with smooth conjugacy, are outside scope. Maps are represented by holomorphic extensions; detailed correspondence and formulation differences are recorded in `paper-correspondence.yaml`.
 
 ## Statements
 
